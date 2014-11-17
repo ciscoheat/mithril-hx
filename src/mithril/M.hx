@@ -6,8 +6,10 @@ typedef Module = {
 	function view() : VirtualElement;
 }
 
-extern class VirtualElement
-{}
+typedef GetterSetter = Dynamic;
+
+extern class VirtualElement {}
+extern class EventHandler {}
 
 //@:native('m')
 class M
@@ -16,17 +18,27 @@ class M
 
 	public static function m(selector : String, ?attributes : Dynamic, ?children : Dynamic) : VirtualElement
 	{
-		if (attributes == null && children == null)
-			return untyped __js__("Mithril(selector)");
+		if (attributes != null && children != null)
+			return untyped __js__("Mithril(selector, attributes, children)");
 		else if(attributes != null)
 			return untyped __js__("Mithril(selector, attributes)");
 		else
-			return untyped __js__("Mithril(selector, attributes, children)");
+			return untyped __js__("Mithril(selector)");
 	}
 
 	public static function module(element : Element, module : Module) : Dynamic
 	{
 		modules.push(module);
 		return untyped __js__("Mithril.module(element, module)");
+	}
+
+	public static function prop<T>(initialValue : T) : GetterSetter
+	{
+		return untyped __js__("Mithril.prop(initialValue)");
+	}
+
+	public static function withAttr(property : String, ?callback : Dynamic) : EventHandler
+	{
+		return untyped __js__("Mithril.withAttr(property, callback)");
 	}
 }
