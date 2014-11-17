@@ -6,6 +6,9 @@ import js.Error;
 
 abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
 
+@:autoBuild(mithril.ModelBuilder.build()) interface Model
+{}
+
 @:autoBuild(mithril.ModuleBuilder.build()) interface View<T>
 {
 	function view(ctrl : T) : VirtualElement;
@@ -27,7 +30,7 @@ typedef MithrilModule<T> = {
 }
 
 typedef GetterSetter = Dynamic;
-typedef EventHandler = Dynamic
+typedef EventHandler = Dynamic;
 
 typedef VirtualElement = {
 	var tag : String;

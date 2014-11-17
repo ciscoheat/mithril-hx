@@ -4,10 +4,10 @@ import js.Browser;
 import mithril.M;
 import js.Lib;
 
-class Todo
+class Todo implements Model
 {
-	public dynamic function description(?v : String) : String return v;
-	public dynamic function done(?v : Bool) : Bool return v;
+	@prop public var description : String;
+	@prop public var done : Bool;
 
 	public function new(description) {
 		this.description = M.prop(description);
@@ -17,10 +17,10 @@ class Todo
 
 typedef TodoList = Array<Todo>;
 
-class Vm
+class ViewModel implements Model
 {
+	@prop public var description : String;
 	public var list : TodoList;
-	public dynamic function description(?v : String) : String return v;
 
 	public function new() {
 		this.list = new TodoList();
@@ -37,12 +37,12 @@ class Vm
 
 class TodoModule implements DynModule
 {
-	var todo : Vm;
+	var todo : ViewModel;
 
 	public function new() {}
 
 	public function controller() {
-		todo = new Vm();
+		todo = new ViewModel();
 	}
 
 	public function view(_) {
