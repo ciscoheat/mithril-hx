@@ -39,23 +39,9 @@ class Main implements Module
 {
 	var todo : Vm;
 
-	public function new() {
-	}
+	public function new() {}
 
-	public function controller() {
-		///// MACRO
-		if (M.modules.first() != this) {
-			M.modules.first().controller();
-			return M.modules.pop();
-		}
-		///// END MACRO
-
-		todo = new Vm();
-
-		///// MACRO
-		return this;
-		///// END MACRO
-	}
+	public function controller() todo = new Vm();
 
 	public function view() {
 		return M.m("body", [
