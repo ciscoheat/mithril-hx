@@ -35,7 +35,7 @@ class Vm
 	}
 }
 
-class Main implements Module
+class TodoModule implements Module
 {
 	var todo : Vm;
 
@@ -62,6 +62,6 @@ class Main implements Module
 
 	static function main()
 	{
-		M.module(Browser.document.body, new Main());
+		M.module(Browser.document.body, new TodoModule());
 	}
 }

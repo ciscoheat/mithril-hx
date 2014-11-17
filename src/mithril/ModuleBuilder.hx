@@ -27,14 +27,14 @@ class ModuleBuilder
 	private static function replaceM(e : Expr) {
 		switch(e) {
 			case macro m($a, $b, $c):
-				e.expr = (macro M.m($a, $b, $c)).expr;
+				e.expr = (macro mithril.M.m($a, $b, $c)).expr;
 				b.iter(replaceM);
 				c.iter(replaceM);
 			case macro m($a, $b):
-				e.expr = (macro M.m($a, $b)).expr;
+				e.expr = (macro mithril.M.m($a, $b)).expr;
 				b.iter(replaceM);
 			case macro m($a):
-				e.expr = (macro M.m($a)).expr;
+				e.expr = (macro mithril.M.m($a)).expr;
 			case _:
 				e.iter(replaceM);
 		}
@@ -44,12 +44,7 @@ class ModuleBuilder
 		if (f.expr == null) return;
 		switch(f.expr.expr) {
 			case EBlock(exprs):
-				exprs.unshift(macro {
-					if (mithril.M.modules.first() != this) {
-						mithril.M.modules.first().controller();
-						return M.modules.pop();
-					}
-				});
+				exprs.unshift(macro if(mithril.M.controllerModule != this) return mithril.M.controllerModule.controller());
 				exprs.push(macro return this);
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};

@@ -22,7 +22,7 @@
     <option directives="" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
-    <option mainClass="Main" />
+    <option mainClass="TodoModule" />
     <option enabledebug="False" />
     <option additional="" />
   </build>
@@ -33,6 +33,8 @@
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
     <compile path="src\Main.hx" />
+    <compile path="src\TodoModul.hx" />
+    <compile path="src\TodoModule.hx" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
