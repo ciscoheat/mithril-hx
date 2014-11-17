@@ -6,10 +6,19 @@ import js.Error;
 
 abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
 
-@:autoBuild(mithril.ModuleBuilder.build()) interface Module
+@:autoBuild(mithril.ModuleBuilder.build()) interface View<T>
+{
+	function view(ctrl : T) : VirtualElement;
+}
+
+@:autoBuild(mithril.ModuleBuilder.build()) interface Controller
 {
 	function controller() : Dynamic;
-	function view() : VirtualElement;
+}
+
+typedef Module<T> = {
+	function controller() : Dynamic;
+	function view(ctrl : T) : VirtualElement;
 }
 
 typedef GetterSetter = Dynamic;
@@ -48,13 +57,13 @@ class M
 	}
 
 	// Stores the current module so it can be used in module() calls (added automatically by macro).
-	public static var controllerModule : Module;
+	@:noCompletion public static var controllerModule : Controller;
 
 	public static function m(selector : String, ?attributes : Dynamic, ?children : Dynamic) : VirtualElement {
 		return untyped __js__("Mithril(selector, attributes, children)");
 	}
 
-	public static function module(element : Element, module : Module) : Dynamic {
+	public static function module<T>(element : Element, module : T) : T {
 		return untyped __js__("Mithril.module(element, module)");
 	}
 
@@ -66,7 +75,11 @@ class M
 		return untyped __js__("Mithril.withAttr(property, callback)");
 	}
 
-	public static function route(?rootElement : Either<Element, String>, ?defaultRoute : String, ?routes : Dynamic<Module>) : Void {
+	public static function route(
+		?rootElement : Either<Element, String>,
+		?defaultRoute : String,
+		?routes : Dynamic<Module<Dynamic>>) : Void
+	{
 		return untyped __js__("Mithril.route(rootElement, defaultRoute, routes)");
 	}
 
@@ -76,10 +89,10 @@ class M
 
 	public static var routeMode(get, set) : String;
 
-	public static function get_routeMode() {
+	@:noCompletion public static function get_routeMode() {
 		return untyped __js__("Mithril.route.mode");
 	}
-	public static function set_routeMode(s : String) {
+	@:noCompletion public static function set_routeMode(s : String) {
 		return untyped __js__("Mithril.route.mode = s");
 	}
 
@@ -93,10 +106,10 @@ class M
 
 	public static var deferredOnerror(get, set) : Error -> Void;
 
-	public static function get_deferredOnerror() {
+	@:noCompletion public static function get_deferredOnerror() {
 		return untyped __js__("Mithril.deferred.onerror");
 	}
-	public static function set_deferredOnerror(f : Error -> Void) {
+	@:noCompletion public static function set_deferredOnerror(f : Error -> Void) {
 		return untyped __js__("Mithril.deferred.onerror = f");
 	}
 
@@ -118,10 +131,10 @@ class M
 
 	public static var redrawStrategy(get, set) : String;
 
-	public static function get_redrawStrategy() {
+	@:noCompletion public static function get_redrawStrategy() {
 		return untyped __js__("Mithril.redraw.strategy");
 	}
-	public static function set_redrawStrategy(s : String) {
+	@:noCompletion public static function set_redrawStrategy(s : String) {
 		return untyped __js__("Mithril.redraw.strategy = s");
 	}
 

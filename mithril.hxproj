@@ -22,7 +22,7 @@
     <option directives="" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
-    <option mainClass="TodoModule" />
+    <option mainClass="ChainController" />
     <option enabledebug="False" />
     <option additional="" />
   </build>
