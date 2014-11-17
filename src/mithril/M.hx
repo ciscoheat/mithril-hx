@@ -7,21 +7,19 @@ import js.html.Event;
 
 abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
 
-@:autoBuild(mithril.ModelBuilder.build()) interface Model
-{}
+@:autoBuild(mithril.ModelBuilder.build()) interface Model {}
 
-@:autoBuild(mithril.ModuleBuilder.build()) interface View<T>
-{
+@:autoBuild(mithril.ModuleBuilder.build()) interface View<T> {
 	function view(ctrl : T) : VirtualElement;
 }
 
-@:autoBuild(mithril.ModuleBuilder.build()) interface Controller
-{
+@:autoBuild(mithril.ModuleBuilder.build()) interface Controller {
 	function controller() : Dynamic;
 }
 
 interface Module<T> extends Controller extends View<T> {}
-interface DynModule extends Controller extends View<Dynamic> {}
+interface DynView extends View<Dynamic> {}
+interface DynModule extends Controller extends DynView {}
 
 //////////
 
