@@ -1,0 +1,10 @@
+{
+  "name": "mithril",
+  "url" : "https://github.com/ciscoheat/mithril-hx",
+  "license": "MIT",
+  "tags": ["js", "mvc", "web"],
+  "description": "A Javascript Framework for Building Brilliant Applications",
+  "version": "0.1.0",
+  "releasenote": "First haxelib release.",
+  "contributors": ["ciscoheat"]
+}
