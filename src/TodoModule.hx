@@ -1,6 +1,9 @@
 package ;
 
 import js.Browser;
+import js.html.Event;
+import js.html.InputElement;
+import js.html.KeyboardEvent;
 import mithril.M;
 import js.Lib;
 
@@ -47,8 +50,16 @@ class TodoModule implements DynModule
 
 	public function view(_) {
 		return m("body", [
-			m("input", { onchange: M.withAttr("value", todo.description), value: todo.description() }),
-			m("button", { onclick: todo.add }, "Add"),
+			m("input", {
+				config: function(e : InputElement) e.focus(),
+				onchange: M.withAttr("value", todo.description),
+				value: todo.description(),
+				onkeyup: function(e : KeyboardEvent) {
+					todo.description(cast(e.target, InputElement).value);
+					if (e.keyCode == 13) todo.add();
+				}
+			}),
+			m("button", { onclick: function() todo.add() }, "Add"),
 			m("table", todo.list.map(function(task) {
 				return m("tr", [
 					m("td", [
