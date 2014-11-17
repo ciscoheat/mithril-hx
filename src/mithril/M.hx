@@ -50,41 +50,24 @@ class M
 	// Stores the current module so it can be used in module() calls (added automatically by macro).
 	public static var controllerModule : Module;
 
-	public static function m(selector : String, ?attributes : Dynamic, ?children : Dynamic) : VirtualElement
-	{
-		if (attributes != null && children != null)
-			return untyped __js__("Mithril(selector, attributes, children)");
-		else if(attributes != null)
-			return untyped __js__("Mithril(selector, attributes)");
-		else
-			return untyped __js__("Mithril(selector)");
+	public static function m(selector : String, ?attributes : Dynamic, ?children : Dynamic) : VirtualElement {
+		return untyped __js__("Mithril(selector, attributes, children)");
 	}
 
-	public static function module(element : Element, module : Module) : Dynamic
-	{
+	public static function module(element : Element, module : Module) : Dynamic {
 		return untyped __js__("Mithril.module(element, module)");
 	}
 
-	public static function prop<T>(initialValue : T) : GetterSetter
-	{
+	public static function prop<T>(initialValue : T) : GetterSetter	{
 		return untyped __js__("Mithril.prop(initialValue)");
 	}
 
-	public static function withAttr(property : String, ?callback : Dynamic) : EventHandler
-	{
+	public static function withAttr(property : String, ?callback : Dynamic) : EventHandler {
 		return untyped __js__("Mithril.withAttr(property, callback)");
 	}
 
-	public static function route(?rootElement : Either<Element, String>, ?defaultRoute : String, ?routes : Dynamic<Module>) : Void
-	{
-		if (rootElement != null && defaultRoute != null && routes != null)
-			return untyped __js__("Mithril.route(rootElement, defaultRoute, routes)");
-		else if(rootElement != null && defaultRoute != null)
-			return untyped __js__("Mithril.route(rootElement, defaultRoute)");
-		else if (rootElement != null)
-			return untyped __js__("Mithril.route(rootElement)");
-		else
-			return untyped __js__("Mithril.route()");
+	public static function route(?rootElement : Either<Element, String>, ?defaultRoute : String, ?routes : Dynamic<Module>) : Void {
+		return untyped __js__("Mithril.route(rootElement, defaultRoute, routes)");
 	}
 
 	public static function routeParam(key : String) : String {
@@ -100,34 +83,36 @@ class M
 		return untyped __js__("Mithril.route.mode = s");
 	}
 
-	public static function request<T>(options : Either<XHROptions, JSONPOptions>) : Promise<T>
-	{
+	public static function request<T>(options : Either<XHROptions, JSONPOptions>) : Promise<T> {
 		return untyped __js__("Mithril.request(options)");
 	}
 
-	public static function deferred<T>() : Deferred<T>
-	{
+	public static function deferred<T>() : Deferred<T> {
 		return untyped __js__("Mithril.deferred()");
-		// TODO: function onerror(e : Error) : Void;
 	}
 
-	public static function sync<T>(promises : Array<Promise<T>>) : Promise<T>
-	{
+	public static var deferredOnerror(get, set) : Error -> Void;
+
+	public static function get_deferredOnerror() {
+		return untyped __js__("Mithril.deferred.onerror");
+	}
+	public static function set_deferredOnerror(f : Error -> Void) {
+		return untyped __js__("Mithril.deferred.onerror = f");
+	}
+
+	public static function sync<T>(promises : Array<Promise<T>>) : Promise<T> {
 		return untyped __js__("Mithril.sync(promises)");
 	}
 
-	public static function trust(html : String) : String
-	{
+	public static function trust(html : String) : String {
 		return untyped __js__("Mithril.trust(html)");
 	}
 
-	public static function render(rootElement : Element, children : Dynamic, forceRecreation : Bool)
-	{
+	public static function render(rootElement : Element, children : Dynamic, forceRecreation : Bool) {
 		return untyped __js__("Mithril.render(rootElement, children, forceRecreation)");
 	}
 
-	public static function redraw(forceSync : Bool) : Void
-	{
+	public static function redraw(forceSync : Bool) : Void {
 		return untyped __js__("Mithril.redraw(forceSync)");
 	}
 
@@ -140,18 +125,15 @@ class M
 		return untyped __js__("Mithril.redraw.strategy = s");
 	}
 
-	public static function startComputation() : Void
-	{
+	public static function startComputation() : Void {
 		return untyped __js__("Mithril.startComputation()");
 	}
 
-	public static function endComputation() : Void
-	{
+	public static function endComputation() : Void {
 		return untyped __js__("Mithril.endComputation()");
 	}
 
-	public static function deps(window : Dynamic) : DOMWindow
-	{
+	public static function deps(window : Dynamic) : DOMWindow {
 		return untyped __js__("Mithril.deps(window)");
 	}
 }
