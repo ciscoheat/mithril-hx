@@ -16,6 +16,7 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
+    <class path="example" />
   </classpaths>
   <!-- Build options -->
   <build>
@@ -35,6 +36,7 @@
     <compile path="src\Main.hx" />
     <compile path="src\TodoModul.hx" />
     <compile path="src\TodoModule.hx" />
+    <compile path="example\DashboardModule.hx" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>

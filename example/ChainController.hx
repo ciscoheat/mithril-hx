@@ -1,4 +1,4 @@
-package ;
+package  ;
 
 import haxe.ds.IntMap;
 import haxe.Json;

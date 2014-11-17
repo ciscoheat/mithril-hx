@@ -1,4 +1,4 @@
-package ;
+package  ;
 
 import js.Browser;
 import js.html.Event;
