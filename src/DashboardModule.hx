@@ -16,7 +16,7 @@ class DashboardModule implements DynModule
 	}
 
 	public function view(_) {
-		return m("div", this.id);
+		return M("div", this.id);
 	}
 
 	public static function main() {

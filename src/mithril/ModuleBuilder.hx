@@ -26,14 +26,14 @@ class ModuleBuilder
 
 	private static function replaceM(e : Expr) {
 		switch(e) {
-			case macro m($a, $b, $c):
+			case macro M($a, $b, $c):
 				e.expr = (macro mithril.M.m($a, $b, $c)).expr;
 				b.iter(replaceM);
 				c.iter(replaceM);
-			case macro m($a, $b):
+			case macro M($a, $b):
 				e.expr = (macro mithril.M.m($a, $b)).expr;
 				b.iter(replaceM);
-			case macro m($a):
+			case macro M($a):
 				e.expr = (macro mithril.M.m($a)).expr;
 			case _:
 				e.iter(replaceM);

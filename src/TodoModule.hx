@@ -49,8 +49,8 @@ class TodoModule implements DynModule
 	}
 
 	public function view(_) {
-		return m("body", [
-			m("input", {
+		return M("body", [
+			M("input", {
 				config: function(e : InputElement) e.focus(),
 				onchange: M.withAttr("value", todo.description),
 				value: todo.description(),
@@ -59,13 +59,13 @@ class TodoModule implements DynModule
 					if (e.keyCode == 13) todo.add();
 				}
 			}),
-			m("button", { onclick: function() todo.add() }, "Add"),
-			m("table", todo.list.map(function(task) {
-				return m("tr", [
-					m("td", [
-						m("input[type=checkbox]", { onclick: M.withAttr("checked", task.done), checked: task.done() } )
+			M("button", { onclick: function() todo.add() }, "Add"),
+			M("table", todo.list.map(function(task) {
+				return M("tr", [
+					M("td", [
+						M("input[type=checkbox]", { onclick: M.withAttr("checked", task.done), checked: task.done() } )
 					]),
-					m("td", { style: { textDecoration: task.done() ? "line-through" : "none" }}, task.description())
+					M("td", { style: { textDecoration: task.done() ? "line-through" : "none" }}, task.description())
 				]);
 			}))
 		]);
