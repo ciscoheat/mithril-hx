@@ -13,16 +13,31 @@ class ModuleBuilder
 	@macro public static function build() : Array<Field>
 	{
 		var fields = Context.getBuildFields();
-		var outputFields : Array<Field> = [];
 
 		for(field in fields) switch(field.kind) {
 			case FFun(f):
-				if (field.name == "controller" && field.access.exists(function(a) return a == Access.APublic))
-					injectModule(f);
+				f.expr.iter(replaceM);
+				if (field.name == "controller") injectModule(f);
 			case _:
 		}
 
 		return fields;
+	}
+
+	private static function replaceM(e : Expr) {
+		switch(e) {
+			case macro m($a, $b, $c):
+				e.expr = (macro M.m($a, $b, $c)).expr;
+				b.iter(replaceM);
+				c.iter(replaceM);
+			case macro m($a, $b):
+				e.expr = (macro M.m($a, $b)).expr;
+				b.iter(replaceM);
+			case macro m($a):
+				e.expr = (macro M.m($a)).expr;
+			case _:
+				e.iter(replaceM);
+		}
 	}
 
 	private static function injectModule(f : Function) {

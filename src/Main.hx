@@ -41,18 +41,20 @@ class Main implements Module
 
 	public function new() {}
 
-	public function controller() todo = new Vm();
+	public function controller() {
+		todo = new Vm();
+	}
 
 	public function view() {
-		return M.m("body", [
-			M.m("input", { onchange: M.withAttr("value", todo.description), value: todo.description() }),
-			M.m("button", { onclick: todo.add }, "Add"),
-			M.m("table", todo.list.map(function(task) {
-				return M.m("tr", [
-					M.m("td", [
-						M.m("input[type=checkbox]", { onclick: M.withAttr("checked", task.done), checked: task.done() } )
+		return m("body", [
+			m("input", { onchange: M.withAttr("value", todo.description), value: todo.description() }),
+			m("button", { onclick: todo.add }, "Add"),
+			m("table", todo.list.map(function(task) {
+				return m("tr", [
+					m("td", [
+						m("input[type=checkbox]", { onclick: M.withAttr("checked", task.done), checked: task.done() } )
 					]),
-					M.m("td", { style: { textDecoration: task.done() ? "line-through" : "none" }}, task.description())
+					m("td", { style: { textDecoration: task.done() ? "line-through" : "none" }}, task.description())
 				]);
 			}))
 		]);
