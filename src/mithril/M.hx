@@ -9,11 +9,11 @@ abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
 
 @:autoBuild(mithril.macros.ModelBuilder.build()) interface Model {}
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface View<T> {
+@:autoBuild(mithril.macros.ModuleBuilder.build()) interface View<T> extends Model {
 	function view(ctrl : T) : VirtualElement;
 }
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller {
+@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller extends Model {
 	function controller() : Dynamic;
 }
 
