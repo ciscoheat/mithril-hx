@@ -7,17 +7,17 @@ import js.html.Event;
 
 abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
 
-@:autoBuild(mithril.macros.ModelBuilder.build()) interface Model {}
+@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Model {}
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface View<T> extends Model {
+@:autoBuild(mithril.macros.ModuleBuilder.build()) interface View<T> {
 	function view(ctrl : T) : VirtualElement;
 }
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller extends Model {
+@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller {
 	function controller() : Dynamic;
 }
 
-interface Module<T> extends Controller extends View<T> {}
+interface Module<T> extends View<T> extends Controller {}
 interface DynView extends View<Dynamic> {}
 interface DynModule extends Controller extends DynView {}
 
