@@ -5,7 +5,7 @@ import mithril.M;
 import mithril.M.Module;
 import mithril.M.VirtualElement;
 
-class DashboardModule implements Module
+class DashboardModule implements DynModule
 {
 	var id : String;
 
@@ -15,7 +15,7 @@ class DashboardModule implements Module
 		id = M.routeParam("userID");
 	}
 
-	public function view() {
+	public function view(_) {
 		return m("div", this.id);
 	}
 

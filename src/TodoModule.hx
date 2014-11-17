@@ -35,7 +35,7 @@ class Vm
 	}
 }
 
-class TodoModule implements Module
+class TodoModule implements DynModule
 {
 	var todo : Vm;
 
@@ -45,7 +45,7 @@ class TodoModule implements Module
 		todo = new Vm();
 	}
 
-	public function view() {
+	public function view(_) {
 		return m("body", [
 			m("input", { onchange: M.withAttr("value", todo.description), value: todo.description() }),
 			m("button", { onclick: todo.add }, "Add"),

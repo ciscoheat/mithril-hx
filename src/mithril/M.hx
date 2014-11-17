@@ -16,7 +16,12 @@ abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
 	function controller() : Dynamic;
 }
 
-typedef Module<T> = {
+interface Module<T> extends Controller extends View<T> {}
+interface DynModule extends Controller extends View<Dynamic> {}
+
+//////////
+
+typedef MithrilModule<T> = {
 	function controller() : Dynamic;
 	function view(ctrl : T) : VirtualElement;
 }
@@ -63,7 +68,7 @@ class M
 		return untyped __js__("Mithril(selector, attributes, children)");
 	}
 
-	public static function module<T>(element : Element, module : T) : T {
+	public static function module<T>(element : Element, module : MithrilModule<T>) : T {
 		return untyped __js__("Mithril.module(element, module)");
 	}
 
