@@ -59,7 +59,7 @@ class ChainModel extends IntMap<Bool>
 class ChainController implements Controller
 {
 	var list : ChainModel;
-	var view : ChainView;
+	public var view : ChainView;
 
 	public function new() {
 		this.list = ChainModel.load();

@@ -42,14 +42,15 @@ class TodoModule implements DynModule
 {
 	var todo : ViewModel;
 
-	public function new() {}
-
-	public function controller() {
+	public function new() {
 		todo = new ViewModel();
 	}
 
+	public function controller() {
+	}
+
 	public function view(_) {
-		return M("body", [
+		return M("div", [
 			M("input", {
 				config: function(e : InputElement) e.focus(),
 				onchange: M.withAttr("value", todo.description),
