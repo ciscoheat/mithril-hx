@@ -1,4 +1,4 @@
-package mithril;
+package mithril.macros;
 
 #if macro
 import haxe.macro.Expr;
