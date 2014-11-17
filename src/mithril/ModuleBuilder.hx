@@ -44,7 +44,12 @@ class ModuleBuilder
 		if (f.expr == null) return;
 		switch(f.expr.expr) {
 			case EBlock(exprs):
-				exprs.unshift(macro if(mithril.M.controllerModule != this && Type.typeof(mithril.M.controllerModule) != Type.ValueType.TObject) return mithril.M.controllerModule.controller());
+				// If an anonymous object is used, don't call it.
+				exprs.unshift(macro
+					if (mithril.M.controllerModule != this &&
+						Type.typeof(mithril.M.controllerModule) != Type.ValueType.TObject)
+							return mithril.M.controllerModule.controller()
+				);
 				exprs.push(macro return this);
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};

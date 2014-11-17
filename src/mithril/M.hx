@@ -45,7 +45,14 @@ typedef Deferred<T> = {
 	function reject(value : T) : Void;
 }
 
-typedef XHROptions = Dynamic;
+/**
+ * Plenty of optional fields for this one:
+ * http://lhorie.github.io/mithril/mithril.request.html#signature
+ */
+typedef XHROptions = {
+	var method : String;
+	var url : String;
+};
 
 typedef JSONPOptions = {
 	var dataType : String;
@@ -94,10 +101,10 @@ class M
 
 	public static var routeMode(get, set) : String;
 
-	@:noCompletion public static function get_routeMode() {
+	private static function get_routeMode() {
 		return untyped __js__("Mithril.route.mode");
 	}
-	@:noCompletion public static function set_routeMode(s : String) {
+	private static function set_routeMode(s : String) {
 		return untyped __js__("Mithril.route.mode = s");
 	}
 
@@ -111,10 +118,10 @@ class M
 
 	public static var deferredOnerror(get, set) : Error -> Void;
 
-	@:noCompletion public static function get_deferredOnerror() {
+	private static function get_deferredOnerror() {
 		return untyped __js__("Mithril.deferred.onerror");
 	}
-	@:noCompletion public static function set_deferredOnerror(f : Error -> Void) {
+	private static function set_deferredOnerror(f : Error -> Void) {
 		return untyped __js__("Mithril.deferred.onerror = f");
 	}
 
@@ -136,10 +143,10 @@ class M
 
 	public static var redrawStrategy(get, set) : String;
 
-	@:noCompletion public static function get_redrawStrategy() {
+	private static function get_redrawStrategy() {
 		return untyped __js__("Mithril.redraw.strategy");
 	}
-	@:noCompletion public static function set_redrawStrategy(s : String) {
+	private static function set_redrawStrategy(s : String) {
 		return untyped __js__("Mithril.redraw.strategy = s");
 	}
 
