@@ -14,16 +14,25 @@ class Model
 class Main
 {
 	var model : Model;
-	static var self : Main;
 
 	public function new() {
-		self = this;
-		model = new Model();
-		model.greeting = "Hello";
+
 	}
 
 	public function controller() {
-		return self;
+		///// MACRO
+		if (M.modules.first() != this) {
+			M.modules.first().controller();
+			return M.modules.pop();
+		}
+		///// END MACRO
+
+		model = new Model();
+		model.greeting = "Hello";
+
+		///// MACRO
+		return this;
+		///// END MACRO
 	}
 
 	public function view() {

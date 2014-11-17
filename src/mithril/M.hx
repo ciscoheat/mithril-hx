@@ -12,6 +12,8 @@ extern class VirtualElement
 //@:native('m')
 class M
 {
+	public static var modules = new List<Module>();
+
 	public static function m(selector : String, ?attributes : Dynamic, ?children : Dynamic) : VirtualElement
 	{
 		if (attributes == null && children == null)
@@ -24,6 +26,7 @@ class M
 
 	public static function module(element : Element, module : Module) : Dynamic
 	{
+		modules.push(module);
 		return untyped __js__("Mithril.module(element, module)");
 	}
 }
