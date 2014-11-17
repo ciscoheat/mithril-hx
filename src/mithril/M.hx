@@ -3,6 +3,7 @@ import js.Browser;
 import js.html.DOMWindow;
 import js.html.Element;
 import js.Error;
+import js.html.Event;
 
 abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
 
@@ -29,8 +30,8 @@ typedef MithrilModule<T> = {
 	function view(ctrl : T) : VirtualElement;
 }
 
-typedef GetterSetter = Dynamic;
-typedef EventHandler = Dynamic;
+typedef GetterSetter<T> = ?T -> T;
+typedef EventHandler = Event -> Void;
 
 typedef VirtualElement = {
 	var tag : String;
@@ -82,11 +83,11 @@ class M
 		return untyped __js__("Mithril.module(element, module)");
 	}
 
-	public static function prop<T>(initialValue : T) : GetterSetter	{
+	public static function prop<T>(initialValue : T) : GetterSetter<T> {
 		return untyped __js__("Mithril.prop(initialValue)");
 	}
 
-	public static function withAttr(property : String, ?callback : Dynamic) : EventHandler {
+	public static function withAttr<T>(property : String, ?callback : T -> Void) : EventHandler {
 		return untyped __js__("Mithril.withAttr(property, callback)");
 	}
 
