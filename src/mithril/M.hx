@@ -1,17 +1,21 @@
 package mithril;
 import js.html.Element;
 
-typedef Module = {
+@:autoBuild(mithril.ModuleBuilder.build()) interface Module
+{
 	function controller() : Dynamic;
 	function view() : VirtualElement;
 }
 
 typedef GetterSetter = Dynamic;
+typedef EventHandler = Dynamic;
 
-extern class VirtualElement {}
-extern class EventHandler {}
+typedef VirtualElement = {
+	var tag : String;
+	var attributes : Dynamic;
+	var children : Dynamic;
+};
 
-//@:native('m')
 class M
 {
 	public static var modules = new List<Module>();

@@ -35,7 +35,7 @@ class Vm
 	}
 }
 
-class Main
+class Main implements Module
 {
 	var todo : Vm;
 
