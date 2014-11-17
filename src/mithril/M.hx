@@ -40,7 +40,7 @@ typedef VirtualElement = {
 };
 
 typedef Promise<T> = {
-	function then(?success : Void -> T, ?error : Void -> T) : Promise<T>;
+	function then(?success : GetterSetter<T>, ?error : GetterSetter<T>) : Promise<T>;
 }
 
 typedef Deferred<T> = {
@@ -93,8 +93,8 @@ class M
 
 	public static function route(
 		?rootElement : Either<Element, String>,
-		?defaultRoute : String,
-		?routes : Dynamic<Module<Dynamic>>) : Void
+		?defaultRoute : Dynamic,
+		?routes : Dynamic<Module<Dynamic>>) : String
 	{
 		return untyped __js__("Mithril.route(rootElement, defaultRoute, routes)");
 	}
@@ -141,7 +141,7 @@ class M
 		return untyped __js__("Mithril.render(rootElement, children, forceRecreation)");
 	}
 
-	public static function redraw(forceSync : Bool) : Void {
+	public static function redraw(?forceSync : Bool) : Void {
 		return untyped __js__("Mithril.redraw(forceSync)");
 	}
 
