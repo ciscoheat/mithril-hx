@@ -115,4 +115,26 @@ class TodoModule implements Module<TodoModule>
 
 That should hopefully be enough for you to get started. Remember, plenty of documentation over at the [Mithril](http://lhorie.github.io/mithril/index.html) site.
 
+# Haxe examples
+
+This repo contains a basic example so clone it, compile and run `bin/index.html` in your browser.
+
+If you want to test from scratch, here's a useful html template:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<title>Mithril</title>
+</head>
+<body>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/mithril/0.1.24/mithril.min.js"></script>
+	<script src="YOUR_HAXE_FILE.js"></script>
+</body>
+</html>
+```
+
+# Feedback please!
+
 This is an early version, so feedback is always welcome! [Open an issue](https://github.com/ciscoheat/mithril-hx/issues) and give me a piece of your mind. :) Macro suggestions are very welcome!
