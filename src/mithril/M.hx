@@ -37,14 +37,14 @@ typedef VirtualElement = {
 	var children : Dynamic;
 };
 
-typedef Promise<T> = {
-	function then(?success : GetterSetter<T>, ?error : GetterSetter<T>) : Promise<T>;
+typedef Promise<T, T2> = {
+	function then(?success : GetterSetter<T> -> Void, ?error : GetterSetter<T2> -> Void) : Promise<T, T2>;
 }
 
-typedef Deferred<T> = {
-	var promise : Promise<T>;
+typedef Deferred<T, T2> = {
+	var promise : Promise<T, T2>;
 	function resolve(value : T) : Void;
-	function reject(value : Dynamic) : Void;
+	function reject(value : T2) : Void;
 }
 
 /**
@@ -110,11 +110,11 @@ class M
 		return untyped __js__("Mithril.route.mode = s");
 	}
 
-	public static function request<T>(options : Either<XHROptions, JSONPOptions>) : Promise<T> {
+	public static function request<T, T2>(options : Either<XHROptions, JSONPOptions>) : Promise<T, T2> {
 		return untyped __js__("Mithril.request(options)");
 	}
 
-	public static function deferred<T>() : Deferred<T> {
+	public static function deferred<T, T2>() : Deferred<T, T2> {
 		return untyped __js__("Mithril.deferred()");
 	}
 
@@ -127,7 +127,7 @@ class M
 		return untyped __js__("Mithril.deferred.onerror = f");
 	}
 
-	public static function sync<T>(promises : Array<Promise<T>>) : Promise<T> {
+	public static function sync<T, T2>(promises : Array<Promise<T, T2>>) : Promise<T, T2> {
 		return untyped __js__("Mithril.sync(promises)");
 	}
 
