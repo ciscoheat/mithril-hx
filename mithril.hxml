@@ -1,6 +1,6 @@
--debug
+#-debug
 -cp src 
 -cp example
 -js bin/mithril.js
 -main DashboardModule
--cmd start bin/index.html
+#-cmd start bin/index.html
