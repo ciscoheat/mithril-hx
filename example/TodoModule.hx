@@ -19,15 +19,15 @@ class Todo implements Model
 	}
 }
 
-typedef TodoList = Array<Todo>;
-
-class ViewModel implements Model
+class TodoList implements Model
 {
 	@prop public var description : String;
-	public var list : TodoList;
+
+	// Mithril has problems with Haxe Lists and map so we need to use an Array.
+	public var list : Array<Todo>;
 
 	public function new() {
-		this.list = new TodoList();
+		this.list = new Array<Todo>();
 		this.description = M.prop("");
 	}
 
@@ -39,16 +39,15 @@ class ViewModel implements Model
 	}
 }
 
-class TodoModule implements DynModule
+class TodoModule implements Module<TodoModule>
 {
-	var todo : ViewModel;
+	var todo : TodoList;
 
 	public function new() {
-		todo = new ViewModel();
+		todo = new TodoList();
 	}
 
-	public function controller() {
-	}
+	public function controller() {}
 
 	public function view(_) {
 		return m("div", [
