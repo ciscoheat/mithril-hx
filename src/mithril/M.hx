@@ -38,7 +38,7 @@ typedef VirtualElement = {
 };
 
 typedef Promise<T, T2> = {
-	function then(?success : GetterSetter<T> -> Void, ?error : GetterSetter<T2> -> Void) : Promise<T, T2>;
+	function then<T3, T4>(?success : GetterSetter<T> -> T3, ?error : GetterSetter<T2> -> T4) : Promise<T3, T4>;
 }
 
 typedef Deferred<T, T2> = {
