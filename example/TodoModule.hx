@@ -1,5 +1,6 @@
 package  ;
 
+import haxe.Timer;
 import js.Browser;
 import js.html.Event;
 import js.html.InputElement;
@@ -60,7 +61,14 @@ class TodoModule implements DynModule
 					if (e.keyCode == 13) todo.add();
 				}
 			}),
-			m("button", { onclick: function() todo.add() }, "Add"),
+			// For testing, the add button has a second delay.
+			m("button", { 
+				onclick: function() {
+					// M.redraw is needed because the operation is async.
+					// See http://lhorie.github.io/mithril/mithril.redraw.html
+					deferOneSecond().then(function(_) { todo.add(); M.redraw(); });
+				}
+			}, "Add"),
 			m("table", todo.list.map(function(task) {
 				return m("tr", [
 					m("td", [
@@ -70,6 +78,12 @@ class TodoModule implements DynModule
 				]);
 			}))
 		]);
+	}
+
+	private function deferOneSecond() {
+		var d = M.deferred();
+		Timer.delay(function() d.resolve("ok"), 1000);
+		return d.promise;
 	}
 
 	static function main()
