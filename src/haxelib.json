@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.5.0",
-  "releasenote": "Even more interface improvements.",
+  "version": "0.6.0",
+  "releasenote": "Event handler improvement.",
   "contributors": ["ciscoheat"]
 }

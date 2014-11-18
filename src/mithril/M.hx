@@ -31,7 +31,7 @@ typedef MithrilModule<T, T2> = {
 }
 
 typedef GetterSetter<T> = ?T -> T;
-typedef EventHandler = Event -> Void;
+typedef EventHandler<T : Event> = T -> Void;
 
 typedef VirtualElement = {
 	var tag : String;
@@ -87,7 +87,7 @@ class M
 		return untyped __js__("Mithril.prop(initialValue)");
 	}
 
-	public static function withAttr<T>(property : String, ?callback : T -> Void) : EventHandler {
+	public static function withAttr<T, T2>(property : String, ?callback : T -> Void) : EventHandler<T2> {
 		return untyped __js__("Mithril.withAttr(property, callback)");
 	}
 
