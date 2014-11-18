@@ -56,7 +56,7 @@ class ChainModel extends IntMap<Bool>
 	}
 }
 
-class ChainController implements Controller
+class ChainController implements Controller<ChainController>
 {
 	var list : ChainModel;
 	public var view : ChainView;
@@ -66,7 +66,7 @@ class ChainController implements Controller
 		this.view = new ChainView(list);
 	}
 
-	public function controller() : Dynamic {
+	public function controller() {
 	}
 
 	public function isChecked(index) {

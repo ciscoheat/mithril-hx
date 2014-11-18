@@ -13,19 +13,21 @@ abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
 	function view(ctrl : T) : VirtualElement;
 }
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller {
-	function controller() : Dynamic;
+@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller<T> {
+	function controller() : T;
 }
 
-interface Module<T> extends View<T> extends Controller {}
+interface Module<T> extends Controller<T> extends View<T> {}
+
 interface DynView extends View<Dynamic> {}
-interface DynModule extends Controller extends DynView {}
+interface DynController extends Controller<Dynamic> {}
+interface DynModule extends DynController extends DynView {}
 
 //////////
 
-typedef MithrilModule<T> = {
-	function controller() : Dynamic;
-	function view(ctrl : T) : VirtualElement;
+typedef MithrilModule<T, T2> = {
+	function controller() : T;
+	function view(ctrl : T2) : VirtualElement;
 }
 
 typedef GetterSetter<T> = ?T -> T;
@@ -71,13 +73,13 @@ class M
 	}
 
 	// Stores the current module so it can be used in module() calls (added automatically by macro).
-	@:noCompletion public static var controllerModule : Controller;
+	@:noCompletion public static var controllerModule : Dynamic;
 
 	public static function m(selector : String, ?attributes : Dynamic, ?children : Dynamic) : VirtualElement {
 		return untyped __js__("Mithril(selector, attributes, children)");
 	}
 
-	public static function module<T>(element : Element, module : MithrilModule<T>) : T {
+	public static function module<T, T2>(element : Element, module : MithrilModule<T, T2>) : T {
 		return untyped __js__("Mithril.module(element, module)");
 	}
 
@@ -92,7 +94,7 @@ class M
 	public static function route(
 		?rootElement : Either<Element, String>,
 		?defaultRoute : Dynamic,
-		?routes : Dynamic<Module<Dynamic>>) : String
+		?routes : Dynamic<MithrilModule<Dynamic, Dynamic>>) : String
 	{
 		return untyped __js__("Mithril.route(rootElement, defaultRoute, routes)");
 	}

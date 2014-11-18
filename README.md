@@ -44,12 +44,13 @@ The Controller interface is simple:
 ```haxe
 import mithril.M;
 
-class Todo implements Controller
+class Todo implements Controller<Todo>
 {
     public function new() {}
 
     // The interface implementation.
-    public function controller() : Dynamic {
+    // It will automatically return "this" unless you specify otherwise.
+    public function controller() : Todo {
     }
 }
 ```
@@ -98,13 +99,12 @@ class TodoModule implements Module<TodoModule>
         ...
     }
 
-    public function controller() : Dynamic {
+    public function controller() {
         ...
     }
 
-    // The argument to view() will be "this" in a Module,
-    // so it's not needed.
-    public function view(_) : VirtualElement {
+    // The argument to view() will be "this" in a Module, so it's not that useful.
+    public function view(_) {
         ...
     }
 
@@ -114,6 +114,8 @@ class TodoModule implements Module<TodoModule>
     }
 }
 ```
+
+If you don't need the type safety, each interface except Model has a Dynamic equivalent: `DynView` `DynController` and `DynModule`.
 
 That should hopefully be enough for you to get started. Remember, plenty of documentation over at the [Mithril](http://lhorie.github.io/mithril/index.html) site.
 
