@@ -104,9 +104,9 @@ class ModuleBuilder
 			case EBlock(exprs):
 				// If an anonymous object is used, don't call it.
 				exprs.unshift(macro
-					if (mithril.M.controllerModule != this &&
-						Type.typeof(mithril.M.controllerModule) != Type.ValueType.TObject)
-							return mithril.M.controllerModule.controller()
+					if (mithril.M.__cm != this &&
+						Type.typeof(mithril.M.__cm) != Type.ValueType.TObject)
+							return mithril.M.__cm.controller()
 				);
 				exprs.push(macro return this);
 			case _:

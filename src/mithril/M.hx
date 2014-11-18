@@ -1,11 +1,16 @@
 package mithril;
+
 import js.Browser;
 import js.html.DOMWindow;
 import js.html.Element;
 import js.Error;
 import js.html.Event;
 
-abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
+using Lambda;
+
+private abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
+
+//////////
 
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface Model {}
 
@@ -65,104 +70,67 @@ typedef JSONPOptions = {
 	var data : Dynamic;
 };
 
-class M
+//////////
+
+@:final @:native("Mithril")
+extern class M
 {
-	static function __init__() {
+	public static function m(selector : String, ?attributes : Dynamic, ?children : Dynamic) : VirtualElement;
+
+	public static function module<T, T2>(element : Element, module : MithrilModule<T, T2>) : T;
+
+	public static function prop<T>(initialValue : T) : GetterSetter<T>;
+
+	public static function withAttr<T, T2>(property : String, ?callback : T -> Void) : EventHandler<T2>;
+
+	public static function route(?rootElement : Either<Element, String>, ?defaultRoute : Dynamic, ?routes : Dynamic<MithrilModule<Dynamic, Dynamic>>) : String;
+
+	public static function request<T, T2>(options : Either<XHROptions, JSONPOptions>) : Promise<T, T2>;
+
+	public static function deferred<T, T2>() : Deferred<T, T2>;
+
+	public static function sync<T, T2>(promises : Array<Promise<T, T2>>) : Promise<T, T2>;
+
+	public static function trust(html : String) : String;
+
+	public static function render(rootElement : Element, children : Dynamic, forceRecreation : Bool) : Void;
+
+	public static function redraw(?forceSync : Bool) : Void;
+
+	public static function startComputation() : Void;
+
+	public static function endComputation() : Void;
+
+	public static function deps(window : Dynamic) : DOMWindow;
+
+	///// Properties that uses function properties /////
+
+	public static function routeParam(key : String) : String;
+
+	public static var routeMode : String;
+
+	public static var deferredOnerror : Error -> Void;
+
+	public static var redrawStrategy : String;
+
+	///// Haxe specific stuff /////
+
+	static function __init__() : Void {
+		// Add properties to support function properties in javascript
+		untyped __js__("
+			Mithril.m =               Mithril;
+			Mithril.routeParam =      Mithril.route.param;
+			Mithril.routeMode =       Mithril.route.mode;
+			Mithril.deferredOnerror = Mithril.deferred.onerror;
+			Mithril.redrawStrategy =  Mithril.redraw.strategy;
+			Mithril.__module =        Mithril.module;
+			Mithril.__cm =            null;
+		");
+
 		// Redefine Mithril.module to have access to the current module.
-		untyped __js__("var __m_m = Mithril.module; Mithril.module = function(root, module) { mithril.M.controllerModule = module; return __m_m(root, module); }");
+		untyped __js__("Mithril.module = function(root, module) { Mithril.__cm = module; return Mithril.__module(root, module); }");
 	}
 
 	// Stores the current module so it can be used in module() calls (added automatically by macro).
-	@:noCompletion public static var controllerModule : Dynamic;
-
-	public static function m(selector : String, ?attributes : Dynamic, ?children : Dynamic) : VirtualElement {
-		return untyped __js__("Mithril(selector, attributes, children)");
-	}
-
-	public static function module<T, T2>(element : Element, module : MithrilModule<T, T2>) : T {
-		return untyped __js__("Mithril.module(element, module)");
-	}
-
-	public static function prop<T>(initialValue : T) : GetterSetter<T> {
-		return untyped __js__("Mithril.prop(initialValue)");
-	}
-
-	public static function withAttr<T, T2>(property : String, ?callback : T -> Void) : EventHandler<T2> {
-		return untyped __js__("Mithril.withAttr(property, callback)");
-	}
-
-	public static function route(
-		?rootElement : Either<Element, String>,
-		?defaultRoute : Dynamic,
-		?routes : Dynamic<MithrilModule<Dynamic, Dynamic>>) : String
-	{
-		return untyped __js__("Mithril.route(rootElement, defaultRoute, routes)");
-	}
-
-	public static function routeParam(key : String) : String {
-		return untyped __js__("Mithril.route.param(key)");
-	}
-
-	public static var routeMode(get, set) : String;
-
-	private static function get_routeMode() {
-		return untyped __js__("Mithril.route.mode");
-	}
-	private static function set_routeMode(s : String) {
-		return untyped __js__("Mithril.route.mode = s");
-	}
-
-	public static function request<T, T2>(options : Either<XHROptions, JSONPOptions>) : Promise<T, T2> {
-		return untyped __js__("Mithril.request(options)");
-	}
-
-	public static function deferred<T, T2>() : Deferred<T, T2> {
-		return untyped __js__("Mithril.deferred()");
-	}
-
-	public static var deferredOnerror(get, set) : Error -> Void;
-
-	private static function get_deferredOnerror() {
-		return untyped __js__("Mithril.deferred.onerror");
-	}
-	private static function set_deferredOnerror(f : Error -> Void) {
-		return untyped __js__("Mithril.deferred.onerror = f");
-	}
-
-	public static function sync<T, T2>(promises : Array<Promise<T, T2>>) : Promise<T, T2> {
-		return untyped __js__("Mithril.sync(promises)");
-	}
-
-	public static function trust(html : String) : String {
-		return untyped __js__("Mithril.trust(html)");
-	}
-
-	public static function render(rootElement : Element, children : Dynamic, forceRecreation : Bool) {
-		return untyped __js__("Mithril.render(rootElement, children, forceRecreation)");
-	}
-
-	public static function redraw(?forceSync : Bool) : Void {
-		return untyped __js__("Mithril.redraw(forceSync)");
-	}
-
-	public static var redrawStrategy(get, set) : String;
-
-	private static function get_redrawStrategy() {
-		return untyped __js__("Mithril.redraw.strategy");
-	}
-	private static function set_redrawStrategy(s : String) {
-		return untyped __js__("Mithril.redraw.strategy = s");
-	}
-
-	public static function startComputation() : Void {
-		return untyped __js__("Mithril.startComputation()");
-	}
-
-	public static function endComputation() : Void {
-		return untyped __js__("Mithril.endComputation()");
-	}
-
-	public static function deps(window : Dynamic) : DOMWindow {
-		return untyped __js__("Mithril.deps(window)");
-	}
+	@:noCompletion public static var __cm : Dynamic;
 }
