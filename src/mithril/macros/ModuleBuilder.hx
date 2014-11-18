@@ -64,15 +64,34 @@ class ModuleBuilder
 	}
 
 	private static function replaceM(e : Expr) {
+		// Autocompletion for m()
+		if (Context.defined("display")) {
+			switch(e.expr) {
+				case ECall(e, params):
+					for (p in params) {
+						switch(p.expr) {
+							case EDisplay(e2, isCall):
+								switch(e2) {
+									case macro m:
+										e2.expr = (macro mithril.M.m).expr;
+									case _:
+								}
+							case _:
+						}
+					}
+				case _:
+			}
+		}
+
 		switch(e) {
-			case macro M($a, $b, $c):
+			case macro M($a, $b, $c), macro m($a, $b, $c):
 				e.expr = (macro mithril.M.m($a, $b, $c)).expr;
 				b.iter(replaceM);
 				c.iter(replaceM);
-			case macro M($a, $b):
+			case macro M($a, $b), macro m($a, $b):
 				e.expr = (macro mithril.M.m($a, $b)).expr;
 				b.iter(replaceM);
-			case macro M($a):
+			case macro M($a), macro m($a):
 				e.expr = (macro mithril.M.m($a)).expr;
 			case _:
 				e.iter(replaceM);

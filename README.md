@@ -12,7 +12,9 @@ Mithril has a great [getting started guide](http://lhorie.github.io/mithril/gett
 
 ## Use M, not m!
 
-The biggest difference! `import mithril.M` then use `M` instead of `m` in the documentation. You want to implement some interfaces as well to take advantage of the macro magic:
+The biggest difference! `import mithril.M` then use `M` instead of `m` for the whole API. The only exception is when building the DOM tree with `m()`, if you want autocompletion you need to use lowercase m for that (though uppercase is still supported).
+
+You'll want to implement some interfaces as well to take advantage of the macro features:
 
 ## Models
 
@@ -68,13 +70,13 @@ class TodoView implements View<TodoController>
 
     // The interface implementation.
 	public function view(ctrl : TodoController) : VirtualElement {
-	    // Use M just as m:
-	    return M("div", [
-	        M("h1", "Welcome!"),
-	        M("table", model.map(function(todo) {
-	            return M("tr", [
-	                M("td", [ M("input[type=checkbox]", { checked: todo.done() }) ]),
-                    M("td", todo.description())
+	    // Remember to use "m" here instead of "M" for autocompletion:
+	    return m("div", [
+	        m("h1", "Welcome!"),
+	        m("table", model.map(function(todo) {
+	            return m("tr", [
+	                m("td", [ m("input[type=checkbox]", { checked: todo.done() }) ]),
+                    m("td", todo.description())
                 ]);
             }))
         ]);
