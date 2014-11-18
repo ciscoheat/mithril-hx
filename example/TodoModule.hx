@@ -69,7 +69,7 @@ class TodoModule implements Module<TodoModule>
 
 					// Need an empty function to delegate to the next "then" even if error.
 					deferOneSecond()
-					.then(function(_) todo.add(), function(_) {})
+					.then(function(_) todo.add(), function(_) { /* Error, just pass through */ })
 					.then(function(_) M.endComputation());
 				}
 			}, "Add"),
@@ -86,7 +86,7 @@ class TodoModule implements Module<TodoModule>
 
 	private function deferOneSecond() {
 		var d = M.deferred();
-		Timer.delay(function() d.resolve("ok"), 1000);
+		Timer.delay(d.resolve.bind("ok"), 1000);
 		return d.promise;
 	}
 

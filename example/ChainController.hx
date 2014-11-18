@@ -95,11 +95,11 @@ class ChainView implements View<ChainController>
 	}
 
 	public function view(ctrl : ChainController) : VirtualElement {
-		return M("table", this.seven(function(y) {
-			return M("tr", this.seven(function(x) {
+		return m("table", this.seven(function(y) {
+			return m("tr", this.seven(function(x) {
 				var index = indexAt(x, y);
-				return M("td", highlights(index), [
-					M("input[type=checkbox]", checks(ctrl, index))
+				return m("td", highlights(index), [
+					m("input[type=checkbox]", checks(ctrl, index))
 				]);
 			}));
 		}));
