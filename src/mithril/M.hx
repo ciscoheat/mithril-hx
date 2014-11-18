@@ -44,7 +44,7 @@ typedef Promise<T> = {
 typedef Deferred<T> = {
 	var promise : Promise<T>;
 	function resolve(value : T) : Void;
-	function reject(value : T) : Void;
+	function reject(value : Dynamic) : Void;
 }
 
 /**
