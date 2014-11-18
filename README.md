@@ -4,7 +4,7 @@
 
 # Installation
 
-The normal proceduce: `haxelib install mithril` and then `-lib mithril` in your .hxml file.
+The normal procedure: `haxelib install mithril` and then `-lib mithril` in your .hxml file.
 
 # How to use
 
@@ -67,22 +67,22 @@ class TodoView implements View<TodoController>
     }
 
     // The interface implementation.
-	public function view(ctrl : TodoController) : VirtualElement {
-	    // Use M just as m:
-	    return M("div", [
-	        M("h1", "Welcome!"),
-	        M("table", model.map(function(todo) {
-	            return M("tr", [
-	                M("td", [ M("input[type=checkbox]", { checked: todo.done() }) ]),
+    public function view(ctrl : TodoController) : VirtualElement {
+        // Use M just as m:
+        return M("div", [
+            M("h1", "Welcome!"),
+            M("table", model.map(function(todo) {
+                return M("tr", [
+                    M("td", [ M("input[type=checkbox]", { checked: todo.done() }) ]),
                     M("td", todo.description())
                 ]);
             }))
         ]);
-	}
+    }
 }
 ```
 
-For simple or tightly coupled components, it's common to put together the view and controller to a Module:
+For simple or tightly coupled components, it's common to put together the view and controller in a Module:
 
 ## Modules
 
