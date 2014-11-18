@@ -4,7 +4,7 @@
 
 # Installation
 
-The normal proceduce: `haxelib install mithril` and then `-lib mithril` in your .hxml file.
+The normal procedure: `haxelib install mithril` and then `-lib mithril` in your .hxml file.
 
 # How to use
 
@@ -25,13 +25,13 @@ import mithril.M;
 
 class Todo implements Model
 {
-	@prop public var description : String;
-	@prop public var done : Bool;
+    @prop public var description : String;
+    @prop public var done : Bool;
 
-	public function new(description) {
-		this.description = M.prop(description);
-		this.done = M.prop(false);
-	}
+    public function new(description) {
+        this.description = M.prop(description);
+        this.done = M.prop(false);
+    }
 }
 ```
 
@@ -46,11 +46,11 @@ import mithril.M;
 
 class Todo implements Controller
 {
-	public function new() {}
+    public function new() {}
 
     // The interface implementation.
-	public function controller() : Dynamic {
-	}
+    public function controller() : Dynamic {
+    }
 }
 ```
 
@@ -69,22 +69,22 @@ class TodoView implements View<TodoController>
     }
 
     // The interface implementation.
-	public function view(ctrl : TodoController) : VirtualElement {
-	    // Remember to use "m" here instead of "M" for autocompletion:
-	    return m("div", [
-	        m("h1", "Welcome!"),
-	        m("table", model.map(function(todo) {
-	            return m("tr", [
-	                m("td", [ m("input[type=checkbox]", { checked: todo.done() }) ]),
+    public function view(ctrl : TodoController) : VirtualElement {
+        // Remember to use "m" here instead of "M" for autocompletion:
+        return m("div", [
+            m("h1", "Welcome!"),
+            m("table", model.map(function(todo) {
+                return m("tr", [
+                    m("td", [ m("input[type=checkbox]", { checked: todo.done() }) ]),
                     m("td", todo.description())
                 ]);
             }))
         ]);
-	}
+    }
 }
 ```
 
-For simple or tightly coupled components, it's common to put together the view and controller to a Module:
+For simple or tightly coupled components, it's common to put together the view and controller in a Module:
 
 ## Modules
 
@@ -94,24 +94,24 @@ import js.Browser;
 
 class TodoModule implements Module<TodoModule>
 {
-	public function new() {
-	    ...
-	}
+    public function new() {
+        ...
+    }
 
-	public function controller() : Dynamic {
-	    ...
-	}
+    public function controller() : Dynamic {
+        ...
+    }
 
-	// The argument to view() will be "this" in a Module,
-	// so it's not needed.
-	public function view(_) : VirtualElement {
-	    ...
-	}
+    // The argument to view() will be "this" in a Module,
+    // so it's not needed.
+    public function view(_) : VirtualElement {
+        ...
+    }
 
-	// Finally, here's how to start everything:
-	static function main() {
-	    M.module(Browser.document.body, new TodoModule());
-	}
+    // Finally, here's how to start everything:
+    static function main() {
+        M.module(Browser.document.body, new TodoModule());
+    }
 }
 ```
 
@@ -127,12 +127,12 @@ If you want to test from scratch, here's a useful html template:
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8"/>
-	<title>Mithril</title>
+    <meta charset="utf-8"/>
+    <title>Mithril</title>
 </head>
 <body>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/mithril/0.1.24/mithril.min.js"></script>
-	<script src="YOUR_HAXE_FILE.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/mithril/0.1.24/mithril.min.js"></script>
+    <script src="YOUR_HAXE_FILE.js"></script>
 </body>
 </html>
 ```
