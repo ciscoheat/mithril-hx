@@ -66,7 +66,11 @@ class TodoModule implements Module<TodoModule>
 					// Calling the redrawing system because of the async delay.
 					// See http://lhorie.github.io/mithril/auto-redrawing.html
 					M.startComputation();
-					deferOneSecond().then(function(_) todo.add()).then(function(_) M.endComputation());
+
+					// Need an empty function to delegate to the next "then" even if error.
+					deferOneSecond()
+					.then(function(_) todo.add(), function(_) {})
+					.then(function(_) M.endComputation());
 				}
 			}, "Add"),
 			m("table", todo.list.map(function(task) {
