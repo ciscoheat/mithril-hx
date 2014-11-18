@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.2.0",
-  "releasenote": "Autocompletion fixed for m().",
+  "version": "0.3.0",
+  "releasenote": "Deferred can now reject with any value.",
   "contributors": ["ciscoheat"]
 }
