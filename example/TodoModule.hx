@@ -63,9 +63,10 @@ class TodoModule implements Module<TodoModule>
 			// For testing, the add button has a second delay.
 			m("button", { 
 				onclick: function() {
-					// M.redraw is needed because the operation is async.
-					// See http://lhorie.github.io/mithril/mithril.redraw.html
-					deferOneSecond().then(function(_) { todo.add(); M.redraw(); });
+					// Calling the redrawing system because of the async delay.
+					// See http://lhorie.github.io/mithril/auto-redrawing.html
+					M.startComputation();
+					deferOneSecond().then(function(_) todo.add()).then(function(_) M.endComputation());
 				}
 			}, "Add"),
 			m("table", todo.list.map(function(task) {
