@@ -25,8 +25,8 @@ class DashboardModule implements DynModule
 		// Detect IP, but with a minimal delay so it won't stop the rendering.
 		if(ip().length == 0) haxe.Timer.delay(function() {
 			M.request({
-				dataType: "jsonp",
-				url: "http://ip.jsontest.com/",
+				method: "GET",
+				url: "http://ip.jsontest.com/"
 			}).then(
 				function(r : {ip : String}) ip(r.ip), 
 				function(_) ip("Don't know!")
