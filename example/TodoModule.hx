@@ -5,6 +5,7 @@ import js.Browser;
 import js.html.Event;
 import js.html.InputElement;
 import js.html.KeyboardEvent;
+import js.html.SpanElement;
 import mithril.M;
 import js.Lib;
 
@@ -50,6 +51,21 @@ class TodoModule implements Module<TodoModule>
 	public function controller() {}
 
 	public function view(_) {
+		var loader : SpanElement = null;
+
+		// Calling the redrawing system because of the async delay.
+		// See http://lhorie.github.io/mithril/auto-redrawing.html
+		var addTodo = function(delay = 0) {
+			M.startComputation();
+			loader.style.display = "inline";
+			return deferMs(delay)
+			.then(function(_) todo.add(), function(_) { /* Error, just pass through */ })
+			.then(function(_) {
+				loader.style.display = "none";
+				M.endComputation();
+			});
+		}
+
 		return m("div", [
 			m("input", {
 				config: function(e : InputElement) e.focus(),
@@ -57,22 +73,15 @@ class TodoModule implements Module<TodoModule>
 				value: todo.description(),
 				onkeyup: function(e : KeyboardEvent) {
 					todo.description(cast(e.target, InputElement).value);
-					if (e.keyCode == 13) todo.add();
+					if (e.keyCode == 13) addTodo();
 				}
 			}),
 			// For testing, the add button has a second delay.
-			m("button", { 
-				onclick: function() {
-					// Calling the redrawing system because of the async delay.
-					// See http://lhorie.github.io/mithril/auto-redrawing.html
-					M.startComputation();
-
-					// Need an empty function to delegate to the next "then" even if error.
-					deferOneSecond()
-					.then(function(_) todo.add(), function(_) { /* Error, just pass through */ })
-					.then(function(_) M.endComputation());
-				}
-			}, "Add"),
+			m("button", { onclick: addTodo.bind(1000) }, "Add"),
+			m("span", {
+				config: function(e : SpanElement) loader = e,
+				style: {display: "none"}
+			}, " Loading..."),
 			m("table", todo.list.map(function(task) {
 				return m("tr", [
 					m("td", [
@@ -84,9 +93,9 @@ class TodoModule implements Module<TodoModule>
 		]);
 	}
 
-	private function deferOneSecond() {
+	private function deferMs(delay : Int) {
 		var d = M.deferred();
-		Timer.delay(d.resolve.bind("ok"), 1000);
+		Timer.delay(d.resolve.bind("ok"), delay);
 		return d.promise;
 	}
 
