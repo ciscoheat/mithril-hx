@@ -58,8 +58,8 @@ class TodoModule implements Module<TodoModule>
 		var addTodo = function(delay = 0) {
 			M.startComputation();
 			loader.style.display = "inline";
-			return deferMs(delay)
-			.then(function(_) todo.add(), function(_) { /* Error, just pass through */ })
+			deferMs(delay)
+			.then(function(ok) { todo.add(); return ok; }, function(error) return error)
 			.then(function(_) {
 				loader.style.display = "none";
 				M.endComputation();
@@ -93,7 +93,7 @@ class TodoModule implements Module<TodoModule>
 		]);
 	}
 
-	private function deferMs(delay : Int) {
+	private function deferMs(delay : Int) : Promise<Bool, Bool> {
 		var d = M.deferred();
 		Timer.delay(d.resolve.bind(true), delay);
 		return d.promise;
