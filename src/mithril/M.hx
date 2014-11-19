@@ -53,7 +53,7 @@ typedef VirtualElement = {
 };
 
 typedef Promise<T, T2> = {
-	function then<T3, T4>(?success : GetterSetter<T> -> T3, ?error : GetterSetter<T2> -> T4) : Promise<T3, T4>;
+	function then<T3, T4>(?success : T -> T3, ?error : T2 -> T4) : Promise<T3, T4>;
 }
 
 typedef Deferred<T, T2> = {
@@ -86,8 +86,8 @@ typedef XHROptions = {
 typedef JSONPOptions = {
 	var dataType : String;
 	var url : String;
-	var callbackKey : String;
-	var data : Dynamic;
+	@:optional var callbackKey : String;
+	@:optional var data : Dynamic;
 };
 
 //////////
