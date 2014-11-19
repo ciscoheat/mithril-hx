@@ -37,6 +37,8 @@ class Todo implements Model
 
 `@prop` is available on all interfaces but the most obvious use is in a Model.
 
+**NOTE:** `@prop` and `M.prop` doesn't work well with Haxe serialization, so if you're using `haxe.Serializer` on a class like this, you cannot have such a property as a class field.
+
 ## Controllers
 
 The Controller interface is simple:
@@ -57,12 +59,9 @@ class Todo implements Controller<Todo>
 
 ## Views
 
-**NOTE:** Mithril seems to have problems with Haxe's `List`, use `Array` instead.
-
 ```haxe
 class TodoView implements View<TodoController>
 {
-    // Use Array, not List.
     var model : Array<Todo>;
 
     public function new() {
