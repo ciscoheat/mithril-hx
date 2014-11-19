@@ -1,5 +1,7 @@
 package  ;
 
+import haxe.Serializer;
+import haxe.Unserializer;
 import haxe.Timer;
 import js.Browser;
 import js.html.Event;
@@ -9,26 +11,39 @@ import js.html.SpanElement;
 import mithril.M;
 import js.Lib;
 
+/**
+* Cannot use @prop and M.prop(), doesn't work well with
+* Haxe serialization.
+*/
 class Todo implements Model
 {
-	@prop public var description : String;
-	@prop public var done : Bool;
+	public var description : String;
+	public var done : Bool;
 
 	public function new(description) {
-		this.description = M.prop(description);
-		this.done = M.prop(false);
+		this.description = description;
 	}
 }
 
 class TodoList implements Model
 {
+	static var storage = Browser.window.localStorage;
+
+	public static function load() : TodoList {
+		var list = storage.getItem("todo-app-list");
+		if(list == "" || list == null) return new TodoList();
+
+		var ser = new Unserializer(list);
+		return new TodoList(cast ser.unserialize());
+	}
+
 	@prop public var description : String;
 
 	// Mithril has problems with Haxe Lists and map so we need to use an Array.
 	public var list : Array<Todo>;
 
-	public function new() {
-		this.list = new Array<Todo>();
+	public function new(list = null) {
+		this.list = list == null ? new Array<Todo>() : list;
 		this.description = M.prop("");
 	}
 
@@ -36,7 +51,14 @@ class TodoList implements Model
 		if (this.description() != "") {
 			this.list.push(new Todo(this.description()));
 			this.description("");
+			this.save();
 		}
+	}
+
+	public function save() {
+		var ser = new Serializer();
+		ser.serialize(list);
+		storage.setItem("todo-app-list", ser.toString());
 	}
 }
 
@@ -45,7 +67,7 @@ class TodoModule implements Module<TodoModule>
 	var todo : TodoList;
 
 	public function new() {
-		todo = new TodoList();
+		this.todo = TodoList.load();
 	}
 
 	public function controller() {}
@@ -85,9 +107,14 @@ class TodoModule implements Module<TodoModule>
 			m("table", todo.list.map(function(task) {
 				return m("tr", [
 					m("td", [
-						m("input[type=checkbox]", { onclick: M.withAttr("checked", task.done), checked: task.done() } )
+						m("input[type=checkbox]", { 
+							onclick: M.withAttr("checked", function(checked) { 
+								task.done = checked; todo.save();
+							}), 
+							checked: task.done
+						})
 					]),
-					m("td", { style: { textDecoration: task.done() ? "line-through" : "none" }}, task.description())
+					m("td", { style: { textDecoration: task.done ? "line-through" : "none" }}, task.description)
 				]);
 			}))
 		]);
