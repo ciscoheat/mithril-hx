@@ -29,6 +29,12 @@ class ChainModel extends IntMap<Bool>
 		super();
 	}
 
+	public function clear() {
+		for(key in keys()) this.remove(key);
+		resetDate();
+		save();
+	}
+
 	public function save() : Void {
 		var ser = new Serializer();
 		ser.serialize(this);
@@ -67,6 +73,12 @@ class ChainController implements Controller<ChainController>
 	}
 
 	public function controller() {
+	}
+
+	public function clear() {
+		M.startComputation();
+		list.clear();
+		M.endComputation();
 	}
 
 	public function isChecked(index) {

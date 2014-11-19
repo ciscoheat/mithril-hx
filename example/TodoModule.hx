@@ -38,8 +38,6 @@ class TodoList implements Model
 	}
 
 	@prop public var description : String;
-
-	// Mithril has problems with Haxe Lists and map so we need to use an Array.
 	public var list : Array<Todo>;
 
 	public function new(list = null) {
@@ -55,6 +53,11 @@ class TodoList implements Model
 		}
 	}
 
+	public function clear() {
+		list.splice(0, list.length);
+		save();
+	}
+
 	public function save() {
 		var ser = new Serializer();
 		ser.serialize(list);
@@ -65,52 +68,38 @@ class TodoList implements Model
 class TodoModule implements Module<TodoModule>
 {
 	var todo : TodoList;
+	var loader : SpanElement;
 
 	public function new() {
 		this.todo = TodoList.load();
 	}
 
+	public function clear() {
+		M.startComputation();
+		todo.clear();
+		M.endComputation();
+	}
+
 	public function controller() {}
 
 	public function view(_) {
-		var loader : SpanElement = null;
-
-		// Calling the redrawing system because of the async delay.
-		// See http://lhorie.github.io/mithril/auto-redrawing.html
-		var addTodo = function(delay = 0) {
-			M.startComputation();
-			loader.style.display = "inline";
-			deferMs(delay)
-			.then(function(ok) { todo.add(); return ok; }, function(error) return error)
-			.then(function(_) {
-				loader.style.display = "none";
-				M.endComputation();
-			});
-		}
-
 		return m("div", [
 			m("input", {
 				config: function(e : InputElement) e.focus(),
-				onchange: M.withAttr("value", todo.description),
 				value: todo.description(),
-				onkeyup: function(e : KeyboardEvent) {
-					todo.description(cast(e.target, InputElement).value);
-					if (e.keyCode == 13) addTodo();
-				}
+				onkeyup: input_keyUp
 			}),
-			// For testing, the add button has a second delay.
-			m("button", { onclick: addTodo.bind(1000) }, "Add"),
+			// The add button has a second delay to simulate a slow ajax request.
+			m("button", { onclick: todo_add.bind(1000) }, "Add"),
 			m("span", {
-				config: function(e : SpanElement) loader = e,
+				config: function(e : SpanElement) if(loader == null) loader = e,
 				style: {display: "none"}
 			}, " Adding..."),
 			m("table", todo.list.map(function(task) {
 				return m("tr", [
 					m("td", [
 						m("input[type=checkbox]", { 
-							onclick: M.withAttr("checked", function(checked) { 
-								task.done = checked; todo.save();
-							}), 
+							onclick: M.withAttr("checked", task_checked.bind(task)), 
 							checked: task.done
 						})
 					]),
@@ -118,6 +107,29 @@ class TodoModule implements Module<TodoModule>
 				]);
 			}))
 		]);
+	}
+
+	private function todo_add(delay = 0) {
+		// Calling the redrawing system because of the async delay.
+		// See http://lhorie.github.io/mithril/auto-redrawing.html
+		M.startComputation();
+		loader.style.display = "inline";
+		deferMs(delay)
+		.then(function(ok) { todo.add(); return ok; }, function(error) return error)
+		.then(function(_) {
+			loader.style.display = "none";
+			M.endComputation();
+		});
+	}
+
+	private function input_keyUp(e : KeyboardEvent) {
+		todo.description(cast(e.target, InputElement).value);
+		if (e.keyCode == 13) todo_add();
+	}
+
+	private function task_checked(task : Todo, checked : Bool) {
+		task.done = checked;
+		todo.save();
 	}
 
 	private function deferMs(delay : Int) : Promise<Bool, Bool> {

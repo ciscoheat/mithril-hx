@@ -49,9 +49,17 @@ class DashboardModule implements DynModule
 					case _: m("#app");
 				},
 				m("hr"),
-				m("div", ip().length == 0 ? "Retreiving IP..." : "Your IP: " + ip())
+				m("div", ip().length == 0 ? "Retreiving IP..." : "Your IP: " + ip()),
+				m("button", { onclick: clearData }, "Clear stored data")
 			])
 		]);
+	}
+
+	public function clearData() {
+		M.startComputation();
+		todo.clear();
+		chainController.clear();
+		M.endComputation();
 	}
 
 	public static function main() {
