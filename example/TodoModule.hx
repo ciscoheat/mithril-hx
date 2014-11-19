@@ -81,7 +81,7 @@ class TodoModule implements Module<TodoModule>
 			m("span", {
 				config: function(e : SpanElement) loader = e,
 				style: {display: "none"}
-			}, " Loading..."),
+			}, " Adding..."),
 			m("table", todo.list.map(function(task) {
 				return m("tr", [
 					m("td", [
@@ -95,7 +95,7 @@ class TodoModule implements Module<TodoModule>
 
 	private function deferMs(delay : Int) {
 		var d = M.deferred();
-		Timer.delay(d.resolve.bind("ok"), delay);
+		Timer.delay(d.resolve.bind(true), delay);
 		return d.promise;
 	}
 
