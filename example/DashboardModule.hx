@@ -18,14 +18,7 @@ class DashboardModule implements DynModule
 		chainView = new ChainView(new ChainModel());
 	}
 
-	public function controller() {
-		/*
-		M.route(Browser.document.getElementById("app"), "/dashboard/todo", {
-			"/dashboard/todo": todo,
-			"/dashboard/chain": chain
-		});
-		*/
-	}
+	public function controller() {}
 
 	public function view(_) {
 		return m("div", [
