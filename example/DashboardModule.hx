@@ -8,9 +8,24 @@ import ChainController;
 
 class DashboardModule implements DynModule
 {
-	public function new() {}
+	var todo : TodoModule;
+	var chainController : ChainController;
+	var chainView : ChainView;
 
-	public function controller() {}
+	public function new() {
+		todo = new TodoModule();
+		chainController = new ChainController();
+		chainView = new ChainView(new ChainModel());
+	}
+
+	public function controller() {
+		/*
+		M.route(Browser.document.getElementById("app"), "/dashboard/todo", {
+			"/dashboard/todo": todo,
+			"/dashboard/chain": chain
+		});
+		*/
+	}
 
 	public function view(_) {
 		return m("div", [
@@ -21,28 +36,23 @@ class DashboardModule implements DynModule
 				m("span", M.trust("&nbsp;")),
 				m("a[href='/dashboard/chain']", {config: M.route}, "Don't break the chain"),
 				m("hr"),
-				m("#app")
+				switch(M.routeParam("app")) {
+					case "todo": todo.view(todo);
+					case "chain": chainView.view(chainController);
+					case _: m("#app");
+				}
 			])
 		]);
 	}
 
 	public static function main() {
-		//var app = new DashboardModule();
-		//var todo = new TodoModule();
-		var chain = {controller: new ChainController().controller, view: new ChainView(new ChainModel()).view };
+		var app = new DashboardModule();
 
 		M.routeMode = "hash";
 
 		M.route(Browser.document.body, "/dashboard", {
-			"/dashboard": new DashboardModule(),
-		//});
-
-		//M.route("#app", "/dashboard/todo", {
-			"/dashboard/todo": new TodoModule(),
-			"/dashboard/chain": {
-				controller: new ChainController().controller, 
-				view: new ChainView(new ChainModel()).view 
-			}
+			"/dashboard": app,
+			"/dashboard/:app": app
 		});
 	}
 }
