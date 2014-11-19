@@ -5,10 +5,11 @@ import js.html.DOMWindow;
 import js.html.Element;
 import js.Error;
 import js.html.Event;
+import js.html.XMLHttpRequest;
 
 using Lambda;
 
-private abstract Either<T1, T2>(Dynamic) from T1 from T2 to T1 to T2 {}
+private abstract Either<T1, T2, T3, T4>(Dynamic) from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 //////////
 
@@ -37,11 +38,12 @@ typedef MithrilModule<T, T2> = {
 
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
+typedef Children = Either<String, VirtualElement, {subtree: String}, Array<Children>>;
 
 typedef VirtualElement = {
 	var tag : String;
 	var attributes : Dynamic;
-	var children : Dynamic;
+	var children : Children;
 };
 
 typedef Promise<T, T2> = {
@@ -61,6 +63,18 @@ typedef Deferred<T, T2> = {
 typedef XHROptions = {
 	var method : String;
 	var url : String;
+	@:optional var user : String;
+	@:optional var password : String;
+	@:optional var data : Dynamic;
+	@:optional var background : Bool;
+	@:optional var initialValue : Dynamic;
+	@:optional var unwrapSuccess : Dynamic -> Dynamic;
+	@:optional var unwrapError : Dynamic -> Dynamic;
+	@:optional var serialize : Dynamic -> String;
+	@:optional var deserialize : String -> Dynamic;
+	@:optional var extract : XMLHttpRequest -> XHROptions -> Dynamic;
+	@:optional var type : Dynamic -> Void;
+	@:optional var config : XMLHttpRequest -> XHROptions -> Null<XMLHttpRequest>;
 };
 
 typedef JSONPOptions = {
@@ -79,13 +93,20 @@ extern class M
 
 	public static function module<T, T2>(element : Element, module : MithrilModule<T, T2>) : T;
 
-	public static function prop<T>(initialValue : T) : GetterSetter<T>;
+	public static function prop<T>(?initialValue : T) : GetterSetter<T>;
 
 	public static function withAttr<T, T2>(property : String, ?callback : T -> Void) : EventHandler<T2>;
 
-	public static function route(?rootElement : Either<Element, String>, ?defaultRoute : Dynamic, ?routes : Dynamic<MithrilModule<Dynamic, Dynamic>>) : String;
+	@:overload(function() : String {})
+	@:overload(function(path : String, ?params : Dynamic) : Void {})
+	@:overload(function(element : Element, isInitialized : Bool) : Void {})
+	public static function route(
+		rootElement : Element, 
+		defaultRoute : String, 
+		routes : Dynamic<MithrilModule<Dynamic, Dynamic>>) : Void;
 
-	public static function request<T, T2>(options : Either<XHROptions, JSONPOptions>) : Promise<T, T2>;
+	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
+	public static function request<T, T2>(options : XHROptions) : Promise<T, T2>;
 
 	public static function deferred<T, T2>() : Deferred<T, T2>;
 
@@ -93,7 +114,10 @@ extern class M
 
 	public static function trust(html : String) : String;
 
-	public static function render(rootElement : Element, children : Dynamic, forceRecreation : Bool) : Void;
+	public static function render(
+		rootElement : Element, 
+		children : Children, 
+		?forceRecreation : Bool) : Void;
 
 	public static function redraw(?forceSync : Bool) : Void;
 
@@ -105,26 +129,30 @@ extern class M
 
 	///// Properties that uses function properties /////
 
-	public static function routeParam(key : String) : String;
+	public static var routeParam(get, set) : String -> String;
+	static inline function get_routeParam() : String -> String { return untyped __js__("Mithril.route.param"); }
+	static inline function set_routeParam(f : String -> String) : String -> String { return untyped __js__("Mithril.route.param = ") (f); }
 
-	public static var routeMode : String;
+	public static var redrawStrategy(get, set) : GetterSetter<String>;
+	static inline function get_redrawStrategy() : GetterSetter<String> { return untyped __js__("Mithril.redraw.strategy"); }
+	static inline function set_redrawStrategy(s : GetterSetter<String>) : GetterSetter<String> { return untyped __js__("Mithril.redraw.strategy = ") (s); }
 
-	public static var deferredOnerror : Error -> Void;
+	public static var routeMode(get, set) : String;
+	static inline function get_routeMode() : String { return untyped __js__("Mithril.route.mode"); }
+	static inline function set_routeMode(s : String) : String { return untyped __js__("Mithril.route.mode = ") (s); }
 
-	public static var redrawStrategy : String;
+	public static var deferredOnerror(get, set) : Error -> Void;
+	static inline function get_deferredOnerror() : Error -> Void { return untyped __js__("Mithril.deferred.onerror"); }
+	static inline function set_deferredOnerror(f : Error -> Void) : Error -> Void { return untyped __js__("Mithril.deferred.onerror = ") (f); }
 
 	///// Haxe specific stuff /////
 
 	static function __init__() : Void {
-		// Add properties to support function properties in javascript
+		// Some extra properties that simplifies the API a lot.
 		untyped __js__("
-			Mithril.m =               Mithril;
-			Mithril.routeParam =      Mithril.route.param;
-			Mithril.routeMode =       Mithril.route.mode;
-			Mithril.deferredOnerror = Mithril.deferred.onerror;
-			Mithril.redrawStrategy =  Mithril.redraw.strategy;
-			Mithril.__module =        Mithril.module;
-			Mithril.__cm =            null;
+			Mithril.m =        Mithril;
+			Mithril.__module = Mithril.module;
+			Mithril.__cm =     null;
 		");
 
 		// Redefine Mithril.module to have access to the current module.
