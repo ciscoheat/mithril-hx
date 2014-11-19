@@ -9,7 +9,8 @@ import js.html.XMLHttpRequest;
 
 using Lambda;
 
-private abstract Either<T1, T2, T3, T4>(Dynamic) from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
+private abstract Either<T1, T2, T3, T4>(Dynamic) 
+from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 //////////
 
@@ -29,16 +30,21 @@ interface DynView extends View<Dynamic> {}
 interface DynController extends Controller<Dynamic> {}
 interface DynModule extends DynController extends DynView {}
 
-//////////
 
-typedef MithrilModule<T, T2> = {
+typedef MithrilModule<T> = {
 	function controller() : T;
-	function view(ctrl : T2) : VirtualElement;
+	function view(ctrl : T) : VirtualElement;
 }
+
+typedef DynMithrilModule = MithrilModule<Dynamic>;
+
+//////////
 
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
-typedef Children = Either<String, VirtualElement, {subtree: String}, Array<Children>>;
+
+typedef Children = Either<String, VirtualElement, {subtree: String}, 
+	Either<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
 
 typedef VirtualElement = {
 	var tag : String;
@@ -89,9 +95,9 @@ typedef JSONPOptions = {
 @:final @:native("Mithril")
 extern class M
 {
-	public static function m(selector : String, ?attributes : Dynamic, ?children : Dynamic) : VirtualElement;
+	public static function m(selector : String, ?attributes : Dynamic, ?children : Children) : VirtualElement;
 
-	public static function module<T, T2>(element : Element, module : MithrilModule<T, T2>) : T;
+	public static function module<T>(element : Element, module : MithrilModule<T>) : T;
 
 	public static function prop<T>(?initialValue : T) : GetterSetter<T>;
 
@@ -103,7 +109,7 @@ extern class M
 	public static function route(
 		rootElement : Element, 
 		defaultRoute : String, 
-		routes : Dynamic<MithrilModule<Dynamic, Dynamic>>) : Void;
+		routes : Dynamic<MithrilModule<Dynamic>>) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
 	public static function request<T, T2>(options : XHROptions) : Promise<T, T2>;
