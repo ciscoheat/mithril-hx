@@ -1,0 +1,8 @@
+# -D nodejs is only required here to remove 
+# some browser-specific stuff in the examples.
+-D nodejs 
+-cp src 
+-cp example
+#-debug
+-js bin/noderendering.js
+-main NodeRendering

@@ -22,34 +22,40 @@ class Todo implements Model
 
 	public function new(description) {
 		this.description = description;
+		this.done = false;
 	}
 }
 
 class TodoList implements Model
 {
+	#if !nodejs
 	static var storage = Browser.window.localStorage;
+	#end
 
 	public static function load() : TodoList {
+		#if nodejs
+		return new TodoList();
+		#else
 		var list = storage.getItem("todo-app-list");
 		if(list == "" || list == null) return new TodoList();
 
 		var ser = new Unserializer(list);
 		return new TodoList(cast ser.unserialize());
+		#end
 	}
 
-	@prop public var description : String;
+	public var description : String;
 	public var list : Array<Todo>;
 
 	public function new(list = null) {
 		this.list = list == null ? new Array<Todo>() : list;
-		this.description = M.prop("");
+		this.description = "";
 	}
 
-	public function add() {
-		if (this.description() != "") {
-			this.list.push(new Todo(this.description()));
-			this.description("");
-			this.save();
+	public function add(?description : Null<String>) {
+		if(description != null && description.length > 0) {
+			this.list.push(new Todo(description));
+			this.save();			
 		}
 	}
 
@@ -59,16 +65,20 @@ class TodoList implements Model
 	}
 
 	public function save() {
+		#if !nodejs
 		var ser = new Serializer();
 		ser.serialize(list);
 		storage.setItem("todo-app-list", ser.toString());
+		#end
 	}
 }
 
 class TodoModule implements Module<TodoModule>
 {
-	var todo : TodoList;
+	public var todo : TodoList;
+
 	var loader : SpanElement;
+	var input : InputElement;
 
 	public function new() {
 		this.todo = TodoList.load();
@@ -85,8 +95,8 @@ class TodoModule implements Module<TodoModule>
 	public function view(_) {
 		return m("div", [
 			m("input", {
-				config: function(e : InputElement) e.focus(),
-				value: todo.description(),
+				config: function(e : InputElement) if(input == null) input = e,
+				value: todo.description,
 				onkeyup: input_keyUp
 			}),
 			// The add button has a second delay to simulate a slow ajax request.
@@ -96,13 +106,12 @@ class TodoModule implements Module<TodoModule>
 				style: {display: "none"}
 			}, " Adding..."),
 			m("table", todo.list.map(function(task) {
+				// Prevent "checked" being added to a todo if not set
+				var attribs : Dynamic = { onclick: M.withAttr("checked", task_checked.bind(task)) } ;
+				if(task.done) attribs.checked = "checked";
+
 				return m("tr", [
-					m("td", [
-						m("input[type=checkbox]", { 
-							onclick: M.withAttr("checked", task_checked.bind(task)), 
-							checked: task.done
-						})
-					]),
+					m("td", [ m("input[type=checkbox]", attribs) ]),
 					m("td", { style: { textDecoration: task.done ? "line-through" : "none" }}, task.description)
 				]);
 			}))
@@ -112,18 +121,19 @@ class TodoModule implements Module<TodoModule>
 	private function todo_add(delay = 0) {
 		// Calling the redrawing system because of the async delay.
 		// See http://lhorie.github.io/mithril/auto-redrawing.html
-		M.startComputation();
 		loader.style.display = "inline";
+		M.startComputation();
 		deferMs(delay)
-		.then(function(ok) { todo.add(); return ok; }, function(error) return error)
+		.then(function(ok) { todo.add(todo.description); return ok; }, function(error) return error)
 		.then(function(_) {
+			todo.description = "";
 			loader.style.display = "none";
 			M.endComputation();
 		});
 	}
 
 	private function input_keyUp(e : KeyboardEvent) {
-		todo.description(cast(e.target, InputElement).value);
+		todo.description = cast(e.target, InputElement).value;
 		if (e.keyCode == 13) todo_add();
 	}
 

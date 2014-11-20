@@ -1,1 +1,3 @@
 /bin/mithril.js
+/node_modules
+/bin/noderendering.js
