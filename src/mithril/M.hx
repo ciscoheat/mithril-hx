@@ -9,7 +9,7 @@ import js.html.XMLHttpRequest;
 
 using Lambda;
 
-private abstract Either<T1, T2, T3, T4>(Dynamic) 
+private abstract Either<T1, T2, T3, T4>(Dynamic)
 from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 //////////
@@ -43,7 +43,7 @@ typedef DynMithrilModule = MithrilModule<Dynamic>;
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
 
-typedef Children = Either<String, VirtualElement, {subtree: String}, 
+typedef Children = Either<String, VirtualElement, {subtree: String},
 	Either<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
 
 typedef VirtualElement = {
@@ -107,8 +107,8 @@ extern class M
 	@:overload(function(path : String, ?params : Dynamic) : Void {})
 	@:overload(function(element : Element, isInitialized : Bool) : Void {})
 	public static function route(
-		rootElement : Element, 
-		defaultRoute : String, 
+		rootElement : Element,
+		defaultRoute : String,
 		routes : Dynamic<MithrilModule<Dynamic>>) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
@@ -121,8 +121,8 @@ extern class M
 	public static function trust(html : String) : String;
 
 	public static function render(
-		rootElement : Element, 
-		children : Children, 
+		rootElement : Element,
+		children : Children,
 		?forceRecreation : Bool) : Void;
 
 	public static function redraw(?forceSync : Bool) : Void;
@@ -154,15 +154,26 @@ extern class M
 	///// Haxe specific stuff /////
 
 	static function __init__() : Void {
-		// Some extra properties that simplifies the API a lot.
-		untyped __js__("
-			Mithril.m =        Mithril;
-			Mithril.__module = Mithril.module;
-			Mithril.__cm =     null;
-		");
+		// Hacking time! For patching window.Mithril and the Node module.
+		// Pass a property of window with the same value as the @:native metadata
+		// to the inline function. It will be replaced with the var name.
+		untyped __js__("try {");
+		_patch(untyped Browser.window.Mithril);
+		_patch(untyped __js__('require("mithril")'));
+		untyped __js__("} catch(_) {}");
+	}
 
-		// Redefine Mithril.module to have access to the current module.
-		untyped __js__("Mithril.module = function(root, module) { Mithril.__cm = module; return Mithril.__module(root, module); }");
+	public static inline function _patch(__varName : Dynamic) : Void {
+		// Some extra properties that simplifies the API a lot.
+		// Also redefines Mithril.module to have access to the current module.
+		untyped __js__("try {");
+		untyped __js__("(function(m) {
+			m.m =        m;
+			m.__module = m.module;
+			m.__cm =     null;
+			m.module = function(root, module) { m.__cm = module; return m.__module(root, module); }
+		})")(__varName);
+		untyped __js__("} catch(_) {}");
 	}
 
 	// Stores the current module so it can be used in module() calls (added automatically by macro).
