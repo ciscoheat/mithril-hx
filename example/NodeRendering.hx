@@ -50,7 +50,7 @@ class NodeRendering
 
 		// Mithril requires window and document to work properly.
 		// emulate them with html-element and some custom stuff.
-		require('./html-element.js');
+		require('html-element');
 		var doc : Document = untyped document;
 		var window = {
 			document: doc,
@@ -61,10 +61,14 @@ class NodeRendering
 			cancelAnimationFrame: function(_) {},
 			XMLHttpRequest: {}
 		};
+
+		// Need some extra functions on the element for everything to work.
+		untyped Element.prototype.addEventListener = Element.prototype.removeEventListener = 
+				Element.prototype.insertAdjacentHTML = function() {};
+
 		window.document.body = doc.createElement('body');
 
 		HTTP.createServer(function(req, resp) {
-			// TODO: Clone window object?
 			window.location = URL.Parse(req.url);
 
 			// Replace the window object in Mithril
@@ -77,60 +81,75 @@ class NodeRendering
 
 			//////////
 
-			var uri = window.location.pathname;
-			var path = require('path');
-			var filename = path.join(process.cwd(), uri.split('/').pop());
-
 			trace('GET ${req.url}');
 
-			File.exists(filename, function(exists) {
-				if(!exists) {
-					dynamicRoute(req.url, filename, resp);
-					return;
-				}
-			});
+			dynamicRoute(req.url, resp, function(isDynamic) {
+				if(isDynamic) return;
 
-			try {
-				if(File.statSync(filename).isDirectory()) filename += "/index.html";
-			} catch(e : Dynamic) {
-				return;
-			}
+				var uri = window.location.pathname;
+				var path = require('path');
+				var filename = path.join(process.cwd(), req.url.split('/').pop());
 
-			File.readFile(filename, function(err, file) {
-				if(err != null) {
-					resp.writeHead(500, {"Content-Type": "text/plain"});
-					resp.write(err + "\n");
-					resp.end();
-					return;										
-				}
+				//trace('GET ${req.url} ($filename $uri)');
 
-				resp.writeHead(200);
-				resp.write(file, "binary");
-				resp.end();
-			});
+				File.exists(filename, function(exists) {
+					if(!exists) {
+						resp.writeHead(404, {"Content-Type": "text/plain"});
+						resp.write("Not Found: " + filename + "\n");
+						resp.write("Url:" + req.url + "\n");
+						resp.end();
+						return;
+					}
+
+					// Static file
+					try {
+						if(File.statSync(filename).isDirectory()) filename += "/index.html";
+					} catch(e : Dynamic) {
+						return;
+					}
+
+					File.readFile(filename, function(err, file) {
+						if(err != null) {
+							resp.writeHead(500, {"Content-Type": "text/plain"});
+							resp.write(err + "\n");
+							resp.end();
+							return;
+						}
+
+						resp.writeHead(200);
+						resp.write(file, "binary");
+						resp.end();
+					});
+				});
+			});				
 		}).listen(6789);
 
 		console.log("Server available at http://localhost:6789");
 	}
 
-	static function dynamicRoute(url : String, filename : String, resp : ServerResponse) {
+	static function dynamicRoute(url : String, resp : ServerResponse, then : Bool -> Void) {
 		var render : MithrilNodeRenderer = require("mithril-node-render");
 		var path = require('path');
+		var test = url.split('/').filter(function(s) return s.length > 0).join('/');
 
-		var indexPage = path.join(process.cwd(), "index.html");
-		File.readFile(indexPage, function(err, html) {
-			switch(url) {
-				case "/dashboard" | "/dashboard/todo" | "/dashboard/chain":					
-					var output = html.toString().replace("<!-- SERVERCONTENT -->", render(app.view(app)));
-					resp.writeHead(200, {"Content-Type": "text/html"});  
+		var template = path.join(process.cwd(), "index.html");
+
+		File.readFile(template, function(err, html) {
+			switch(test) {
+				case "dashboard", "dashboard/todo", "dashboard/chain":
+					var rendered = render(app.view(app));
+					var output : String = html.toString().replace("<!-- SERVERCONTENT -->", rendered);
+					resp.writeHead(200, {
+						"Content-Length": output.length,
+						"Content-Type": "text/html"
+					});  
 					resp.write(output);
+					resp.end();
+					//console.log(output);
+					then(true);
 				case _:
-					resp.writeHead(404, {"Content-Type": "text/plain"});
-					resp.write("Not Found:" + filename + "\n");
-					resp.write("Url:" + url + "\n");
+					then(false);
 			}
-
-			resp.end();
 		});
 	}
 }

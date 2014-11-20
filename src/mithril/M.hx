@@ -165,7 +165,8 @@ extern class M
 
 	public static inline function _patch(__varName : Dynamic) : Void {
 		// Some extra properties that simplifies the API a lot.
-		// Also redefines Mithril.module to have access to the current module.
+		// Also redefines Mithril.module to have access to the current module,
+		// and removes ajax requests on Node.js.
 		untyped __js__("try {");
 		untyped __js__("(function(m) {
 			m.m =        m;
@@ -173,8 +174,9 @@ extern class M
 			m.__cm =     null;
 			m.module = function(root, module) { m.__cm = module; return m.__module(root, module); }
 			if (typeof module !== 'undefined' && module.exports) 
-				m.request = function(xhrOptions) { var def = m.deferred(); def.reject(); return def.promise; };
+				m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);
+		// var def = m.deferred(); def.reject(); return def.promise;
 		untyped __js__("} catch(_) {}");
 	}
 

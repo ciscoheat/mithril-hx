@@ -7,3 +7,4 @@
 -js bin/noderendering.js
 -main NodeRendering
 #-debug
+-cmd haxe mithril.hxml

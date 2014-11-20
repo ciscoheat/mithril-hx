@@ -68,13 +68,12 @@ class DashboardModule implements DynModule
 		M.route(body, "/dashboard", {
 			"/dashboard": this,
 			"/dashboard/:app": this
-		});		
+		});
 	}
 
 	public static function main() {
-		haxe.Timer.delay(function() {
-			var app = new DashboardModule();
-			app.setRoutes(Browser.document.body);
-		}, 0);
+		Browser.document.addEventListener('DOMContentLoaded', function(e){
+			new DashboardModule().setRoutes(Browser.document.body);
+		});		
 	}
 }
