@@ -1,7 +1,9 @@
 package  ;
 
+#if !nodejs
 import haxe.Serializer;
 import haxe.Unserializer;
+#end
 import haxe.Timer;
 import js.Browser;
 import js.html.Event;

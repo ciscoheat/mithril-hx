@@ -3,6 +3,7 @@
 -D nodejs 
 -cp src 
 -cp example
-#-debug
+-lib nodehx
 -js bin/noderendering.js
 -main NodeRendering
+#-debug

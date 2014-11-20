@@ -1,9 +1,11 @@
 package  ;
 
-import haxe.ds.IntMap;
-import haxe.Json;
+#if !nodejs
 import haxe.Serializer;
 import haxe.Unserializer;
+#end
+import haxe.ds.IntMap;
+import haxe.Json;
 import js.Browser;
 import js.html.Event;
 import js.html.InputElement;
@@ -15,14 +17,20 @@ import mithril.M.VirtualElement;
 
 class ChainModel extends IntMap<Bool>
 {
+	#if !nodejs
 	static var storage = Browser.window.localStorage;
+	#end
 
 	public static function load() : ChainModel {
+		#if nodejs
+		return new ChainModel();
+		#else
 		var list = storage.getItem("chain-app-list");
 		if(list == "" || list == null) return new ChainModel();
 
 		var ser = new Unserializer(list);
 		return cast ser.unserialize();
+		#end
 	}
 
 	public function new() {
@@ -36,9 +44,11 @@ class ChainModel extends IntMap<Bool>
 	}
 
 	public function save() : Void {
+		#if !nodejs
 		var ser = new Serializer();
 		ser.serialize(this);
 		storage.setItem("chain-app-list", ser.toString());
+		#end
 	}
 
 	public function today() : Date {
@@ -48,12 +58,18 @@ class ChainModel extends IntMap<Bool>
 
 	public function resetDate() : Float {
 		var time = today().getTime();
+		#if !nodejs
 		storage.setItem("chain-app.start-date", Std.string(time));
+		#end
 		return time;
 	}
 
 	public function startDate() : Date {
+		#if nodejs
+		var date = null;
+		#else
 		var date = Std.parseInt(storage.getItem("chain-app.start-date"));
+		#end
 		return Date.fromTime(date == null ? resetDate() : date);
 	}
 
@@ -125,13 +141,15 @@ class ChainView implements View<ChainController>
 	}
 
 	public function checks(ctrl : ChainController, index : Int) {
-		return {
+		var attribs : Dynamic = {
 			onclick: function(e : Event) {
 				var checkBox = cast(e.target, InputElement);
 				ctrl.check(index, checkBox.checked);
 			},
-			checked: ctrl.isChecked(index)
 		};
+		
+		if(ctrl.isChecked(index)) attribs.checked = "checked";
+		return attribs;
 	}
 
 	public function highlights(index) {

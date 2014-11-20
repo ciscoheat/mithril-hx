@@ -172,6 +172,8 @@ extern class M
 			m.__module = m.module;
 			m.__cm =     null;
 			m.module = function(root, module) { m.__cm = module; return m.__module(root, module); }
+			if (typeof module !== 'undefined' && module.exports) 
+				m.request = function(xhrOptions) { var def = m.deferred(); def.reject(); return def.promise; };
 		})")(__varName);
 		untyped __js__("} catch(_) {}");
 	}

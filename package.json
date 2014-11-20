@@ -5,6 +5,7 @@
 
 	"dependencies": {
 		"mithril": "^0.1.24",
-		"mithril-node-render": "^0.1.5"
+		"mithril-node-render": "^0.1.5",
+		"class-list": "~0.1.1"
 	}
 }
