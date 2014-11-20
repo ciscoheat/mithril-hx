@@ -4,7 +4,7 @@ import mithril.M;
 
 typedef MithrilNodeRenderer = VirtualElement -> String;
 
-class NodeRendering implements Model
+class NodeRendering
 {
 	static function require<T>(s : String) : T return untyped __js__('require(s)');
 	static var console(default,null) : {log: Dynamic -> Void} = untyped __js__('console');
