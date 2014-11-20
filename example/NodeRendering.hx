@@ -48,6 +48,8 @@ class NodeRendering
 	static function startServer() {
 		app = new DashboardModule();
 
+		// Mithril requires window and document to work properly.
+		// emulate them with html-element and some custom stuff.
 		require('./html-element.js');
 		var doc : Document = untyped document;
 		var window = {
@@ -62,18 +64,16 @@ class NodeRendering
 		window.document.body = doc.createElement('body');
 
 		HTTP.createServer(function(req, resp) {
-			// TODO: Clone window object
+			// TODO: Clone window object?
 			window.location = URL.Parse(req.url);
 
 			// Replace the window object in Mithril
+			// must be done after window.location is set.
 			M.deps(window);
 
-			// Set the same routes as on clientside (DashboardModule)
-			M.routeMode = "pathname";
-			M.route(window.document.body, "/dashboard", {
-				"/dashboard": app,
-				"/dashboard/:app": app
-			});
+			// Set the same routes as on clientside
+			// must be done after M.deps()
+			app.setRoutes(window.document.body);
 
 			//////////
 
