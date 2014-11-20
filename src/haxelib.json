@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.9.0",
-  "releasenote": "Needed another Promise fix.",
+  "version": "0.10.0",
+  "releasenote": "Node.js support for serverside rendering!",
   "contributors": ["ciscoheat"]
 }

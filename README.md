@@ -138,6 +138,14 @@ If you want to test from scratch, here's a useful html template:
 </html>
 ```
 
+# Node.js support!
+
+Without much hassle, it's possible to render a Mithril module/view serverside on Node.js. The repo contains an example for that too. Execute the following in the cloned repo directory:
+
+1. `npm install`
+1. `haxe noderendering.hxml`
+1. `node bin/noderendering.js`
+
 # Feedback please!
 
-This is an early version, so feedback is always welcome! [Open an issue](https://github.com/ciscoheat/mithril-hx/issues) and give me a piece of your mind. :) Macro suggestions are very welcome!
+This is an early version, so feedback is always welcome! [Open an issue](https://github.com/ciscoheat/mithril-hx/issues) and give me a piece of your mind. :)
