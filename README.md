@@ -120,7 +120,7 @@ That should hopefully be enough for you to get started. Remember, plenty of docu
 
 # Haxe examples
 
-This repo contains a basic example so clone it, compile and run `bin/index.html` in your browser.
+This repo contains a basic example so clone it, compile with `haxe mithril.js` and open `bin/index.html` in your browser.
 
 If you want to test from scratch, here's a useful html template:
 

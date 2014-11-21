@@ -7,4 +7,5 @@
 -js bin/noderendering.js
 -main NodeRendering
 #-debug
--cmd haxe mithril.hxml
+# Changing route mode in the demo with -D isomorphic.
+-cmd haxe -D isomorphic mithril.hxml

@@ -63,7 +63,11 @@ class DashboardModule implements DynModule
 	}
 
 	public function setRoutes(body : js.html.Element) {
+		#if isomorphic
 		M.routeMode = "pathname";
+		#else
+		M.routeMode = "hash";
+		#end
 
 		M.route(body, "/dashboard", {
 			"/dashboard": this,
