@@ -9,18 +9,22 @@ import js.html.XMLHttpRequest;
 
 using Lambda;
 
-private abstract Either<T1, T2, T3, T4>(Dynamic)
+private abstract Either4<T1, T2, T3, T4>(Dynamic)
 from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
-//////////
+///// Interfaces /////
 
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface Model {}
 
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface View<T> {
-	function view(ctrl : T) : VirtualElement;
+	function view(ctrl : T) : VirtualElementView;
 }
 
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller<T> {
+	/**
+	 * When implementing Controller<T>, the method will automatically return "this"
+	 * unless otherwise specified.
+	 */
 	function controller() : T;
 }
 
@@ -30,27 +34,31 @@ interface DynView extends View<Dynamic> {}
 interface DynController extends Controller<Dynamic> {}
 interface DynModule extends DynController extends DynView {}
 
+///// Typedefs /////
 
+/**
+ * A typedef of View<T> and Controller<T>, so it can be used by anonymous objects.
+ */
 typedef MithrilModule<T> = {
 	function controller() : T;
-	function view(ctrl : T) : VirtualElement;
+	function view(ctrl : T) : VirtualElementView;
 }
 
 typedef DynMithrilModule = MithrilModule<Dynamic>;
 
-//////////
-
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
 
-typedef Children = Either<String, VirtualElement, {subtree: String},
-	Either<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
+typedef Children = Either4<String, VirtualElement, {subtree: String},
+	Either4<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
 
 typedef VirtualElement = {
 	var tag : String;
 	var attributes : Dynamic;
 	var children : Children;
 };
+
+typedef VirtualElementView = Either4<VirtualElement, String, Array<VirtualElement>, Array<String>>;
 
 typedef Promise<T, T2> = {
 	function then<T3, T4>(?success : T -> T3, ?error : T2 -> T4) : Promise<T3, T4>;
