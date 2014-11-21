@@ -35,7 +35,7 @@ class DashboardModule implements DynModule
 	}
 
 	public function view(_) {
-		return m("div", [
+		return [
 			m("h1", "Welcome!"),
 			m("p", "Choose your app:"),
 			m("div", {style: {width: "300px"}}, [
@@ -52,7 +52,7 @@ class DashboardModule implements DynModule
 				m("div", ip().length == 0 ? "Retreiving IP..." : "Your IP: " + ip()),
 				m("button", { onclick: clearData }, "Clear stored data")
 			])
-		]);
+		];
 	}
 
 	public function clearData() {

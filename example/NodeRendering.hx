@@ -13,7 +13,7 @@ import js.Browser;
 import js.html.Document;
 using StringTools;
 
-typedef MithrilNodeRenderer = VirtualElement -> String;
+typedef MithrilNodeRenderer = VirtualElementView -> String;
 
 class NodeRendering
 {
@@ -77,7 +77,7 @@ class NodeRendering
 
 			// Set the same routes as on clientside
 			// must be done after M.deps()
-			app.setRoutes(window.document.body);
+			app.setRoutes(window.document.body);			
 
 			//////////
 
