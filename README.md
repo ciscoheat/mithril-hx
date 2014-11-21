@@ -142,17 +142,18 @@ If you want to test from scratch, here's a useful html template:
 
 Without much hassle, it's possible to render a Mithril module/view serverside on Node.js. The repo contains two examples. Execute the following in the cloned repo directory to compile:
 
-1. `npm install` (first time only)
+1. `npm install`
+1. `haxelib install nodehx`
 1. `haxe noderendering.hxml`
+1. `cd bin`
 
 ## Example 1: Simple rendering
 
-`node bin/noderendering.js` outputs a simple HTML rendering example.
+`node noderendering.js` outputs a simple HTML rendering example.
 
 ## Example 2: Isomorphic code
 
-1. `cd bin`
-1. `node noderendering.js server`
+`node noderendering.js server`
 
 Starts a server on [http://localhost:6789](http://localhost:6789) that executes the same code on server and client. The server generates the HTML so the page is percieved to load quickly, then the client enables the functionality. Check [this article](http://artsy.github.io/blog/2013/11/30/rendering-on-the-server-and-client-in-node-dot-js/) for more about isomorphic code.
 
