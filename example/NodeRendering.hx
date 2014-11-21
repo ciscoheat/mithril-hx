@@ -124,7 +124,7 @@ class NodeRendering
 			});				
 		}).listen(6789);
 
-		console.log("Server available at http://localhost:6789");
+		console.log("Server started on http://localhost:6789");
 	}
 
 	static function dynamicRoute(url : String, resp : ServerResponse, then : Bool -> Void) {
@@ -132,11 +132,10 @@ class NodeRendering
 		var path = require('path');
 		var test = url.split('/').filter(function(s) return s.length > 0).join('/');
 
-		var template = path.join(process.cwd(), "index.html");
-
-		File.readFile(template, function(err, html) {
-			switch(test) {
-				case "dashboard", "dashboard/todo", "dashboard/chain":
+		switch(test) {
+			case "dashboard", "dashboard/todo", "dashboard/chain":
+				var template = path.join(process.cwd(), "index.html");
+				File.readFile(template, function(err, html) {
 					var rendered = render(app.view(app));
 					var output : String = html.toString().replace("<!-- SERVERCONTENT -->", rendered);
 					resp.writeHead(200, {
@@ -147,9 +146,9 @@ class NodeRendering
 					resp.end();
 					//console.log(output);
 					then(true);
-				case _:
-					then(false);
-			}
-		});
+				});
+			case _:
+				then(false);
+		}
 	}
 }
