@@ -344,7 +344,7 @@ class M
 
 	///// Stubs /////
 
-	public static function module<T>(element : Element, module : MithrilModule<T>) : T { return null; }
+	public static function module<T>(element : Element, module : MithrilModule<T>) : T { return module.controller(); }
 	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void {}
 	public static function request<T, T2>(options : XHROptions) : Promise<T, T2> { return new MPromise<T, T2>(); }
 	public static function sync<T, T2>(promises : Array<Promise<T, T2>>) : Promise<T, T2> { return new MPromise(); }
