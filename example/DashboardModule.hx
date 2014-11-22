@@ -64,7 +64,11 @@ class DashboardModule implements DynModule
 
 	public function setRoutes(body : js.html.Element) {
 		#if isomorphic
+		// Changing route mode to "pathname" to get urls without hash.
 		M.routeMode = "pathname";
+		// Changing redraw strategy to "current" to diff with existing DOM
+		// (not part of the official Mithril yet)
+		M.redrawStrategy("current");
 		#else
 		M.routeMode = "hash";
 		#end
