@@ -1,0 +1,5 @@
+-cp src 
+-cp example
+-neko bin/haxerendering.n
+-main HaxeRendering
+-debug

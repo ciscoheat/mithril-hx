@@ -1,17 +1,23 @@
 package  ;
 
-#if !nodejs
+import mithril.M;
+import haxe.Timer;
+
+#if (js && !nodejs)
 import haxe.Serializer;
 import haxe.Unserializer;
 #end
-import haxe.Timer;
+#if js
 import js.Browser;
 import js.html.Event;
 import js.html.InputElement;
 import js.html.KeyboardEvent;
 import js.html.SpanElement;
-import mithril.M;
 import js.Lib;
+#else
+typedef KeyboardEvent = Dynamic;
+typedef InputElement = Dynamic;
+#end
 
 /**
 * Cannot use @prop and M.prop(), doesn't work well with
@@ -30,19 +36,19 @@ class Todo implements Model
 
 class TodoList implements Model
 {
-	#if !nodejs
+	#if (js && !nodejs)
 	static var storage = Browser.window.localStorage;
 	#end
 
 	public static function load() : TodoList {
-		#if nodejs
-		return new TodoList();
-		#else
+		#if (js && !nodejs)
 		var list = storage.getItem("todo-app-list");
 		if(list == "" || list == null) return new TodoList();
 
 		var ser = new Unserializer(list);
 		return new TodoList(cast ser.unserialize());
+		#else
+		return new TodoList();
 		#end
 	}
 
@@ -67,7 +73,7 @@ class TodoList implements Model
 	}
 
 	public function save() {
-		#if !nodejs
+		#if (js && !nodejs)
 		var ser = new Serializer();
 		ser.serialize(list);
 		storage.setItem("todo-app-list", ser.toString());
@@ -79,8 +85,13 @@ class TodoModule implements Module<TodoModule>
 {
 	public var todo : TodoList;
 
+	#if js
 	var loader : SpanElement;
 	var input : InputElement;
+	#else
+	var loader : Dynamic;
+	var input : Dynamic;
+	#end
 
 	public function new() {
 		this.todo = TodoList.load();
@@ -95,16 +106,16 @@ class TodoModule implements Module<TodoModule>
 	public function controller() {}
 
 	public function view(_) {
-		return m("div", [
+		return m("div[name=test]", [
 			m("input", {
-				config: function(e : InputElement) if(input == null) input = e,
+				config: function(e) if(input == null) input = e,
 				value: todo.description,
 				onkeyup: input_keyUp
 			}),
 			// The add button has a second delay to simulate a slow ajax request.
 			m("button", { onclick: todo_add.bind(1000) }, "Add"),
 			m("span", {
-				config: function(e : SpanElement) if(loader == null) loader = e,
+				config: function(e) if(loader == null) loader = e,
 				style: {display: "none"}
 			}, " Adding..."),
 			m("table", todo.list.map(function(task) {
@@ -135,8 +146,10 @@ class TodoModule implements Module<TodoModule>
 	}
 
 	private function input_keyUp(e : KeyboardEvent) {
+		#if js
 		todo.description = cast(e.target, InputElement).value;
 		if (e.keyCode == 13) todo_add();
+		#end
 	}
 
 	private function task_checked(task : Todo, checked : Bool) {
@@ -146,12 +159,16 @@ class TodoModule implements Module<TodoModule>
 
 	private function deferMs(delay : Int) : Promise<Bool, Bool> {
 		var d = M.deferred();
+		#if js
 		Timer.delay(d.resolve.bind(true), delay);
+		#end
 		return d.promise;
 	}
 
+	#if js
 	static function main()
 	{
 		M.module(Browser.document.body, new TodoModule());
 	}
+	#end
 }
