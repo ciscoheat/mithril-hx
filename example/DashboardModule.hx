@@ -1,10 +1,13 @@
 package  ;
 
-import js.Browser;
 import mithril.M;
 import mithril.M.Module;
 import mithril.M.VirtualElement;
 import ChainController;
+#if js
+import js.Browser;
+import js.html.Element;
+#end
 
 class DashboardModule implements Module<Dynamic>
 {
@@ -22,6 +25,7 @@ class DashboardModule implements Module<Dynamic>
 	}
 
 	public function controller() {
+		#if js
 		// Detect IP, but with a minimal delay so it won't stop the rendering.
 		if(ip().length == 0) haxe.Timer.delay(function() {
 			M.request({
@@ -32,6 +36,7 @@ class DashboardModule implements Module<Dynamic>
 				function(_) ip("Don't know!")
 			);
 		}, 0);
+		#end
 	}
 
 	public function view(_) {
@@ -62,7 +67,7 @@ class DashboardModule implements Module<Dynamic>
 		M.endComputation();
 	}
 
-	public function setRoutes(body : js.html.Element) {
+	public function setRoutes(body : Element) {
 		#if isomorphic
 		// Changing route mode to "pathname" to get urls without hash.
 		M.routeMode = "pathname";
@@ -79,9 +84,11 @@ class DashboardModule implements Module<Dynamic>
 		});
 	}
 
+	#if js
 	public static function main() {
 		Browser.document.addEventListener('DOMContentLoaded', function(e){
 			new DashboardModule().setRoutes(Browser.document.body);
 		});		
 	}
+	#end
 }

@@ -4,32 +4,34 @@ package  ;
 import haxe.Serializer;
 import haxe.Unserializer;
 #end
-import haxe.ds.IntMap;
-import haxe.Json;
+#if js
 import js.Browser;
 import js.html.Event;
 import js.html.InputElement;
 import js.html.Storage;
 import js.Lib;
+#end
+import haxe.ds.IntMap;
+import haxe.Json;
 import mithril.M;
 import mithril.M.Module;
 import mithril.M.VirtualElement;
 
 class ChainModel extends IntMap<Bool>
 {
-	#if !nodejs
+	#if (js && !nodejs)
 	static var storage = Browser.window.localStorage;
 	#end
 
 	public static function load() : ChainModel {
-		#if nodejs
-		return new ChainModel();
-		#else
+		#if (js && !nodejs)
 		var list = storage.getItem("chain-app-list");
 		if(list == "" || list == null) return new ChainModel();
 
 		var ser = new Unserializer(list);
 		return cast ser.unserialize();
+		#else
+		return new ChainModel();
 		#end
 	}
 
@@ -44,7 +46,7 @@ class ChainModel extends IntMap<Bool>
 	}
 
 	public function save() : Void {
-		#if !nodejs
+		#if (js && !nodejs)
 		var ser = new Serializer();
 		ser.serialize(this);
 		storage.setItem("chain-app-list", ser.toString());
@@ -58,17 +60,17 @@ class ChainModel extends IntMap<Bool>
 
 	public function resetDate() : Float {
 		var time = today().getTime();
-		#if !nodejs
+		#if (js && !nodejs)
 		storage.setItem("chain-app.start-date", Std.string(time));
 		#end
 		return time;
 	}
 
 	public function startDate() : Date {
-		#if nodejs
-		var date = null;
-		#else
+		#if (js && !nodejs)
 		var date = Std.parseInt(storage.getItem("chain-app.start-date"));
+		#else
+		var date = null;
 		#end
 		return Date.fromTime(date == null ? resetDate() : date);
 	}
@@ -108,10 +110,12 @@ class ChainController implements Controller<ChainController>
 		}
 	}
 
+	#if js
 	public static function main() {
 		var controller = new ChainController();
 		M.module(Browser.document.body, { controller: controller.controller, view: controller.view.view });
 	}
+	#end
 }
 
 class ChainView implements View<ChainController>
@@ -143,7 +147,7 @@ class ChainView implements View<ChainController>
 	public function checks(ctrl : ChainController, index : Int) {
 		var attribs : Dynamic = {
 			onclick: function(e : Event) {
-				var checkBox = cast(e.target, InputElement);
+				var checkBox : InputElement = cast e.target;
 				ctrl.check(index, checkBox.checked);
 			},
 		};

@@ -106,8 +106,8 @@ class TodoModule implements Module<TodoModule>
 	public function controller() {}
 
 	public function view(_) {
-		return m("div[name=test]", [
-			m("input", {
+		return m("div.todo", [
+			m("input[name=description]", {
 				config: function(e) if(input == null) input = e,
 				value: todo.description,
 				onkeyup: input_keyUp
@@ -146,10 +146,9 @@ class TodoModule implements Module<TodoModule>
 	}
 
 	private function input_keyUp(e : KeyboardEvent) {
-		#if js
-		todo.description = cast(e.target, InputElement).value;
+		var input : InputElement = cast e.target;
+		todo.description = input.value;
 		if (e.keyCode == 13) todo_add();
-		#end
 	}
 
 	private function task_checked(task : Todo, checked : Bool) {
