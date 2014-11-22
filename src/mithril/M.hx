@@ -1,6 +1,7 @@
 package mithril;
 
 import js.Browser;
+import js.html.Document;
 import js.html.DOMWindow;
 import js.html.Element;
 import js.Error;
@@ -9,7 +10,7 @@ import js.html.XMLHttpRequest;
 
 using Lambda;
 
-private abstract Either4<T1, T2, T3, T4>(Dynamic)
+private abstract Either<T1, T2, T3, T4>(Dynamic)
 from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 ///// Interfaces /////
@@ -17,7 +18,7 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface Model {}
 
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface View<T> {
-	function view(ctrl : T) : VirtualElementView;
+	function view(ctrl : T) : ViewOutput;
 }
 
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller<T> {
@@ -30,27 +31,22 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 interface Module<T> extends Controller<T> extends View<T> {}
 
-interface DynView extends View<Dynamic> {}
-interface DynController extends Controller<Dynamic> {}
-interface DynModule extends DynController extends DynView {}
-
 ///// Typedefs /////
 
 /**
  * A typedef of View<T> and Controller<T>, so it can be used by anonymous objects.
+ * If you're using a class, implement Module<T> to get macro benefits.
  */
 typedef MithrilModule<T> = {
 	function controller() : T;
-	function view(ctrl : T) : VirtualElementView;
+	function view(ctrl : T) : ViewOutput;
 }
-
-typedef DynMithrilModule = MithrilModule<Dynamic>;
 
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
 
-typedef Children = Either4<String, VirtualElement, {subtree: String},
-	Either4<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
+typedef Children = Either<String, VirtualElement, {subtree: String},
+	Either<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
 
 typedef VirtualElement = {
 	var tag : String;
@@ -58,9 +54,10 @@ typedef VirtualElement = {
 	var children : Children;
 };
 
-typedef VirtualElementView = Either4<VirtualElement, String, Array<VirtualElement>, Array<String>>;
+typedef ViewOutput = Either<VirtualElement, String, Array<VirtualElement>, Array<String>>;
 
 typedef Promise<T, T2> = {
+	// Haxe limitation: Cannot expose the GetterSetter directly. then() is required to get value.
 	function then<T3, T4>(?success : T -> T3, ?error : T2 -> T4) : Promise<T3, T4>;
 }
 
@@ -86,7 +83,7 @@ typedef XHROptions = {
 	@:optional var unwrapError : Dynamic -> Dynamic;
 	@:optional var serialize : Dynamic -> String;
 	@:optional var deserialize : String -> Dynamic;
-	@:optional var extract : XMLHttpRequest -> XHROptions -> Dynamic;
+	@:optional var extract : XMLHttpRequest -> XHROptions -> String;
 	@:optional var type : Dynamic -> Void;
 	@:optional var config : XMLHttpRequest -> XHROptions -> Null<XMLHttpRequest>;
 };
@@ -112,12 +109,10 @@ extern class M
 	public static function withAttr<T, T2>(property : String, ?callback : T -> Void) : EventHandler<T2>;
 
 	@:overload(function() : String {})
-	@:overload(function(path : String, ?params : Dynamic) : Void {})
 	@:overload(function(element : Element, isInitialized : Bool) : Void {})
-	public static function route(
-		rootElement : Element,
-		defaultRoute : String,
-		routes : Dynamic<MithrilModule<Dynamic>>) : Void;
+	@:overload(function(path : String, ?params : Dynamic, ?shouldReplaceHistory : Bool) : Void {})
+	@:overload(function(rootElement : Document, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void {})
+	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
 	public static function request<T, T2>(options : XHROptions) : Promise<T, T2>;
@@ -128,10 +123,8 @@ extern class M
 
 	public static function trust(html : String) : String;
 
-	public static function render(
-		rootElement : Element,
-		children : Children,
-		?forceRecreation : Bool) : Void;
+	@:overload(function(rootElement : Document, children : Children, ?forceRecreation : Bool) : Void {})
+	public static function render(rootElement : Element, children : Children, ?forceRecreation : Bool) : Void;
 
 	public static function redraw(?forceSync : Bool) : Void;
 
@@ -139,7 +132,7 @@ extern class M
 
 	public static function endComputation() : Void;
 
-	public static function deps(window : Dynamic) : DOMWindow;
+	public static function deps(window : Dynamic) : Dynamic;
 
 	///// Properties that uses function properties /////
 
@@ -171,10 +164,10 @@ extern class M
 		untyped __js__("} catch(_) {}");
 	}
 
-	public static inline function _patch(__varName : Dynamic) : Void {
+	@:noCompletion public static inline function _patch(__varName : Dynamic) : Void {
 		// Some extra properties that simplifies the API a lot.
 		// Also redefines Mithril.module to have access to the current module,
-		// and removes ajax requests on Node.js.
+		// and prevents deferred being resolved on Node.js.
 		untyped __js__("try {");
 		untyped __js__("(function(m) {
 			m.m =        m;
@@ -184,7 +177,6 @@ extern class M
 			if (typeof module !== 'undefined' && module.exports) 
 				m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);
-		// var def = m.deferred(); def.reject(); return def.promise;
 		untyped __js__("} catch(_) {}");
 	}
 
