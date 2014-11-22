@@ -54,7 +54,7 @@ typedef Children = Either4<String, VirtualElement, {subtree: String},
 
 typedef VirtualElement = {
 	var tag : String;
-	var attributes : Dynamic;
+	var attrs : Dynamic;
 	var children : Children;
 };
 
