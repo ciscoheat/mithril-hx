@@ -114,7 +114,7 @@ class TodoModule implements Module<TodoModule>
 }
 ```
 
-If you don't need the type safety, each interface except Model has a Dynamic equivalent: `DynView` `DynController` and `DynModule`.
+If you don't need the type safety, you can always implement the interface with `<Dynamic>`.
 
 That should hopefully be enough for you to get started. Remember, plenty of documentation over at the [Mithril](http://lhorie.github.io/mithril/index.html) site.
 

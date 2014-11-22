@@ -6,7 +6,7 @@ import mithril.M.Module;
 import mithril.M.VirtualElement;
 import ChainController;
 
-class DashboardModule implements DynModule
+class DashboardModule implements Module<Dynamic>
 {
 	var todo : TodoModule;
 	var chainController : ChainController;

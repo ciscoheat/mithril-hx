@@ -13,7 +13,7 @@ import js.Browser;
 import js.html.Document;
 using StringTools;
 
-typedef MithrilNodeRenderer = VirtualElementView -> String;
+typedef MithrilNodeRenderer = ViewOutput -> String;
 
 class NodeRendering
 {
