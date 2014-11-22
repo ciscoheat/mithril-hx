@@ -1,8 +1,6 @@
 package ;
 
 import mithril.M;
-import mithril.M.Module;
-using StringTools;
 
 class HaxeRendering
 {
@@ -18,6 +16,6 @@ class HaxeRendering
 
 		todoList.todo.list[0].done = true;
 
-		Sys.println(M.render(todoList.view(todoList)));
+		Sys.println(M.instance.render(todoList.view(todoList)));
 	}
 }
