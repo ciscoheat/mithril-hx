@@ -46,7 +46,12 @@ typedef MithrilModule<T> = {
 }
 
 #if !js
-private typedef Event = Dynamic;
+typedef Browser = Dynamic;
+typedef Event = Dynamic;
+typedef Element = Dynamic;
+typedef XHROptions = Dynamic;
+typedef Error = Dynamic;
+typedef InputElement = Dynamic;
 #end
 
 typedef GetterSetter<T> = ?T -> T;
@@ -194,6 +199,13 @@ extern class M
 	@:noCompletion public static var __cm : Dynamic;
 }
 #else
+private class MPromise<T, T2> {
+	public function new() {}
+	public function then<T3, T4>(?success : T -> T3, ?error : T2 -> T4) : Promise<T3, T4> {
+		return new MPromise();
+	}
+}
+
 class M
 {
 	static var parser : EReg = ~/(?:(^|#|\.)([^#\.\[\]]+))|(\[.+?\])/g;
@@ -208,7 +220,7 @@ class M
 			!Reflect.hasField(attributes, "tag") && !Reflect.hasField(attributes, "subtree");
 
 		var attrs = hasAttrs ? attributes : {};
-		var classAttrName = Reflect.hasField(attributes, "class") ? "class" : "className";
+		var classAttrName = Reflect.hasField(attrs, "class") ? "class" : "className";
 		var cell : Dynamic = {tag: "div", attrs: {}};
 		var match = [];
 		var classes = [];
@@ -235,7 +247,9 @@ class M
 			}
 			tempSelector = parser.matchedRight();
 		}
-		if(classes.length > 0) Reflect.setField(cell, classAttrName, classes.join(" "));
+		if(classes.length > 0) {
+			Reflect.setField(cell.attrs, classAttrName, classes.join(" "));
+		}
 
 		var realChildren : Children = cast (children == null ? attributes : children);
 		if(Std.is(realChildren, Array)) {
@@ -270,7 +284,8 @@ class M
 
 		// view must be a VirtualElement now.
 		var el : VirtualElement = cast view;
-		if(Reflect.hasField(el, "$trusted")) return createTrustedContent(el);
+		// Special case for trusted data.
+		if(el.tag == "$trusted") return createTrustedContent(el);
 
 		var children = createChildrenContent(el);
 		if(children.length == 0 && voidElementsArray.indexOf(el.tag) >= 0) {
@@ -290,7 +305,7 @@ class M
 	}
 
 	static function createTrustedContent(el : VirtualElement) : String {
-		return null;
+		return el.attrs;
 	}
 
 	static function createAttrString(attrs : Dynamic) {
@@ -314,18 +329,42 @@ class M
 		return (~/([a-z\d])([A-Z])/g).replace(str, '$1-$2');		
 	}
 
+	public static function trust(v : Dynamic) {
+		return {
+			tag: "$trusted",
+			attrs: Std.string(v),
+			children: []
+		}
+	}
+
+	public static function prop<T>(?initialValue : T) : GetterSetter<T> { 
+		var value = initialValue;
+		return function(?v) { if(v != null) value = v; return value; }; 
+	}
+
 	///// Stubs /////
 
+	public static function module<T>(element : Element, module : MithrilModule<T>) : T { return null; }
+	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void {}
+	public static function request<T, T2>(options : XHROptions) : Promise<T, T2> { return new MPromise<T, T2>(); }
+	public static function sync<T, T2>(promises : Array<Promise<T, T2>>) : Promise<T, T2> { return new MPromise(); }
+	public static function redraw(?forceSync : Bool) : Void {}
+	public static function deps(window : Dynamic) : Dynamic { return window; }
 	public static function startComputation() : Void {}
 	public static function endComputation() : Void {}
 	public static function withAttr<T, T2>(property : String, ?callback : T -> Void) : EventHandler<T2> { return function(_) {}; }
 	public static function deferred<T, T2>() : Deferred<T, T2> { 
 		return {
-			promise: null,
+			promise: new MPromise(),
 			resolve: function(_) {},
 			reject: function(_) {}
 		}; 
 	}
+
+	public static var routeParam(default, default) : String -> String = function(s) { return ""; }
+	public static var redrawStrategy(default, default) : GetterSetter<String> = M.prop();
+	public static var routeMode(default, default) : String;
+	public static var deferredOnerror(default, default) : Error -> Void = function(_) {}
 
 	// Stores the current module so it can be used in module() calls (added automatically by macro).
 	@:noCompletion public static var __cm : Dynamic;
