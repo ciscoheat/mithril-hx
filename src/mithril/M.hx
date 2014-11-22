@@ -1,19 +1,29 @@
 package mithril;
 
-#if js
-import js.Browser;
-import js.html.Document;
-import js.html.DOMWindow;
-import js.html.Element;
-import js.Error;
-import js.html.Event;
-import js.html.XMLHttpRequest;
-#end
-
 using Lambda;
 using StringTools;
 
-private abstract Either<T1, T2, T3, T4>(Dynamic)
+#if js
+import js.Browser;
+import js.html.Document;
+import js.html.Event;
+import js.html.Element;
+import js.html.XMLHttpRequest;
+import js.Error;
+#elseif !dom_implemented
+typedef Browser = Dynamic;
+typedef Document = Dynamic;
+typedef Event = Dynamic;
+typedef Element = Dynamic;
+typedef XMLHttpRequest = Dynamic;
+typedef Error = Dynamic;
+typedef InputElement = Dynamic;
+#end
+
+private abstract Either<T1, T2>(Dynamic)
+from T1 from T2 to T1 to T2 {}
+
+private abstract Either4<T1, T2, T3, T4>(Dynamic)
 from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 ///// Interfaces /////
@@ -21,7 +31,7 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface Model {}
 
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface View<T> {
-	function view(ctrl : T) : ViewOutput;
+	function view(ctrl : T) : Children;
 }
 
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller<T> {
@@ -42,31 +52,20 @@ interface Module<T> extends Controller<T> extends View<T> {}
  */
 typedef MithrilModule<T> = {
 	function controller() : T;
-	function view(ctrl : T) : ViewOutput;
+	function view(ctrl : T) : Children;
 }
-
-#if !js
-typedef Browser = Dynamic;
-typedef Event = Dynamic;
-typedef Element = Dynamic;
-typedef XHROptions = Dynamic;
-typedef Error = Dynamic;
-typedef InputElement = Dynamic;
-#end
 
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
 
-typedef Children = Either<String, VirtualElement, {subtree: String},
-	Either<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
+typedef Children = Either4<String, VirtualElement, {subtree: String},
+	Either4<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
 
 typedef VirtualElement = {
 	var tag : String;
 	var attrs : Dynamic;
 	var children : Children;
 };
-
-typedef ViewOutput = Either<VirtualElement, String, Array<VirtualElement>, Array<String>>;
 
 typedef Promise<T, T2> = {
 	// Haxe limitation: Cannot expose the GetterSetter directly. then() is required to get value.
@@ -79,7 +78,6 @@ typedef Deferred<T, T2> = {
 	function reject(value : T2) : Void;
 }
 
-#if js
 /**
  * Plenty of optional fields for this one:
  * http://lhorie.github.io/mithril/mithril.request.html#signature
@@ -107,11 +105,11 @@ typedef JSONPOptions = {
 	@:optional var callbackKey : String;
 	@:optional var data : Dynamic;
 };
-#end
-
-//////////
 
 #if js
+
+///// Externs for javascript (including Node.js) /////
+
 @:final @:native("Mithril")
 extern class M
 {
@@ -199,6 +197,9 @@ extern class M
 	@:noCompletion public static var __cm : Dynamic;
 }
 #else
+
+///// Implementation of Mithril for other platforms than js /////
+
 private class MPromise<T, T2> {
 	public function new() {}
 	public function then<T3, T4>(?success : T -> T3, ?error : T2 -> T4) : Promise<T3, T4> {
@@ -206,16 +207,42 @@ private class MPromise<T, T2> {
 	}
 }
 
+/**
+* Since M is used by macros to call M.instance, this class can be used to configure
+* the actual instance retrieval.
+*/
+class MConfig
+{
+	public static var instance(default, default) : MConfig = new MConfig();
+
+	public var currentMithril(default, default) : Void -> M;
+
+	var mithril : M;
+
+	public function new() {
+		mithril = new M();
+		currentMithril = function() return mithril;
+	}
+}
+
 class M
 {
+	@:noCompletion public static var instance(get, null) : M;
+	static function get_instance() return MConfig.instance.currentMithril();
+
 	static var parser : EReg = ~/(?:(^|#|\.)([^#\.\[\]]+))|(\[.+?\])/g;
 	static var attrParser : EReg = ~/\[(.+?)(?:=("|'|)(.*?)\2)?\]/;
 	static var voidElements : EReg = ~/^(AREA|BASE|BR|COL|COMMAND|EMBED|HR|IMG|INPUT|KEYGEN|LINK|META|PARAM|SOURCE|TRACK|WBR)$/;
 	static var voidElementsArray = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 
 									'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
 
+	public function new() {
+		this.redrawStrategy = this.prop(null);
+		this.routeParam = function(s) return "";
+		this.deferredOnerror = function(_) {};
+	}
 
-	public static function m(selector : String, ?attributes : Dynamic, ?children : Children) : VirtualElement {
+	public function m(selector : String, ?attributes : Dynamic, ?children : Children) : VirtualElement {
 		var hasAttrs = Reflect.isObject(attributes) && Type.getClass(attributes) == null &&
 			!Reflect.hasField(attributes, "tag") && !Reflect.hasField(attributes, "subtree");
 
@@ -277,7 +304,7 @@ class M
 		return cell;
 	}
 
-	public static function render(view : ViewOutput) : String {
+	public function render(view : Children) : String {
 		if(view == null) return "";
 		if(Std.is(view, String)) return cast view;
 		if(Std.is(view, Array)) return cast(view, Array<Dynamic>).map(render).join('');
@@ -299,16 +326,16 @@ class M
 		].join('');
 	}
 
-	static function createChildrenContent(el : VirtualElement) : String {
+	function createChildrenContent(el : VirtualElement) : String {
 		if(el.children == null || !Std.is(el.children, Array)) return '';
 		return render(cast el.children);
 	}
 
-	static function createTrustedContent(el : VirtualElement) : String {
+	function createTrustedContent(el : VirtualElement) : String {
 		return el.attrs;
 	}
 
-	static function createAttrString(attrs : Dynamic) {
+	function createAttrString(attrs : Dynamic) {
 		if(attrs == null || Reflect.fields(attrs).length == 0) return '';
 
 		return Reflect.fields(attrs).map(function(name) {
@@ -324,12 +351,12 @@ class M
 		}).join('');
 	}
 
-	static function camelToDash(str : String) {
+	function camelToDash(str : String) {
 		str = (~/\W+/g).replace(str, '-');
 		return (~/([a-z\d])([A-Z])/g).replace(str, '$1-$2');		
 	}
 
-	public static function trust(v : Dynamic) {
+	public function trust(v : Dynamic) {
 		return {
 			tag: "$trusted",
 			attrs: Std.string(v),
@@ -337,23 +364,23 @@ class M
 		}
 	}
 
-	public static function prop<T>(?initialValue : T) : GetterSetter<T> { 
+	public function prop<T>(?initialValue : T) : GetterSetter<T> { 
 		var value = initialValue;
 		return function(?v) { if(v != null) value = v; return value; }; 
 	}
 
 	///// Stubs /////
 
-	public static function module<T>(element : Element, module : MithrilModule<T>) : T { return module.controller(); }
-	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void {}
-	public static function request<T, T2>(options : XHROptions) : Promise<T, T2> { return new MPromise<T, T2>(); }
-	public static function sync<T, T2>(promises : Array<Promise<T, T2>>) : Promise<T, T2> { return new MPromise(); }
-	public static function redraw(?forceSync : Bool) : Void {}
-	public static function deps(window : Dynamic) : Dynamic { return window; }
-	public static function startComputation() : Void {}
-	public static function endComputation() : Void {}
-	public static function withAttr<T, T2>(property : String, ?callback : T -> Void) : EventHandler<T2> { return function(_) {}; }
-	public static function deferred<T, T2>() : Deferred<T, T2> { 
+	public function module<T>(element : Element, module : MithrilModule<T>) : T { return module.controller(); }
+	public function route(rootElement : Element, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void {}
+	public function request<T, T2>(options : Either<XHROptions, JSONPOptions>) : Promise<T, T2> { return new MPromise(); }
+	public function sync<T, T2>(promises : Array<Promise<T, T2>>) : Promise<T, T2> { return new MPromise(); }
+	public function redraw(?forceSync : Bool) : Void {}
+	public function deps(window : Dynamic) : Dynamic { return window; }
+	public function startComputation() : Void {}
+	public function endComputation() : Void {}
+	public function withAttr<T, T2>(property : String, ?callback : T -> Void) : EventHandler<T2> { return function(_) {}; }
+	public function deferred<T, T2>() : Deferred<T, T2> { 
 		return {
 			promise: new MPromise(),
 			resolve: function(_) {},
@@ -361,12 +388,12 @@ class M
 		}; 
 	}
 
-	public static var routeParam(default, default) : String -> String = function(s) { return ""; }
-	public static var redrawStrategy(default, default) : GetterSetter<String> = M.prop();
-	public static var routeMode(default, default) : String;
-	public static var deferredOnerror(default, default) : Error -> Void = function(_) {}
+	public var routeParam(default, default) : String -> String; 
+	public var redrawStrategy(default, default) : GetterSetter<String>;
+	public var routeMode(default, default) : String;
+	public var deferredOnerror(default, default) : Error -> Void;
 
 	// Stores the current module so it can be used in module() calls (added automatically by macro).
-	@:noCompletion public static var __cm : Dynamic;
+	@:noCompletion public var __cm : Dynamic;
 }
 #end
