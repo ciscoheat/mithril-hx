@@ -73,7 +73,10 @@ class ModuleBuilder
 							case EDisplay(e2, isCall):
 								switch(e2) {
 									case macro m:
-										e2.expr = (macro mithril.M.m).expr;
+										if(Context.defined("js"))
+											e2.expr = (macro mithril.M.m).expr;
+										else
+											e2.expr = (macro mithril.M.instance.m).expr;
 									case _:
 								}
 							case _:

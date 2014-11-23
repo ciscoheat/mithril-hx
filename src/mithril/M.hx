@@ -187,7 +187,7 @@ extern class M
 			m.__module = m.module;
 			m.__cm =     null;
 			m.module = function(root, module) { m.__cm = module; return m.__module(root, module); }
-			if (typeof module !== 'undefined' && module.exports) 
+			if (typeof module !== 'undefined' && module.exports) // Node.js detection
 				m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);
 		untyped __js__("} catch(_) {}");
@@ -227,7 +227,13 @@ class MConfig
 
 class M
 {
-	@:noCompletion public static var instance(get, null) : M;
+	/**
+	 * Singleton access to the current M instance. Not part of the Mithril API.
+	 * In a class implementing one of the Module/Model/View/Controller interfaces
+	 * this is not required, you can use M directly from there. It will look like a static
+	 * call but macros will transform it to M.instance.
+	 */
+	public static var instance(get, null) : M;
 	static function get_instance() return MConfig.instance.currentMithril();
 
 	static var parser : EReg = ~/(?:(^|#|\.)([^#\.\[\]]+))|(\[.+?\])/g;
