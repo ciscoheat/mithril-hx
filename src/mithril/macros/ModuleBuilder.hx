@@ -85,30 +85,25 @@ class ModuleBuilder
 
 		switch(e) {
 			case macro M($a, $b, $c), macro m($a, $b, $c):
-				#if js
-				e.expr = (macro mithril.M.m($a, $b, $c)).expr;
-				#else
-				e.expr = (macro mithril.M.instance.m($a, $b, $c)).expr;
-				#end
+				if(Context.defined("js"))
+					e.expr = (macro mithril.M.m($a, $b, $c)).expr;
+				else
+					e.expr = (macro mithril.M.instance.m($a, $b, $c)).expr;
 				b.iter(replaceM);
 				c.iter(replaceM);
 			case macro M($a, $b), macro m($a, $b):
-				#if js
-				e.expr = (macro mithril.M.m($a, $b)).expr;
-				#else
-				e.expr = (macro mithril.M.instance.m($a, $b)).expr;
-				#end
+				if(Context.defined("js"))
+					e.expr = (macro mithril.M.m($a, $b)).expr;
+				else
+					e.expr = (macro mithril.M.instance.m($a, $b)).expr;
 				b.iter(replaceM);
 			case macro M($a), macro m($a):
-				#if js
-				e.expr = (macro mithril.M.m($a)).expr;
-				#else
-				e.expr = (macro mithril.M.instance.m($a)).expr;
-				#end
-			#if !js
-			case macro M.$a:
+				if(Context.defined("js"))
+					e.expr = (macro mithril.M.m($a)).expr;
+				else
+					e.expr = (macro mithril.M.instance.m($a)).expr;			
+			case macro M.$a if(!Context.defined("js")):
 				e.expr = (macro M.instance.$a).expr;
-			#end
 			case _:
 				e.iter(replaceM);
 		}
@@ -119,17 +114,16 @@ class ModuleBuilder
 		switch(f.expr.expr) {
 			case EBlock(exprs):
 				// If an anonymous object is used, don't call it.
-				#if js
-				exprs.unshift(macro
-					if (mithril.M.__cm != this && Type.typeof(mithril.M.__cm) != Type.ValueType.TObject)
-						return mithril.M.__cm.controller()
-				);
-				#else
-				exprs.unshift(macro
-					if (mithril.M.instance.__cm != this && Type.typeof(mithril.M.instance.__cm) != Type.ValueType.TObject)
-						return mithril.M.instance.__cm.controller()
-				);
-				#end
+				if(Context.defined("js"))
+					exprs.unshift(macro
+						if (mithril.M.__cm != this && Type.typeof(mithril.M.__cm) != Type.ValueType.TObject)
+							return mithril.M.__cm.controller()
+					);
+				else
+					exprs.unshift(macro
+						if (mithril.M.instance.__cm != this && Type.typeof(mithril.M.instance.__cm) != Type.ValueType.TObject)
+							return mithril.M.instance.__cm.controller()
+					);
 				exprs.push(macro return this);
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};

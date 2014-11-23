@@ -13,7 +13,7 @@ import js.Browser;
 import js.html.Document;
 using StringTools;
 
-typedef MithrilNodeRenderer = ViewOutput -> String;
+typedef MithrilNodeRenderer = Children -> String;
 
 class NodeRendering
 {
