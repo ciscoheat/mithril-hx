@@ -122,21 +122,62 @@ That should hopefully be enough for you to get started. Remember, plenty of docu
 
 This repo contains a basic example so clone it, compile with `haxe mithril.js` and open `bin/index.html` in your browser.
 
-If you want to test from scratch, here's a useful html template:
+If you want a bare-bones example, after [installing Haxe](http://haxe.org/download/) create the following two files and follow the instructions below:
+
+**index.html**
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <title>Mithril</title>
-</head>
+<!doctype html>
 <body>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/mithril/0.1.24/mithril.min.js"></script>
-    <script src="YOUR_HAXE_FILE.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.1.24/mithril.min.js"></script>
+<script src="example.js"></script>
 </body>
-</html>
 ```
+
+**Example.hx**
+
+```haxe
+package;
+using mithril.M;
+
+class User implements Model
+{
+    @prop public var name : String;
+
+    public function new(name) {
+        this.name = M.prop(name);
+    }
+}
+
+class Example implements Module<Example>
+{
+    var user : User;
+
+    public function new() {}
+
+    public function controller() {
+        this.user = new User("John Doe");
+    }
+
+    public function view(_) {
+        return m("input", {
+            onchange: M.withAttr("value", user.name),
+            value: user.name()
+        });
+    }
+
+    // Program entry point
+    static function main() {
+        M.module(js.Browser.document.body, new Example());
+    }
+}
+```
+
+Compile and run with:
+
+1. `haxelib install mithril`
+1. `haxe -lib mithril -js example.js -main Example`
+1. Open index.html in a browser.
 
 # Node.js support!
 
