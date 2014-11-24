@@ -138,7 +138,7 @@ If you want a bare-bones example, after [installing Haxe](http://haxe.org/downlo
 
 ```haxe
 package;
-using mithril.M;
+import mithril.M;
 
 class User implements Model
 {
