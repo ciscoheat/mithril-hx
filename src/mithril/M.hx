@@ -111,7 +111,6 @@ extern class M
 	@:overload(function() : String {})
 	@:overload(function(element : Element, isInitialized : Bool) : Void {})
 	@:overload(function(path : String, ?params : Dynamic, ?shouldReplaceHistory : Bool) : Void {})
-	@:overload(function(rootElement : Document, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void {})
 	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
