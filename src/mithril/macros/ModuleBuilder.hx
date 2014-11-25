@@ -13,8 +13,8 @@ class ModuleBuilder
 	@macro public static function build() : Array<Field>
 	{
 		var c = Context.getLocalClass().get();
-		if (c.meta.has(":processed")) return null;
-		c.meta.add(":processed",[],c.pos);
+		if (c.meta.has(":ModuleProcessed")) return null;
+		c.meta.add(":ModuleProcessed",[],c.pos);
 
 		var fields = Context.getBuildFields();
 
@@ -28,6 +28,7 @@ class ModuleBuilder
 			case FFun(f):
 				f.expr.iter(replaceM);
 				if (field.name == "controller") injectModule(f);
+				// TODO: Auto-add optional parameter to view() if it doesn't exist
 				propWarning(field);
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
@@ -85,12 +86,11 @@ class ModuleBuilder
 
 		switch(e) {
 			case macro M($a, $b, $c), macro m($a, $b, $c):
+				e.iter(replaceM);
 				e.expr = (macro mithril.M.m($a, $b, $c)).expr;
-				b.iter(replaceM);
-				c.iter(replaceM);
 			case macro M($a, $b), macro m($a, $b):
+				e.iter(replaceM);
 				e.expr = (macro mithril.M.m($a, $b)).expr;
-				b.iter(replaceM);
 			case macro M($a), macro m($a):
 				e.expr = (macro mithril.M.m($a)).expr;
 			case _:
