@@ -18,13 +18,13 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 ///// Interfaces /////
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Model {}
+@:autoBuild(mithril.macros.ModuleBuilder.build(0)) interface Model {}
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface View<T> {
+@:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface View<T> {
 	function view(ctrl : T) : ViewOutput;
 }
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller<T> {
+@:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Controller<T> {
 	/**
 	 * When implementing Controller<T>, the method will automatically return "this"
 	 * unless otherwise specified.
@@ -32,7 +32,10 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 	function controller() : T;
 }
 
-interface Module<T> extends Controller<T> extends View<T> {}
+@:autoBuild(mithril.macros.ModuleBuilder.build(3)) interface Module<T> {
+	function controller() : T;
+	function view(ctrl : T) : ViewOutput;
+}
 
 ///// Typedefs /////
 

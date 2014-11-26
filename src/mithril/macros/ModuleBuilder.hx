@@ -10,9 +10,10 @@ using Lambda;
 
 class ModuleBuilder
 {
-	@macro public static function build() : Array<Field>
+	// Types: 1 - View, 2 - Controller, 3 - Module
+	@macro public static function build(type : Int) : Array<Field>
 	{
-		var c = Context.getLocalClass().get();
+		var c : ClassType = Context.getLocalClass().get();
 		if (c.meta.has(":ModuleProcessed")) return null;
 		c.meta.add(":ModuleProcessed",[],c.pos);
 
@@ -27,8 +28,8 @@ class ModuleBuilder
 		for(field in fields) switch(field.kind) {
 			case FFun(f):
 				f.expr.iter(replaceM);
-				if (field.name == "controller") injectModule(f);
-				// TODO: Auto-add optional parameter to view() if it doesn't exist
+				if (type & 2 == 2 && field.name == "controller") injectModule(f);
+				if (type & 3 == 3 && field.name == "view") implyViewArgument(f, Context.getLocalType());
 				propWarning(field);
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
@@ -96,6 +97,16 @@ class ModuleBuilder
 			case _:
 				e.iter(replaceM);
 		}
+	}
+
+	private static function implyViewArgument(f : Function, t : Type) {
+		if(f.args.length > 0) return;
+		f.args.push({
+			value: null,
+			type: Context.toComplexType(t),
+			opt: false,
+			name: "__controller"
+		});
 	}
 
 	private static function injectModule(f : Function) {

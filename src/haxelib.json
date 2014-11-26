@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.13.0",
-  "releasenote": "Macros for m() didn't work in some cases.",
+  "version": "0.14.0",
+  "releasenote": "Implied argument for view() added if not existing.",
   "contributors": ["ciscoheat"]
 }
