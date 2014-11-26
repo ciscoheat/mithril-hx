@@ -10,7 +10,10 @@ import js.html.XMLHttpRequest;
 
 using Lambda;
 
-private abstract Either<T1, T2, T3, T4>(Dynamic)
+private abstract Either3<T1, T2, T3>(Dynamic)
+from T1 from T2 from T3 to T1 to T2 to T3 {}
+
+private abstract Either4<T1, T2, T3, T4>(Dynamic)
 from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 ///// Interfaces /////
@@ -33,6 +36,8 @@ interface Module<T> extends Controller<T> extends View<T> {}
 
 ///// Typedefs /////
 
+typedef BasicType = Either4<Bool, Float, Int, String>;
+
 /**
  * A typedef of View<T> and Controller<T>, so it can be used by anonymous objects.
  * If you're using a class, implement Module<T> to get macro benefits.
@@ -45,8 +50,8 @@ typedef MithrilModule<T> = {
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
 
-typedef Children = Either<String, VirtualElement, {subtree: String},
-	Either<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
+typedef Children = Either4<BasicType, VirtualElement, {subtree: String},
+	Either3<Array<BasicType>, Array<VirtualElement>, Array<{subtree: String}>>>;
 
 typedef VirtualElement = {
 	var tag : String;
@@ -54,7 +59,7 @@ typedef VirtualElement = {
 	var children : Children;
 };
 
-typedef ViewOutput = Either<VirtualElement, String, Array<VirtualElement>, Array<String>>;
+typedef ViewOutput = Either4<VirtualElement, BasicType, Array<VirtualElement>, Array<BasicType>>;
 
 typedef Promise<T, T2> = {
 	// Haxe limitation: Cannot expose the GetterSetter directly. then() is required to get value.
