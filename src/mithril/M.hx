@@ -321,7 +321,7 @@ class M
 
 	public function render(view : Children) : String {
 		if(view == null) return "";
-		if(Std.is(view, String)) return cast view;
+		if(Std.is(view, BasicType)) return Std.string(view);
 		if(Std.is(view, Array)) return cast(view, Array<Dynamic>).map(render).join('');
 
 		// view must be a VirtualElement now.
