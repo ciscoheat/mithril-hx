@@ -23,18 +23,21 @@ typedef InputElement = Dynamic;
 private abstract Either<T1, T2>(Dynamic)
 from T1 from T2 to T1 to T2 {}
 
+private abstract Either3<T1, T2, T3>(Dynamic)
+from T1 from T2 from T3 to T1 to T2 to T3 {}
+
 private abstract Either4<T1, T2, T3, T4>(Dynamic)
 from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 ///// Interfaces /////
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Model {}
+@:autoBuild(mithril.macros.ModuleBuilder.build(0)) interface Model {}
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface View<T> {
+@:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface View<T> {
 	function view(ctrl : T) : Children;
 }
 
-@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Controller<T> {
+@:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Controller<T> {
 	/**
 	 * When implementing Controller<T>, the method will automatically return "this"
 	 * unless otherwise specified.
@@ -42,9 +45,14 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 	function controller() : T;
 }
 
-interface Module<T> extends Controller<T> extends View<T> {}
+@:autoBuild(mithril.macros.ModuleBuilder.build(3)) interface Module<T> {
+	function controller() : T;
+	function view(ctrl : T) : ViewOutput;
+}
 
 ///// Typedefs /////
+
+typedef BasicType = Either4<Bool, Float, Int, String>;
 
 /**
  * A typedef of View<T> and Controller<T>, so it can be used by anonymous objects.
@@ -58,14 +66,16 @@ typedef MithrilModule<T> = {
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
 
-typedef Children = Either4<String, VirtualElement, {subtree: String},
-	Either4<Array<String>, Array<VirtualElement>, Array<{subtree: String}>, Array<Children>>>;
+typedef Children = Either4<BasicType, VirtualElement, {subtree: String},
+	Either3<Array<BasicType>, Array<VirtualElement>, Array<{subtree: String}>>>;
 
 typedef VirtualElement = {
 	var tag : String;
 	var attrs : Dynamic;
 	var children : Children;
 };
+
+typedef ViewOutput = Either4<VirtualElement, BasicType, Array<VirtualElement>, Array<BasicType>>;
 
 typedef Promise<T, T2> = {
 	// Haxe limitation: Cannot expose the GetterSetter directly. then() is required to get value.
@@ -124,7 +134,6 @@ extern class M
 	@:overload(function() : String {})
 	@:overload(function(element : Element, isInitialized : Bool) : Void {})
 	@:overload(function(path : String, ?params : Dynamic, ?shouldReplaceHistory : Bool) : Void {})
-	@:overload(function(rootElement : Document, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void {})
 	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})

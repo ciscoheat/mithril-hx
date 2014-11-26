@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.12.0",
-  "releasenote": "Types now following Typescript definitions very closely.",
+  "version": "0.14.0",
+  "releasenote": "Implied argument for view() added if not existing.",
   "contributors": ["ciscoheat"]
 }

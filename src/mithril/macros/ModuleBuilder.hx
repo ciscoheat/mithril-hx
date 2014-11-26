@@ -10,11 +10,12 @@ using Lambda;
 
 class ModuleBuilder
 {
-	@macro public static function build() : Array<Field>
+	// Types: 1 - View, 2 - Controller, 3 - Module
+	@macro public static function build(type : Int) : Array<Field>
 	{
-		var c = Context.getLocalClass().get();
-		if (c.meta.has(":processed")) return null;
-		c.meta.add(":processed",[],c.pos);
+		var c : ClassType = Context.getLocalClass().get();
+		if (c.meta.has(":ModuleProcessed")) return null;
+		c.meta.add(":ModuleProcessed",[],c.pos);
 
 		var fields = Context.getBuildFields();
 
@@ -27,7 +28,8 @@ class ModuleBuilder
 		for(field in fields) switch(field.kind) {
 			case FFun(f):
 				f.expr.iter(replaceM);
-				if (field.name == "controller") injectModule(f);
+				if (type & 2 == 2 && field.name == "controller") injectModule(f);
+				if (type & 3 == 3 && field.name == "view") implyViewArgument(f, Context.getLocalType());
 				propWarning(field);
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
@@ -88,18 +90,18 @@ class ModuleBuilder
 
 		switch(e) {
 			case macro M($a, $b, $c), macro m($a, $b, $c):
+				e.iter(replaceM);
 				if(Context.defined("js"))
 					e.expr = (macro mithril.M.m($a, $b, $c)).expr;
 				else
 					e.expr = (macro mithril.M.instance.m($a, $b, $c)).expr;
-				b.iter(replaceM);
-				c.iter(replaceM);
+
 			case macro M($a, $b), macro m($a, $b):
+				e.iter(replaceM);
 				if(Context.defined("js"))
 					e.expr = (macro mithril.M.m($a, $b)).expr;
 				else
 					e.expr = (macro mithril.M.instance.m($a, $b)).expr;
-				b.iter(replaceM);
 			case macro M($a), macro m($a):
 				if(Context.defined("js"))
 					e.expr = (macro mithril.M.m($a)).expr;
@@ -110,6 +112,16 @@ class ModuleBuilder
 			case _:
 				e.iter(replaceM);
 		}
+	}
+
+	private static function implyViewArgument(f : Function, t : Type) {
+		if(f.args.length > 0) return;
+		f.args.push({
+			value: null,
+			type: Context.toComplexType(t),
+			opt: false,
+			name: "__controller"
+		});
 	}
 
 	private static function injectModule(f : Function) {
