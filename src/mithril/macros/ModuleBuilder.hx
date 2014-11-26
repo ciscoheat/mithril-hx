@@ -29,7 +29,7 @@ class ModuleBuilder
 			case FFun(f):
 				f.expr.iter(replaceM);
 				if (type & 2 == 2 && field.name == "controller") injectModule(f);
-				if (type & 3 == 3 && field.name == "view") implyViewArgument(f, Context.getLocalType());
+				if (type & 1 == 1 && field.name == "view") implyViewArgument(f, Context.getLocalType());
 				propWarning(field);
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
