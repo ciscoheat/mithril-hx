@@ -121,9 +121,29 @@ That should hopefully be enough for you to get started. Remember, plenty of docu
 
 # Haxe examples
 
-This repo contains a basic example so clone it, compile with `haxe mithril.js` and open `bin/index.html` in your browser.
+After [installing Haxe](http://haxe.org/download/), this repo has some examples that can be interesting to test. Clone it, open a prompt in the directory and execute:
 
-If you want a bare-bones example, after [installing Haxe](http://haxe.org/download/) create the following two files and follow the instructions below:
+`haxelib install mithril`
+
+Then select one of the following:
+
+## Some small apps
+
+A collection of two demo apps, available on the Mithril site.
+
+1. `haxe mithril.js` 
+1. Open `bin/index.html` in a browser.
+
+## Webshop
+
+A simple (incomplete) webshop to demonstrate the power of Mithril.
+
+1. `haxe webshop.hxml`
+1. Open `bin/webshop/index.html` in a browser.
+
+## From scratch
+
+If you prefer a bare-bones example without cloning, create the following two files and follow the instructions below:
 
 **index.html**
 
@@ -176,24 +196,23 @@ class Example implements Module<Example>
 
 Compile and run with:
 
-1. `haxelib install mithril`
 1. `haxe -lib mithril -js example.js -main Example`
 1. Open index.html in a browser.
 
-# Node.js support!
+## Node.js
 
-Without much hassle, it's possible to render a Mithril module/view serverside on Node.js. The repo contains two examples. Execute the following in the cloned repo directory to compile:
+Without much hassle, it's possible to render a Mithril module/view serverside on Node.js. The repo contains two examples. Execute the following:
 
 1. `npm install`
 1. `haxelib install nodehx`
 1. `haxe noderendering.hxml`
 1. `cd bin`
 
-## Example 1: Simple rendering
+### Example 1: Simple rendering
 
 `node noderendering.js` outputs a simple HTML rendering example.
 
-## Example 2: Isomorphic code
+### Example 2: Isomorphic code
 
 `node noderendering.js server`
 
