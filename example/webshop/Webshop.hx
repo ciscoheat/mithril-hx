@@ -19,14 +19,16 @@ class Menu implements Module<Menu>
     public function controller() {}
 
     public function view() {
-        return m("ul.nav.nav-sidebar", categories.array().map(function(c) {
-            return m("li", {"class": M.routeParam("categoryId") == c.id ? "active" : ""}, 
-                m("a", {
-                    href: '/category/${c.id}',
-                    config: M.route
-                }, c.name)
-            );
-        }));
+        return m("ul.nav.nav-sidebar", 
+            categories.array().map(function(c) {
+                return m("li", {"class": M.routeParam("categoryId") == c.id ? "active" : ""}, 
+                    m("a", {
+                        href: '/category/${c.id}',
+                        config: M.route
+                    }, c.name)
+                );
+            })
+        );
     }
 
 }
