@@ -34,7 +34,7 @@ class DashboardModule implements Module<Dynamic>
 		}, 0);
 	}
 
-	public function view(_) {
+	public function view() {
 		return [
 			m("h1", "Welcome!"),
 			m("p", "Choose your app:"),

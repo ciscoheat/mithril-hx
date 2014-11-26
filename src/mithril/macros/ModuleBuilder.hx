@@ -100,12 +100,22 @@ class ModuleBuilder
 	}
 
 	private static function implyViewArgument(f : Function, t : Type) {
+		// Inject "return null" to view()
+		if (f.expr != null) switch(f.expr.expr) {
+			case EBlock(exprs):
+				exprs.push(macro return null);
+			case _:
+				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
+				implyViewArgument(f, t);
+				return;
+		}
+
 		if(f.args.length > 0) return;
 		f.args.push({
 			value: null,
 			type: Context.toComplexType(t),
-			opt: false,
-			name: "__controller"
+			opt: true,
+			name: "ctrl"
 		});
 	}
 

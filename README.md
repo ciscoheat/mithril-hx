@@ -69,7 +69,7 @@ class TodoView implements View<TodoController>
     }
 
     // The interface implementation.
-    public function view(ctrl : TodoController) : VirtualElement {
+    public function view(?ctrl : TodoController) : VirtualElement {
         // Remember to use "m" here instead of "M" for autocompletion:
         return m("div", [
             m("h1", "Welcome!"),
@@ -102,8 +102,9 @@ class TodoModule implements Module<TodoModule>
         ...
     }
 
-    // The argument to view() will be "this" in a Module, so it's not that useful.
-    public function view(_) {
+    // The argument to view() will be "this" in a Module, so you don't have to specify it
+    // unless you want to explicitly use it.
+    public function view() {
         ...
     }
 
@@ -159,7 +160,7 @@ class Example implements Module<Example>
         this.user = new User("John Doe");
     }
 
-    public function view(_) {
+    public function view() {
         return m("input", {
             onchange: M.withAttr("value", user.name),
             value: user.name()

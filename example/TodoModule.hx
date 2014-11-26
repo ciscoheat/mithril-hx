@@ -94,7 +94,7 @@ class TodoModule implements Module<TodoModule>
 
 	public function controller() {}
 
-	public function view(_) {
+	public function view() {
 		return m("div", [
 			m("input", {
 				config: function(e : InputElement) if(input == null) input = e,
