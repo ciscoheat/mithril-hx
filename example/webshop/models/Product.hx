@@ -1,10 +1,11 @@
 package webshop.models;
 
-using mithril.M;
+import mithril.M;
+using Lambda;
 
 class Product 
 {
-    public var id : Int;
+    public var id : String;
     public var name : String;
     public var price : Float;
     public var stock : Int;
@@ -17,13 +18,7 @@ class Product
         this.stock = data.stock;
     }
 
-    public static function getByCategory(id : String) : Promise<Array<Product>, String> {
-        return M.request({
-            method: "GET",
-            url: 'http://beta.json-generator.com/api/json/get/$id?delay=100',
-            background: true
-        }).then(function(data : Array<Dynamic>) {
-            return data.map(function(d) return new Product(d));
-        });
+    public function slug() {
+        return name.replace(" ", "-").toLowerCase();
     }
 }
