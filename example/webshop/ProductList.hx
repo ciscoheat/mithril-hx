@@ -1,5 +1,6 @@
 package webshop;
 
+import js.html.MouseEvent;
 import mithril.M;
 import webshop.models.*;
 using Lambda;
@@ -11,9 +12,11 @@ class ProductList implements Module<ProductList>
 {
     @prop var category : Category;
     var loading : Loader;
+    var cart : ShoppingCart;
 
-    public function new() {
+    public function new(cart) {
         this.category = M.prop(new Category());
+        this.cart = cart;
     }
 
     public function controller() {
@@ -27,7 +30,17 @@ class ProductList implements Module<ProductList>
         // Load products with an Ajax request.
         // It has background = true to allow navigation to update, so a call 
         // to M.redraw (executed in loading.done) is required when it finishes.
-        Category.all().then(getCurrentCategory, loading.error).then(category).then(loading.done);
+        Category.all().then(function(c) { 
+            category(getCurrentCategory(c));
+            loading.done();
+        }, 
+            loading.error
+        );
+    }
+
+    function cart_add(e : MouseEvent, p : Product) {
+        cart.add(p);
+        cart.open(true);
     }
 
     public function view() : ViewOutput {
@@ -49,14 +62,23 @@ class ProductList implements Module<ProductList>
                         m("tr", [
                             m("th", "Name"),
                             m("th", "Price"),
-                            m("th", "Stock")
+                            m("th", "Stock"),
+                            m("th")
                         ])
                     ]),
                     m("tbody#products", category().products.map(function(p) 
                         return m("tr", [
                             m("td", p.name),
                             m("td", p.price >= 0 ? '$$${p.price}' : ""),
-                            m("td", {style: {color: p.stock < 10 ? "red" : ""}}, p.stock)
+                            m("td", {style: {color: p.stock < 10 ? "red" : ""}}, p.stock),
+                            m("td", 
+                                m("button.btn.btn-success.btn-xs", {
+                                    onclick: cart_add.bind(_, p)
+                                }, [
+                                    m("span.glyphicon.glyphicon-shopping-cart", {"aria-hidden": "true"}),
+                                    cast "Add to cart" // Need a cast since mixed Arrays aren't valid.
+                                ])
+                            )
                         ])
                     ))
                 ])

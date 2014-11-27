@@ -11,23 +11,30 @@ using Lambda;
  */
 class Webshop implements Module<Webshop>
 {
+    var cart : ShoppingCart;
     var menu : Menu;
     var routes : Dynamic<MithrilModule<Dynamic>>;
 
     // Create menu and routes.
     public function new() {
         menu = new Menu();
+        cart = new ShoppingCart();
         routes = {
             "/": this,
-            "/category/:categoryId": new ProductList()
+            "/category/:categoryId": new ProductList(cart)
         };
     }
 
     // Call to start the whole site.
-    // Define the routes and render the menu.
+    // Define the routes and render the menu and cart.
     public function start() {
         M.route(element("content"), "/", routes);
-        M.module(element("navigation"), menu);
+
+        // Need a delay because the JSON service will deny otherwise.
+        haxe.Timer.delay(function() {
+            M.module(element("navigation"), menu);
+            M.module(element("shopping-cart"), cart);
+        }, 250);
     }
 
     public function controller() {}
