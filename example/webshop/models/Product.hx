@@ -2,6 +2,7 @@ package webshop.models;
 
 import mithril.M;
 using Lambda;
+using StringTools;
 
 class Product 
 {

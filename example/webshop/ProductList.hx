@@ -10,15 +10,14 @@ using Lambda;
 class ProductList implements Module<ProductList>
 {
     @prop var category : Category;
-    @prop var loading : Bool;
+    var loading : Loader;
 
     public function new() {
         this.category = M.prop(new Category());
-        this.loading = M.prop(true);
     }
 
     public function controller() {
-        loading(true);
+        loading = new Loader();
 
         // Get category based on the current route.
         var getCurrentCategory = function(categories : Array<Category>) {
@@ -26,17 +25,21 @@ class ProductList implements Module<ProductList>
         };
 
         // Load products with an Ajax request.
-        // It has background = true to allow navigation to update,
-        // so a call to M.redraw is required when it finishes.
-        Category.all().then(getCurrentCategory).then(category).then(function(_) {
-            loading(false);
-            M.redraw();
-        });
+        // It has background = true to allow navigation to update, so a call 
+        // to M.redraw (executed in loading.done) is required when it finishes.
+        Category.all().then(getCurrentCategory, loading.error).then(category).then(loading.done);
     }
 
     public function view() : ViewOutput {
-        if(loading()) 
-            return m("h2.sub-header", {style: {"text-align": "center"}}, "Loading...");
+        switch(loading.state()) {
+            case Started:
+                return null;
+            case Delayed:          
+                return m("h2.sub-header", {style: {"text-align": "center"}}, "Loading...");
+            case Error:
+                return m("h2.sub-header", {style: {"text-align": "center", color: "red"}}, "Loading error, please reload page.");
+            case Done:
+        }
 
         return [
             m("h2.sub-header", category().name),
