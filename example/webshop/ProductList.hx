@@ -71,7 +71,7 @@ class ProductList implements Module<ProductList>
                             m("td", p.name),
                             m("td", p.price >= 0 ? '$$${p.price}' : ""),
                             m("td", {style: {color: p.stock < 10 ? "red" : ""}}, p.stock),
-                            m("td", 
+                            m("td", p.stock == 0 ? null :
                                 m("button.btn.btn-success.btn-xs", {
                                     onclick: cart_add.bind(_, p)
                                 }, [
