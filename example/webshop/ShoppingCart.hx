@@ -1,5 +1,7 @@
 package webshop;
 
+import haxe.Timer;
+import jQuery.Event;
 import jQuery.JQuery;
 import mithril.M;
 import webshop.models.*;
@@ -10,16 +12,14 @@ using Lambda;
  */
 class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<ShoppingCart>
 {
-    var el : JQuery;
-    @prop public var open : Bool;
+    @prop var isOpen : Bool;
 
     public function new() {
         super();
-        open = M.prop(false);
+        isOpen = M.prop(false);
     }
 
     public function controller() {
-        //el = new JQuery("#shopping-cart").find(".dropdown");
     }
 
     public function add(p : Product) {
@@ -27,9 +27,40 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
         else set(p, 1);
     }
 
+    public function open() {
+        new JQuery('body').off("click.closeCart");
+
+        Timer.delay(function() {
+            new JQuery('body').on('click.closeCart', closeEvent);
+        }, 10);
+
+        isOpen(true);
+        M.redraw();
+    }
+
+    function closeEvent(e : Event) {
+        // Close cart if clicking outside it.
+        if(new JQuery(e.target).parents("#shopping-cart").length > 0) return;
+
+        isOpen(false);
+        M.redraw();
+    }
+
     public function view() : ViewOutput {
-        return m("li", {"class": "dropdown" + (open() ? " open" : "")} , [
-            m("a.dropdown-toggle", {href: "#", "data-toggle": "dropdown", role: "button", "aria-expanded": false}, [
+        return m("li", {
+            "class": isOpen() ? "dropdown open" : "dropdown",
+            config: function(el, isInit) {
+                if(isInit) return;
+                new JQuery(el).on("hide.bs.dropdown", function() return false);
+                new JQuery("body").on("click.closeCart", closeEvent);
+            }
+        }, [
+            m("a.dropdown-toggle", {
+                href: "#",
+                role: "button", 
+                "aria-expanded": false,
+                onclick: open
+            }, [
                 cast "Shopping cart ",
                 m("span.caret")
             ]),

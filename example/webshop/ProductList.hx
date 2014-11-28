@@ -40,7 +40,7 @@ class ProductList implements Module<ProductList>
 
     function cart_add(e : MouseEvent, p : Product) {
         cart.add(p);
-        cart.open(true);
+        cart.open();
     }
 
     public function view() : ViewOutput {
