@@ -27,6 +27,11 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
         else set(p, 1);
     }
 
+    override public function set(p : Product, v : Int) {
+        if(v <= 0 && exists(p)) remove(p);
+        else super.set(p, v);
+    }
+
     public function open() {
         new JQuery('body').off("click.closeCart");
 
@@ -76,9 +81,17 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
 
         var products = keys.map(function(p) {
             var subTotal = p.price * get(p);
-            var name = '${get(p)} ${p.name} | $$$subTotal';
+            var name = ' ${p.name} | $$$subTotal';
             total += subTotal;
-            return m("li", m("a", name));
+            return m("li", m("a", [
+                m("input[type=number]", {
+                    min: 0, 
+                    value: get(p), 
+                    style: {width: "36px"},
+                    oninput: M.withAttr("value", set.bind(p, _))
+                }),
+                name
+            ]));
         }).concat([
             m("li.divider"),
             m("li", m("a", 'Total: $$$total'))
