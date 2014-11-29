@@ -2,6 +2,7 @@ package webshop;
 
 import jQuery.JQuery;
 import js.html.Event;
+import js.html.InputElement;
 import js.html.KeyboardEvent;
 import mithril.M;
 import webshop.models.*;
@@ -10,12 +11,10 @@ using StringTools;
 
 class Search implements Module<Search>
 {
-    @prop var hidden : Bool;
     @prop var results : Array<Product>;
 
     public function new() {
         this.results = M.prop([]);
-        this.hidden = M.prop(true);
     }
 
     public function controller() {
@@ -40,8 +39,7 @@ class Search implements Module<Search>
     function closeEvent(e : Event) {
         // Close cart if clicking outside it.
         if(new JQuery(e.target).parents("#search").length > 0) return;
-
-        hidden(true);
+        results([]);
         M.redraw();
     }
 
@@ -50,11 +48,11 @@ class Search implements Module<Search>
             m("input.form-control", {
                 placeholder: "Search...",
                 oninput: M.withAttr("value", search),
-                onfocus: function(_) hidden(false)
+                onfocus: M.withAttr("value", search)
             }),
             m("ul.dropdown-menu.dropdown-menu-right", {
                 role: "menu",
-                style: {display: !hidden() && results().length > 0 ? "block" : "none"},
+                style: {display: results().length > 0 ? "block" : "none"},
                 config: function(el, isInit) {
                     if(isInit) return;
                     new JQuery('html').on("click.closeSearch", closeEvent);

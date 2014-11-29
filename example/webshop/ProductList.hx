@@ -78,7 +78,10 @@ class ProductList implements Module<ProductList>
                                         el.scrollIntoView();
                                 }
                             }, [
-                            m("td", p.name),
+                            m("td", m("a", {
+                                href: '/category/${p.category.slug()}/${p.id}',
+                                config: M.route
+                            }, p.name)),
                             m("td", p.price >= 0 ? '$$${p.price}' : ""),
                             m("td", {style: {color: p.stock < 10 ? "red" : ""}}, p.stock),
                             m("td", p.stock == 0 ? null :

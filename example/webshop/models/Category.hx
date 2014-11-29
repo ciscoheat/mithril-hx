@@ -31,7 +31,9 @@ class Category
         var mapData = function(data : Array<Dynamic>) {
             return data.map(function(d) {
                 var products = d.products.map(function(p) return new Product(p));
-                return new Category(d, products);
+                var c = new Category(d, products);
+                for(p in products) p.category = c;
+                return c;
             });
         };
 
