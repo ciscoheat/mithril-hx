@@ -73,7 +73,7 @@ class TodoView implements View<TodoController>
             m("h1", "Welcome!"),
             m("table", model.map(function(todo) {
                 return m("tr", [
-                    m("td", [ m("input[type=checkbox]", { checked: todo.done() }) ]),
+                    m("td", m("input[type=checkbox]", { checked: todo.done() })),
                     m("td", todo.description())
                 ]);
             }))
@@ -176,7 +176,7 @@ class Example implements Module<Example>
     public function new() {}
 
     public function controller() {
-        this.user = new User("John Doe");
+        this.user = new User("Thorin Oakenshield");
     }
 
     public function view() {
