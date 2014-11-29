@@ -10,14 +10,16 @@ class Product
     public var name : String;
     public var price : Float;
     public var stock : Int;
-    public var category : Category;
+    public var category(default, null) : Category;
 
-    public function new(?data) {
+    public function new(data, category) {
         if(data == null) return;
         this.id = data.id;
         this.name = data.name;
         this.price = data.price;
         this.stock = data.stock;
+
+        this.category = category;
     }
 
     public function slug() {
@@ -27,7 +29,6 @@ class Product
     public static function all() : Promise<Array<Product>, String> {
         return Category.all().then(function(cat) {
             return cat.fold(function(c, products : Array<Product>) { 
-                for(p in c.products) p.category = c;
                 return products.concat(c.products);
             }, []);
         });

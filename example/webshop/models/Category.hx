@@ -7,14 +7,12 @@ class Category
 {
     public var id : String;
     public var name : String;
-    public var products : Array<Product>;
+    public var products(default, null) : Array<Product>;
 
-    public function new(?data, ?products) {
-        if(data != null)
-            this.name = data.name;
-
-        if(products != null)
-            this.products = products;
+    public function new(?data) {
+        if(data == null) return;
+        this.id = data.id;
+        this.name = data.name;
     }
 
     public function slug() {
@@ -29,10 +27,9 @@ class Category
         if(Math.random() > 0.87) delay = 2000;
 
         var mapData = function(data : Array<Dynamic>) {
-            return data.map(function(d) {
-                var products = d.products.map(function(p) return new Product(p));
-                var c = new Category(d, products);
-                for(p in products) p.category = c;
+            return data.map(function(d : Dynamic) {
+                var c = new Category(d);
+                c.products = d.products.map(function(p) return new Product(p, c));
                 return c;
             });
         };
