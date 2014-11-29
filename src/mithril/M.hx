@@ -129,7 +129,7 @@ extern class M
 
 	public static function prop<T>(?initialValue : T) : GetterSetter<T>;
 
-	public static function withAttr<T, T2>(property : String, ?callback : T -> Void) : EventHandler<T2>;
+	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : EventHandler<T2>;
 
 	@:overload(function() : String {})
 	@:overload(function(element : Element, isInitialized : Bool) : Void {})
