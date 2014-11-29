@@ -1,31 +1,73 @@
 package webshop;
 
+import jQuery.JQuery;
+import js.html.Event;
+import js.html.KeyboardEvent;
 import mithril.M;
 import webshop.models.*;
 using Lambda;
+using StringTools;
 
 class Search implements Module<Search>
 {
-    @prop var categories : Array<Category>;
+    @prop var hidden : Bool;
+    @prop var results : Array<Product>;
 
     public function new() {
-        this.categories = M.prop([]);
+        this.results = M.prop([]);
+        this.hidden = M.prop(true);
     }
 
     public function controller() {
-        Category.all().then(categories).then(function(_) M.redraw());
+
+    }
+
+    function search(phrase : String) {
+        if(phrase.length < 2) {
+            results([]);
+            return;
+        }
+        phrase = phrase.toLowerCase();
+        Product.all().then(function(products : Array<Product>) {
+            products = products.filter(function(p) {
+                return p.name.toLowerCase().indexOf(phrase) >= 0;
+            });
+            results(products);
+            M.redraw();
+        });
+    }
+
+    function closeEvent(e : Event) {
+        // Close cart if clicking outside it.
+        if(new JQuery(e.target).parents("#search").length > 0) return;
+
+        hidden(true);
+        M.redraw();
     }
 
     public function view() {
-        return m("ul.nav.nav-sidebar", 
-            categories().array().map(function(c) {
-                return m("li", {"class": M.routeParam("categoryId") == c.slug() ? "active" : ""}, 
+        return [
+            m("input.form-control", {
+                placeholder: "Searching...",
+                oninput: M.withAttr("value", search),
+                onfocus: function(_) hidden(false)
+            }),
+            m("ul.dropdown-menu.dropdown-menu-right", {
+                role: "menu",
+                style: {display: !hidden() && results().length > 0 ? "block" : "none"},
+                config: function(el, isInit) {
+                    if(isInit) return;
+                    new JQuery('html').on("click.closeSearch", closeEvent);
+                }
+            }, results().map(function(p) {
+                return m("li", {role: "presentation"},
                     m("a", {
-                        href: '/category/${c.slug()}',
-                        config: M.route
-                    }, c.name)
+                        role: "menuitem",
+                        tabindex: -1,
+                        href: "#"
+                    }, p.name)
                 );
-            })
-        );
+            }))
+        ];
     }
 }

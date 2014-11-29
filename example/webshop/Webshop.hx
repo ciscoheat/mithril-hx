@@ -13,12 +13,14 @@ class Webshop implements Module<Webshop>
 {
     var cart : ShoppingCart;
     var menu : Menu;
+    var search : Search;
     var routes : Dynamic<MithrilModule<Dynamic>>;
 
     // Create menu and routes.
     public function new() {
         menu = new Menu();
         cart = new ShoppingCart();
+        search = new Search();
         routes = {
             "/": this,
             "/category/:categoryId": new ProductList(cart)
@@ -30,11 +32,9 @@ class Webshop implements Module<Webshop>
     public function start() {
         M.route(element("content"), "/", routes);
 
-        // Need a delay because the JSON service will deny otherwise.
-        haxe.Timer.delay(function() {
-            M.module(element("navigation"), menu);
-            M.module(element("shopping-cart"), cart);
-        }, 250);
+        M.module(element("navigation"), menu);
+        M.module(element("shopping-cart"), cart);
+        M.module(element("search"), search);
     }
 
     public function controller() {}
