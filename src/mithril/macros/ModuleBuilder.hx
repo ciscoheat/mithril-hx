@@ -29,7 +29,7 @@ class ModuleBuilder
 			case FFun(f):
 				f.expr.iter(replaceM);
 				if (type & 2 == 2 && field.name == "controller") injectModule(f);
-				if (type & 3 == 3 && field.name == "view") implyViewArgument(f, Context.getLocalType());
+				if (type & 1 == 1 && field.name == "view") implyViewArgument(f, Context.getLocalType());
 				propWarning(field);
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
@@ -115,12 +115,22 @@ class ModuleBuilder
 	}
 
 	private static function implyViewArgument(f : Function, t : Type) {
+		// Inject "return null" to view()
+		if (f.expr != null) switch(f.expr.expr) {
+			case EBlock(exprs):
+				exprs.push(macro return null);
+			case _:
+				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
+				implyViewArgument(f, t);
+				return;
+		}
+
 		if(f.args.length > 0) return;
 		f.args.push({
 			value: null,
 			type: Context.toComplexType(t),
-			opt: false,
-			name: "__controller"
+			opt: true,
+			name: "ctrl"
 		});
 	}
 

@@ -105,10 +105,10 @@ class TodoModule implements Module<TodoModule>
 
 	public function controller() {}
 
-	public function view(_) {
-		return m("div.todo", [
-			m("input[name=description]", {
-				config: function(e) if(input == null) input = e,
+	public function view() {
+		return m("div", [
+			m("input", {
+				config: function(e : InputElement) if(input == null) input = e,
 				value: todo.description,
 				onkeyup: input_keyUp
 			}),

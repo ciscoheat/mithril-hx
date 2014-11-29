@@ -2,4 +2,6 @@
 /node_modules
 /bin/noderendering.js
 /*.sublime-workspace
+/bin/webshop/webshop.js
+/docs
 /bin/haxerendering.n

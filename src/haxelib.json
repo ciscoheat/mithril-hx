@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.14.0",
-  "releasenote": "Implied argument for view() added if not existing.",
+  "version": "0.15.0",
+  "releasenote": "Needed to change the view interface. The parameter is now optional.",
   "contributors": ["ciscoheat"]
 }

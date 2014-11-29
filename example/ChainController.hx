@@ -126,7 +126,7 @@ class ChainView implements View<ChainController>
 		this.model = model;
 	}
 
-	public function view(ctrl : ChainController) : VirtualElement {
+	public function view(?ctrl : ChainController) : VirtualElement {
 		return m("table", this.seven(function(y) {
 			return m("tr", this.seven(function(x) {
 				var index = indexAt(x, y);

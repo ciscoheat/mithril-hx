@@ -34,7 +34,7 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 @:autoBuild(mithril.macros.ModuleBuilder.build(0)) interface Model {}
 
 @:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface View<T> {
-	function view(ctrl : T) : Children;
+	function view(?ctrl : T) : ViewOutput;
 }
 
 @:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Controller<T> {
@@ -47,7 +47,7 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 @:autoBuild(mithril.macros.ModuleBuilder.build(3)) interface Module<T> {
 	function controller() : T;
-	function view(ctrl : T) : ViewOutput;
+	function view(?ctrl : T) : ViewOutput;
 }
 
 ///// Typedefs /////
@@ -60,7 +60,7 @@ typedef BasicType = Either4<Bool, Float, Int, String>;
  */
 typedef MithrilModule<T> = {
 	function controller() : T;
-	function view(ctrl : T) : Children;
+	function view(?ctrl : T) : ViewOutput;
 }
 
 typedef GetterSetter<T> = ?T -> T;
