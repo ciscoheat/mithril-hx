@@ -10,6 +10,7 @@ class Product
     public var name : String;
     public var price : Float;
     public var stock : Int;
+    public var category : Category;
 
     public function new(?data) {
         if(data == null) return;
@@ -26,6 +27,7 @@ class Product
     public static function all() : Promise<Array<Product>, String> {
         return Category.all().then(function(cat) {
             return cat.fold(function(c, products : Array<Product>) { 
+                for(p in c.products) p.category = c;
                 return products.concat(c.products);
             }, []);
         });

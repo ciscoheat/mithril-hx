@@ -1,5 +1,6 @@
 package webshop;
 
+import js.html.Element;
 import js.html.MouseEvent;
 import mithril.M;
 import webshop.models.*;
@@ -67,7 +68,16 @@ class ProductList implements Module<ProductList>
                         ])
                     ]),
                     m("tbody#products", category().products.map(function(p) 
-                        return m("tr", [
+                        return m("tr", {
+                                style: 
+                                    M.routeParam("productId") == p.id 
+                                        ? {"background-color": "#d7ffbb"}
+                                        : {},
+                                config: function(el : Element, isInit) {
+                                    if(!isInit && M.routeParam("productId") == p.id)
+                                        el.scrollIntoView();
+                                }
+                            }, [
                             m("td", p.name),
                             m("td", p.price >= 0 ? '$$${p.price}' : ""),
                             m("td", {style: {color: p.stock < 10 ? "red" : ""}}, p.stock),

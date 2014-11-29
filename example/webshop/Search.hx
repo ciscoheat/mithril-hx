@@ -48,7 +48,7 @@ class Search implements Module<Search>
     public function view() {
         return [
             m("input.form-control", {
-                placeholder: "Searching...",
+                placeholder: "Search...",
                 oninput: M.withAttr("value", search),
                 onfocus: function(_) hidden(false)
             }),
@@ -64,7 +64,8 @@ class Search implements Module<Search>
                     m("a", {
                         role: "menuitem",
                         tabindex: -1,
-                        href: "#"
+                        href: '/category/${p.category.slug()}/${p.id}',
+                        config: M.route
                     }, p.name)
                 );
             }))

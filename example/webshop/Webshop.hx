@@ -21,9 +21,13 @@ class Webshop implements Module<Webshop>
         menu = new Menu();
         cart = new ShoppingCart();
         search = new Search();
+
+        var productList = new ProductList(cart);
+
         routes = {
             "/": this,
-            "/category/:categoryId": new ProductList(cart)
+            "/category/:categoryId": productList,
+            "/category/:categoryId/:productId": productList
         };
     }
 
