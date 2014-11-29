@@ -22,4 +22,12 @@ class Product
     public function slug() {
         return name.replace(" ", "-").toLowerCase();
     }
+
+    public static function all() : Promise<Array<Product>, String> {
+        return Category.all().then(function(cat) {
+            return cat.fold(function(c, products : Array<Product>) { 
+                return products.concat(c.products);
+            }, []);
+        });
+    }
 }
