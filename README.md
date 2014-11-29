@@ -1,6 +1,6 @@
 # Mithril for Haxe
 
-[Mithril](http://lhorie.github.io/mithril/index.html) is a nice little javascript MVC framework with lots of power under the hood. Here's the Haxe version, of course with some improvements thanks to macros and the type inference.
+[Mithril](http://lhorie.github.io/mithril/index.html) is a nice little javascript MVC framework with lots of power under the hood. Here's the Haxe version, of course with some useful extra features thanks to macros and the type inference.
 
 # Installation
 
@@ -34,8 +34,6 @@ class Todo implements Model
     }
 }
 ```
-
-`@prop` is available on all interfaces but the most obvious use is in a Model.
 
 **NOTE:** `@prop` and `M.prop` doesn't work well with Haxe serialization, so if you're using `haxe.Serializer` on a class like this, you cannot have such a property as a class field.
 
@@ -84,7 +82,7 @@ class TodoView implements View<TodoController>
 }
 ```
 
-For simple or tightly coupled components, it's common to put together the view and controller in a Module:
+For simple or tightly coupled components, it's common to put the view and controller together in a Module:
 
 ## Modules
 
@@ -102,8 +100,8 @@ class TodoModule implements Module<TodoModule>
         ...
     }
 
-    // The argument to view() will be "this" in a Module, so you don't have to specify it
-    // unless you want to explicitly use it.
+    // The argument to view() will be "this" in a Module, so you don't 
+    // have to specify it unless you want to use it explicitly.
     public function view() {
         ...
     }
@@ -114,8 +112,6 @@ class TodoModule implements Module<TodoModule>
     }
 }
 ```
-
-If you don't need the type safety, you can always implement the interface with `<Dynamic>`.
 
 That should hopefully be enough for you to get started. Remember, plenty of documentation over at the [Mithril](http://lhorie.github.io/mithril/index.html) site.
 
@@ -136,14 +132,14 @@ A collection of two demo apps, available on the Mithril site.
 
 ## Webshop
 
-A simple (incomplete) webshop to demonstrate the power of Mithril.
+A simple (and incomplete) webshop to demonstrate the power of Mithril.
 
 1. `haxe webshop.hxml`
 1. Open `bin/webshop/index.html` in a browser.
 
 ## From scratch
 
-If you prefer a bare-bones example without cloning, create the following two files and follow the instructions below:
+If you prefer a bare-bones example (doesn't require cloning), create the following two files and follow the instructions below:
 
 **index.html**
 
@@ -166,6 +162,9 @@ class User implements Model
     @prop public var name : String;
 
     public function new(name) {
+        // Using M.prop, this.name is now a method similar to
+        // jQuery's methods. If called with no parameters the
+        // value is returned, otherwise the value is set.
         this.name = M.prop(name);
     }
 }
@@ -181,8 +180,13 @@ class Example implements Module<Example>
     }
 
     public function view() {
+        // Display an input field.
         return m("input", {
+            // Listens to the "onchange" event of the field and will
+            // set user.name with the fields "value" attribute.
             onchange: M.withAttr("value", user.name),
+            // The redraw triggered by the onchange event will
+            // get and display the latest value automatically.
             value: user.name()
         });
     }
@@ -201,7 +205,7 @@ Compile and run with:
 
 ## Node.js
 
-Without much hassle, it's possible to render a Mithril module/view serverside on Node.js. The repo contains two examples. Execute the following:
+Without too much hassle, it's possible to render a Mithril module/view serverside on Node.js. The repo contains two examples for that. Execute the following:
 
 1. `npm install`
 1. `haxelib install nodehx`
