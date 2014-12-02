@@ -22,7 +22,7 @@ class Webshop implements Module<Webshop>
         cart = new ShoppingCart();
         search = new Search();
 
-        var productList = new ProductList(cart);
+        var productList = new ProductList(cart, menu);
         var productPage = new ProductPage(cart, menu);
 
         routes = {

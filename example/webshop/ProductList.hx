@@ -14,10 +14,12 @@ class ProductList implements Module<ProductList>
     @prop var category : Category;
     var loading : Loader;
     var cart : ShoppingCart;
+    var menu : Menu;
 
-    public function new(cart) {
+    public function new(cart, menu) {
         this.category = M.prop(new Category());
         this.cart = cart;
+        this.menu = menu;
     }
 
     public function controller() {
@@ -33,6 +35,7 @@ class ProductList implements Module<ProductList>
         // to M.redraw (executed in loading.done) is required when it finishes.
         Category.all().then(function(c) { 
             category(getCurrentCategory(c));
+            menu.active(category());
             loading.done();
         }, 
             loading.error

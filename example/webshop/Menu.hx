@@ -23,12 +23,7 @@ class Menu implements Module<Menu>
     }
 
     public function isActive(c : Category) {
-        if(M.routeParam("productId") != null)
-            return (active() != null && active().id == c.id);
-        else {
-            active(null);
-            return M.routeParam("categoryId") == c.slug();
-        }
+        return (active() != null && active().id == c.id);
     }
 
     public function view() {
