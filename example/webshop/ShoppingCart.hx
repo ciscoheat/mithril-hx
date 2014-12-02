@@ -28,7 +28,7 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
     public function serialize() {
         var output = new Map<String, Int>();
 
-        for (p in {iterator: this.keys})
+        for (p in products())
             output.set(p.id, this.get(p));
 
         js.Browser.getLocalStorage()
@@ -49,14 +49,20 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
         });
     }
 
-    public function add(p : Product) {
-        if(exists(p)) set(p, get(p)+1);
-        else set(p, 1);
+    function products() {
+        return {iterator: this.keys};
     }
 
-    override public function set(p : Product, v : Int) {
-        if(v <= 0 && exists(p)) remove(p);
-        else super.set(p, v);
+    public function add(product : Product) {
+        var existing = products().find(function(p) return p.id == product.id);
+        if(existing != null) set(existing, get(existing)+1);
+        else set(product, 1);
+    }
+
+    override public function set(product : Product, v : Int) {
+        var existing = products().find(function(p) return product.id == p.id);
+        if(v <= 0 && existing != null) remove(product);
+        else super.set(product, v);
         serialize();
     }
 
@@ -104,10 +110,9 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
     function items() : Array<VirtualElement> {
         if(this.empty()) return [m("li", m("a", "Empty"))];
 
-        var keys = {iterator: this.keys};
         var total = 0.0;
 
-        var products = keys.map(function(p) {
+        var products = products().map(function(p) {
             var subTotal = p.price * get(p);
             var name = ' ${p.name} | $$$subTotal';
             total += subTotal;
