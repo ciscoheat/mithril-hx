@@ -62,7 +62,7 @@ class Search implements Module<Search>
                     m("a", {
                         role: "menuitem",
                         tabindex: -1,
-                        href: '/category/${p.category.slug()}/${p.id}',
+                        href: '/product/${p.id}',
                         config: M.route
                     }, p.name)
                 );

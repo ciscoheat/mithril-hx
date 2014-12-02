@@ -13,11 +13,12 @@ class Product
     public var category(default, null) : Category;
 
     public function new(data, category) {
-        if(data == null) return;
-        this.id = data.id;
-        this.name = data.name;
-        this.price = data.price;
-        this.stock = data.stock;
+        if(data != null) {
+            this.id = data.id;
+            this.name = data.name;
+            this.price = data.price;
+            this.stock = data.stock;
+        }
 
         this.category = category;
     }

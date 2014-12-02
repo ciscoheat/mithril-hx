@@ -49,9 +49,9 @@ class ProductList implements Module<ProductList>
             case Started:
                 return null;
             case Delayed:          
-                return m("h2.sub-header", {style: {"text-align": "center"}}, "Loading...");
+                return m("h2.sub-header", "Loading...");
             case Error:
-                return m("h2.sub-header", {style: {"text-align": "center", color: "red"}}, "Loading error, please reload page.");
+                return m("h2.sub-header", {style: {color: "red"}}, "Loading error, please reload page.");
             case Done:
         }
 
@@ -68,18 +68,9 @@ class ProductList implements Module<ProductList>
                         ])
                     ]),
                     m("tbody#products", category().products.map(function(p) 
-                        return m("tr", {
-                                style: 
-                                    M.routeParam("productId") == p.id 
-                                        ? {"background-color": "#d7ffbb"}
-                                        : {},
-                                config: function(el : Element, isInit) {
-                                    if(!isInit && M.routeParam("productId") == p.id)
-                                        el.scrollIntoView();
-                                }
-                            }, [
+                        return m("tr", [
                             m("td", m("a", {
-                                href: '/category/${p.category.slug()}/${p.id}',
+                                href: '/product/${p.id}',
                                 config: M.route
                             }, p.name)),
                             m("td", p.price >= 0 ? '$$${p.price}' : ""),
