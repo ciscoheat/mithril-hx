@@ -5,6 +5,7 @@ import mithril.M;
 import webshop.models.*;
 import jQuery.*;
 using Lambda;
+using StringTools;
 
 /**
  * A simple webshop to demonstrate the power of Mithril.
@@ -40,6 +41,14 @@ class Webshop implements Module<Webshop>
         M.module(element("navigation"), menu);
         M.module(element("shopping-cart"), cart);
         M.module(element("search"), search);
+
+        // An "inline module" just to create the home link.
+        M.module(element("home-link"), {
+            controller: function() return null,
+            view: function(?c) return m("a.navbar-brand[href='/']", {
+                config: M.route
+            }, "Mithril Webshop")
+        });
     }
 
     public function controller() {}
@@ -48,7 +57,16 @@ class Webshop implements Module<Webshop>
     public function view() {
         return [
             m("h1.page-header", "Welcome!"),
-            m("p", "Select a category on the left.")
+            m("p", "Select a category on the left."),
+            m("h2", "Todo"),
+
+            m("ul.list-group", todo().map(function(t) {
+                var done = t.toLowerCase().startsWith("x ");
+                return m("li.list-group-item", [
+                    m("input[type=checkbox]", { checked: done ? "checked" : "" }), 
+                    ' ' + (done ? t.substring(2) : t)
+                ]);
+            }))
         ];
     }
 
@@ -57,6 +75,18 @@ class Webshop implements Module<Webshop>
     }
 
     ///////////////////////////
+
+    function todo() {
+        return [
+            "Checkout page",
+            "Thank you page",
+            "Make cart not change size when open and items are deleted",
+            "Enable use of arrow keys when navigating search results",
+            "URL slugs for products",
+            "Fix css for navbar and cart for low-res devices",
+            "Administration section..."
+        ];
+    }
 
     // Program entry point
     static function main() {

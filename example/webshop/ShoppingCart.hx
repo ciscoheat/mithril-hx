@@ -86,25 +86,30 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
     }
 
     public function view() : ViewOutput {
-        return m("li", {
-            "class": isOpen() ? "dropdown open" : "dropdown",
-            config: function(el, isInit) {
-                if(isInit) return;
-                new JQuery(el).on("hide.bs.dropdown", function() return false);
-                new JQuery("html").on("click.closeCart", closeEvent);
-            }
-        }, [
-            m("a.dropdown-toggle", {
-                href: "#",
-                role: "button", 
-                "aria-expanded": false,
-                onclick: open
+        return [
+            m("li", {
+                "class": isOpen() ? "dropdown open" : "dropdown",
+                config: function(el, isInit) {
+                    if(isInit) return;
+                    new JQuery(el).on("hide.bs.dropdown", function() return false);
+                    new JQuery("html").on("click.closeCart", closeEvent);
+                }
             }, [
-                cast "Shopping cart ",
-                m("span.caret")
+                m("a.dropdown-toggle", {
+                    href: "#",
+                    role: "button", 
+                    "aria-expanded": false,
+                    onclick: open
+                }, [
+                    cast "Shopping cart ",
+                    m("span.caret")
+                ]),
+                m("ul.dropdown-menu", {role: "menu"}, items())
             ]),
-            m("ul.dropdown-menu", {role: "menu"}, items())
-        ]);
+            m("li", this.empty() 
+                ? m("span", "Proceed to checkout")
+                : m("a[href='/checkout']", {config: M.route}, "Proceed to checkout"))
+        ];
     }
 
     function items() : Array<VirtualElement> {
