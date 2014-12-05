@@ -67,18 +67,24 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
     }
 
     public function open() {
-        new JQuery('html').off("click.closeCart");
-
-        Timer.delay(function() {
-            new JQuery('html').on('click.closeCart', closeEvent);
-        }, 10);
+        M.startComputation();
 
         isOpen(true);
-        M.redraw();
+        new JQuery('html').off("click.clickOutsideMenu");
+
+        // A little tweak to keep the menu size when removing items.
+        // Set the width to auto and after a short delay its calculated width.
+        var menu = new JQuery("#shopping-cart .dropdown-menu").css('width', "auto");
+
+        Timer.delay(function() {
+            new JQuery('html').on('click.clickOutsideMenu', clickOutsideMenu);
+
+            menu.css('width', menu.outerWidth());
+            M.endComputation();
+        }, 10);
     }
 
-    function closeEvent(e : Event) {
-        // Close cart if clicking outside it.
+    function clickOutsideMenu(e : Event) {
         if(new JQuery(e.target).parents("#shopping-cart").length > 0) return;
 
         isOpen(false);
@@ -92,7 +98,7 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
                 config: function(el, isInit) {
                     if(isInit) return;
                     new JQuery(el).on("hide.bs.dropdown", function() return false);
-                    new JQuery("html").on("click.closeCart", closeEvent);
+                    new JQuery("html").on("click.clickOutsideMenu", clickOutsideMenu);
                 }
             }, [
                 m("a.dropdown-toggle", {

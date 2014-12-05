@@ -80,7 +80,7 @@ class Webshop implements Module<Webshop>
         return [
             "Checkout page",
             "Thank you page",
-            "Make cart not change size when open and items are deleted",
+            "x Make cart not change size when open and items are deleted",
             "Enable use of arrow keys when navigating search results",
             "URL slugs for products",
             "Fix css for navbar and cart for low-res devices",
