@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.16.0",
-  "releasenote": "withAttr constraint now follows EventHandler constraint.",
+  "version": "0.17.0",
+  "releasenote": "Mithril var removed from latest version, replaced with m.",
   "contributors": ["ciscoheat"]
 }

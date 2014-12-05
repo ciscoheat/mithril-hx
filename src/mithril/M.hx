@@ -105,7 +105,7 @@ typedef JSONPOptions = {
 
 //////////
 
-@:final @:native("Mithril")
+@:final @:native("m")
 extern class M
 {
 	public static function m(selector : String, ?attributes : Dynamic, ?children : Children) : VirtualElement;
@@ -144,20 +144,20 @@ extern class M
 	///// Properties that uses function properties /////
 
 	public static var routeParam(get, set) : String -> String;
-	static inline function get_routeParam() : String -> String { return untyped __js__("Mithril.route.param"); }
-	static inline function set_routeParam(f : String -> String) : String -> String { return untyped __js__("Mithril.route.param = ") (f); }
+	static inline function get_routeParam() : String -> String { return untyped __js__("m.route.param"); }
+	static inline function set_routeParam(f : String -> String) : String -> String { return untyped __js__("m.route.param = ") (f); }
 
 	public static var redrawStrategy(get, set) : GetterSetter<String>;
-	static inline function get_redrawStrategy() : GetterSetter<String> { return untyped __js__("Mithril.redraw.strategy"); }
-	static inline function set_redrawStrategy(s : GetterSetter<String>) : GetterSetter<String> { return untyped __js__("Mithril.redraw.strategy = ") (s); }
+	static inline function get_redrawStrategy() : GetterSetter<String> { return untyped __js__("m.redraw.strategy"); }
+	static inline function set_redrawStrategy(s : GetterSetter<String>) : GetterSetter<String> { return untyped __js__("m.redraw.strategy = ") (s); }
 
 	public static var routeMode(get, set) : String;
-	static inline function get_routeMode() : String { return untyped __js__("Mithril.route.mode"); }
-	static inline function set_routeMode(s : String) : String { return untyped __js__("Mithril.route.mode = ") (s); }
+	static inline function get_routeMode() : String { return untyped __js__("m.route.mode"); }
+	static inline function set_routeMode(s : String) : String { return untyped __js__("m.route.mode = ") (s); }
 
 	public static var deferredOnerror(get, set) : Error -> Void;
-	static inline function get_deferredOnerror() : Error -> Void { return untyped __js__("Mithril.deferred.onerror"); }
-	static inline function set_deferredOnerror(f : Error -> Void) : Error -> Void { return untyped __js__("Mithril.deferred.onerror = ") (f); }
+	static inline function get_deferredOnerror() : Error -> Void { return untyped __js__("m.deferred.onerror"); }
+	static inline function set_deferredOnerror(f : Error -> Void) : Error -> Void { return untyped __js__("m.deferred.onerror = ") (f); }
 
 	///// Haxe specific stuff /////
 
@@ -166,7 +166,7 @@ extern class M
 		// Pass a property of window with the same value as the @:native metadata
 		// to the inline function. It will be replaced with the var name.
 		untyped __js__("try {");
-		_patch(untyped Browser.window.Mithril);
+		_patch(untyped Browser.window.m);
 		_patch(untyped __js__('require("mithril")'));
 		untyped __js__("} catch(_) {}");
 	}
