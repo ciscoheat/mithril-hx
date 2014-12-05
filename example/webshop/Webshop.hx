@@ -62,10 +62,13 @@ class Webshop implements Module<Webshop>
 
             m("ul.list-group", todo().map(function(t) {
                 var done = t.toLowerCase().startsWith("x ");
-                return m("li.list-group-item", [
-                    m("input[type=checkbox]", { checked: done ? "checked" : "" }), 
-                    ' ' + (done ? t.substring(2) : t)
-                ]);
+                return m("li.list-group-item", 
+                    { style: { textDecoration: done ? "line-through" : "none" }},
+                    [
+                        m("input[type=checkbox]", { checked: done ? "checked" : "" }), 
+                        m("span[style='margin-left:5px']", done ? t.substring(2) : t)
+                    ]
+                );
             }))
         ];
     }
