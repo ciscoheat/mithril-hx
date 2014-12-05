@@ -3,7 +3,11 @@
 	[
 		{
 			"follow_symlinks": true,
-			"path": "."
+			"path": ".",
+			"folder_exclude_patterns": [
+				"docs", "bin/fonts", "node_modules"
+			],
+			"file_exclude_patterns": ["bin/*.js", "bootstrap.min.css"]
 		}
 	]
 }
