@@ -1,8 +1,8 @@
-Mithril = m = new function app(window, undefined) {
-	var sObj = "[object Object]", sArr = "[object Array]", sStr = "[object String]", sFn = "function";
+var m = (function app(window, undefined) {
+	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
 	var parser = /(?:(^|#|\.)([^#\.\[\]]+))|(\[.+?\])/g, attrParser = /\[(.+?)(?:=("|'|)(.*?)\2)?\]/;
-	var voidElements = /AREA|BASE|BR|COL|COMMAND|EMBED|HR|IMG|INPUT|KEYGEN|LINK|META|PARAM|SOURCE|TRACK|WBR/;
+	var voidElements = /^(AREA|BASE|BR|COL|COMMAND|EMBED|HR|IMG|INPUT|KEYGEN|LINK|META|PARAM|SOURCE|TRACK|WBR)$/;
 
 	// caching commonly used variables
 	var $document, $location, $requestAnimationFrame, $cancelAnimationFrame;
@@ -33,11 +33,12 @@ Mithril = m = new function app(window, undefined) {
 	 */
 	function m() {
 		var args = [].slice.call(arguments);
-		var hasAttrs = args[1] != null && type.call(args[1]) == sObj && !("tag" in args[1]) && !("subtree" in args[1]);
+		var hasAttrs = args[1] != null && type.call(args[1]) == OBJECT && !("tag" in args[1]) && !("subtree" in args[1]);
 		var attrs = hasAttrs ? args[1] : {};
 		var classAttrName = "class" in attrs ? "class" : "className";
 		var cell = {tag: "div", attrs: {}};
 		var match, classes = [];
+		if (type.call(args[0]) != STRING) throw new Error("selector in m(selector, attrs, children) should be a string")
 		while (match = parser.exec(args[0])) {
 			if (match[1] == "" && match[2]) cell.tag = match[2];
 			else if (match[1] == "#") cell.attrs.id = match[2];
@@ -51,7 +52,7 @@ Mithril = m = new function app(window, undefined) {
 
 
 		var children = hasAttrs ? args[2] : args[1];
-		if (type.call(children) == sArr) {
+		if (type.call(children) == ARRAY) {
 			cell.children = children
 		}
 		else {
@@ -88,7 +89,7 @@ Mithril = m = new function app(window, undefined) {
 		//`configs` is a list of config functions to run after the topmost `build` call finishes running
 
 		//there's logic that relies on the assumption that null and undefined data are equivalent to empty strings
-		//- this prevents lifecycle surprises from procedural helpers that mix implicit and explicit return statements
+		//- this prevents lifecycle surprises from procedural helpers that mix implicit and explicit return statements (e.g. function foo() {if (cond) return m("div")}
 		//- it simplifies diffing code
 		if (data == null) data = "";
 		if (data.subtree === "retain") return cached;
@@ -97,7 +98,7 @@ Mithril = m = new function app(window, undefined) {
 			if (cached != null) {
 				if (parentCache && parentCache.nodes) {
 					var offset = index - parentIndex;
-					var end = offset + (dataType == sArr ? data : cached.nodes).length;
+					var end = offset + (dataType == ARRAY ? data : cached.nodes).length;
 					clear(parentCache.nodes.slice(offset, end), parentCache.slice(offset, end))
 				}
 				else if (cached.nodes) clear(cached.nodes, cached)
@@ -107,8 +108,15 @@ Mithril = m = new function app(window, undefined) {
 			cached.nodes = []
 		}
 
-		if (dataType == sArr) {
-			data = flatten(data);
+		if (dataType == ARRAY) {
+			//recursively flatten array
+			for (var i = 0; i < data.length; i++) {
+				if (type.call(data[i]) == ARRAY) {
+					data = data.concat.apply([], data);
+					i-- //check current index again and flatten until there are no more nested arrays at that index
+				}
+			}
+			
 			var nodes = [], intact = cached.length === data.length, subArrayCount = 0;
 
 			//keys algorithm: sort elements without recreating them if keys are present
@@ -186,40 +194,37 @@ Mithril = m = new function app(window, undefined) {
 					//the second clause (after the pipe) matches text nodes
 					subArrayCount += (item.match(/<[^\/]|\>\s*[^<]/g) || []).length
 				}
-				else subArrayCount += type.call(item) == sArr ? item.length : 1;
+				else subArrayCount += type.call(item) == ARRAY ? item.length : 1;
 				cached[cacheCount++] = item
 			}
 			if (!intact) {
 				//diff the array itself
-
+				
 				//update the list of DOM nodes by collecting the nodes from each item
 				for (var i = 0; i < data.length; i++) {
-					if (cached[i] != null) nodes = nodes.concat(cached[i].nodes)
+					if (cached[i] != null) nodes.push.apply(nodes, cached[i].nodes)
 				}
 				//remove items from the end of the array if the new array is shorter than the old one
 				//if errors ever happen here, the issue is most likely a bug in the construction of the `cached` data structure somewhere earlier in the program
 				for (var i = 0, node; node = cached.nodes[i]; i++) {
 					if (node.parentNode != null && nodes.indexOf(node) < 0) clear([node], [cached[i]])
 				}
-				//add items to the end if the new array is longer than the old one
-				for (var i = cached.nodes.length, node; node = nodes[i]; i++) {
-					if (node.parentNode == null) parentElement.appendChild(node)
-				}
 				if (data.length < cached.length) cached.length = data.length;
 				cached.nodes = nodes
 			}
 		}
-		else if (data != null && dataType == sObj) {
+		else if (data != null && dataType == OBJECT) {
 			if (!data.attrs) data.attrs = {};
 			if (!cached.attrs) cached.attrs = {};
 
 			var dataAttrKeys = Object.keys(data.attrs);
+			var hasKeys = dataAttrKeys.length > ("key" in data.attrs ? 1 : 0)
 			//if an element is different enough from the one in cache, recreate it
 			if (data.tag != cached.tag || dataAttrKeys.join() != Object.keys(cached.attrs).join() || data.attrs.id != cached.attrs.id) {
 				if (cached.nodes.length) clear(cached.nodes);
-				if (cached.configContext && typeof cached.configContext.onunload == sFn) cached.configContext.onunload()
+				if (cached.configContext && typeof cached.configContext.onunload == FUNCTION) cached.configContext.onunload()
 			}
-			if (type.call(data.tag) != sStr) return;
+			if (type.call(data.tag) != STRING) return;
 
 			var node, isNew = cached.nodes.length === 0;
 			if (data.attrs.xmlns) namespace = data.attrs.xmlns;
@@ -250,7 +255,7 @@ Mithril = m = new function app(window, undefined) {
 				if (shouldReattach === true && node != null) parentElement.insertBefore(node, parentElement.childNodes[index] || null)
 			}
 			//schedule configs to be called. They are called after `build` finishes running
-			if (typeof data.attrs["config"] == sFn) {
+			if (typeof data.attrs["config"] == FUNCTION) {
 				var context = cached.configContext = cached.configContext || {};
 
 				// bind
@@ -262,7 +267,7 @@ Mithril = m = new function app(window, undefined) {
 				configs.push(callback(data, [node, !isNew, context, cached]))
 			}
 		}
-		else if (typeof dataType != sFn) {
+		else if (typeof dataType != FUNCTION) {
 			//handle text nodes
 			var nodes;
 			if (cached.nodes.length === 0) {
@@ -317,11 +322,11 @@ Mithril = m = new function app(window, undefined) {
 					//we don't ignore `key` because it must be unique and having it on the DOM helps debugging
 					if (attrName === "config") continue;
 					//hook event handlers to the auto-redrawing system
-					else if (typeof dataAttr == sFn && attrName.indexOf("on") == 0) {
+					else if (typeof dataAttr == FUNCTION && attrName.indexOf("on") == 0) {
 						node[attrName] = autoredraw(dataAttr, node)
 					}
 					//handle `style: {...}`
-					else if (attrName === "style" && dataAttr != null && type.call(dataAttr) == sObj) {
+					else if (attrName === "style" && dataAttr != null && type.call(dataAttr) == OBJECT) {
 						for (var rule in dataAttr) {
 							if (cachedAttr == null || cachedAttr[rule] !== dataAttr[rule]) node.style[rule] = dataAttr[rule]
 						}
@@ -338,8 +343,9 @@ Mithril = m = new function app(window, undefined) {
 					//handle cases that are properties (but ignore cases where we should use setAttribute instead)
 					//- list and form are typically used as strings, but are DOM element references in js
 					//- when using CSS selectors (e.g. `m("[style='']")`), style is used as a string, but it's an object in js
-					else if (attrName in node && !(attrName == "list" || attrName == "style" || attrName == "form")) {
-						node[attrName] = dataAttr
+					else if (attrName in node && !(attrName == "list" || attrName == "style" || attrName == "form" || attrName == "type")) {
+						//#348 don't set the value if not needed otherwise cursor placement breaks in Chrome
+						if (node[attrName] != dataAttr) node[attrName] = dataAttr
 					}
 					else node.setAttribute(attrName, dataAttr)
 				}
@@ -348,7 +354,8 @@ Mithril = m = new function app(window, undefined) {
 					if (e.message.indexOf("Invalid argument") < 0) throw e
 				}
 			}
-			else if (attrName === "value" && tag === "input" && node.value !== dataAttr) {
+			//#348 dataAttr may not be a string, so use loose comparison (double equal) instead of strict (triple equal)
+			else if (attrName === "value" && tag === "input" && node.value != dataAttr) {
 				node.value = dataAttr
 			}
 		}
@@ -357,7 +364,8 @@ Mithril = m = new function app(window, undefined) {
 	function clear(nodes, cached) {
 		for (var i = nodes.length - 1; i > -1; i--) {
 			if (nodes[i] && nodes[i].parentNode) {
-				nodes[i].parentNode.removeChild(nodes[i]);
+				try {nodes[i].parentNode.removeChild(nodes[i])}
+				catch (e) {} //ignore if this fails due to order of events (see http://stackoverflow.com/questions/21926083/failed-to-execute-removechild-on-node)
 				cached = [].concat(cached);
 				if (cached[i]) unload(cached[i])
 			}
@@ -365,9 +373,9 @@ Mithril = m = new function app(window, undefined) {
 		if (nodes.length != 0) nodes.length = 0
 	}
 	function unload(cached) {
-		if (cached.configContext && typeof cached.configContext.onunload == sFn) cached.configContext.onunload();
+		if (cached.configContext && typeof cached.configContext.onunload == FUNCTION) cached.configContext.onunload();
 		if (cached.children) {
-			if (type.call(cached.children) == sArr) {
+			if (type.call(cached.children) == ARRAY) {
 				for (var i = 0; i < cached.children.length; i++) unload(cached.children[i])
 			}
 			else if (cached.children.tag) unload(cached.children)
@@ -392,21 +400,6 @@ Mithril = m = new function app(window, undefined) {
 			index++
 		}
 		return nodes
-	}
-	function flatten(data) {
-		var index = 0;
-		loop: while (true) {
-			for (var i = index; i < data.length; i++) {
-				var item = data[i];
-				if (type.call(data[i]) == sArr) {
-					index = i;
-					data = data.concat.apply([], data);
-					continue loop
-				}
-			}
-			break
-		}
-		return data
 	}
 	function autoredraw(callback, object) {
 		return function(e) {
@@ -474,7 +467,7 @@ Mithril = m = new function app(window, undefined) {
 
 	m.prop = function (store) {
 		//note: using non-strict equality check here because we're checking if store is null OR undefined
-		if (((store != null && type.call(store) == sObj) || typeof store == sFn) && typeof store.then == sFn) {
+		if (((store != null && type.call(store) == OBJECT) || typeof store == FUNCTION) && typeof store.then == FUNCTION) {
 			return propify(store)
 		}
 
@@ -487,7 +480,7 @@ Mithril = m = new function app(window, undefined) {
 		var index = roots.indexOf(root);
 		if (index < 0) index = roots.length;
 		var isPrevented = false;
-		if (controllers[index] && typeof controllers[index].onunload == sFn) {
+		if (controllers[index] && typeof controllers[index].onunload == FUNCTION) {
 			var event = {
 				preventDefault: function() {isPrevented = true}
 			};
@@ -560,11 +553,12 @@ Mithril = m = new function app(window, undefined) {
 
 	//routing
 	var modes = {pathname: "", hash: "#", search: "?"};
-	var redirect = function() {}, routeParams = {}, currentRoute;
+	var redirect = function() {}, routeParams, currentRoute;
 	m.route = function() {
 		//m.route()
 		if (arguments.length === 0) return currentRoute;
-		else if (arguments.length === 3 && type.call(arguments[1]) == sStr) {
+		//m.route(el, defaultRoute, routes)
+		else if (arguments.length === 3 && type.call(arguments[1]) == STRING) {
 			var root = arguments[0], defaultRoute = arguments[1], router = arguments[2];
 			redirect = function(source) {
 				var path = currentRoute = normalizeRoute(source);
@@ -590,11 +584,16 @@ Mithril = m = new function app(window, undefined) {
 			element.removeEventListener("click", routeUnobtrusive);
 			element.addEventListener("click", routeUnobtrusive)
 		}
-		//m.route(route)
-		else if (type.call(arguments[0]) == sStr) {
+		//m.route(route, params)
+		else if (type.call(arguments[0]) == STRING) {
 			currentRoute = arguments[0];
-			var querystring = arguments[1] != null && type.call(arguments[1]) == sObj ? buildQueryString(arguments[1]) : null;
-			if (querystring) currentRoute += (currentRoute.indexOf("?") === -1 ? "?" : "&") + querystring;
+			var args = arguments[1] || {}
+			var queryIndex = currentRoute.indexOf("?")
+			var params = queryIndex > -1 ? parseQueryString(currentRoute.slice(queryIndex + 1)) : {}
+			for (var i in args) params[i] = args[i]
+			var querystring = buildQueryString(params)
+			var currentPath = queryIndex > -1 ? currentRoute.slice(0, queryIndex) : currentRoute
+			if (querystring) currentRoute = currentPath + (currentPath.indexOf("?") === -1 ? "?" : "&") + querystring;
 
 			var shouldReplaceHistoryEntry = (arguments.length == 3 ? arguments[2] : arguments[1]) === true;
 
@@ -608,7 +607,10 @@ Mithril = m = new function app(window, undefined) {
 			else $location[m.route.mode] = currentRoute
 		}
 	};
-	m.route.param = function(key) {return routeParams[key]};
+	m.route.param = function(key) {
+		if (!routeParams) throw new Error("You must call m.route(element, defaultRoute, routes) before calling m.route.param()")
+		return routeParams[key]
+	};
 	m.route.mode = "search";
 	function normalizeRoute(route) {return route.slice(modes[m.route.mode].length)}
 	function routeByValue(root, router, path) {
@@ -656,7 +658,7 @@ Mithril = m = new function app(window, undefined) {
 		var str = [];
 		for(var prop in object) {
 			var key = prefix ? prefix + "[" + prop + "]" : prop, value = object[prop];
-			str.push(value != null && type.call(value) == sObj ? buildQueryString(value, key) : encodeURIComponent(key) + "=" + encodeURIComponent(value))
+			str.push(value != null && type.call(value) == OBJECT ? buildQueryString(value, key) : encodeURIComponent(key) + "=" + encodeURIComponent(value))
 		}
 		return str.join("&")
 	}
@@ -664,7 +666,7 @@ Mithril = m = new function app(window, undefined) {
 		var pairs = str.split("&"), params = {};
 		for (var i = 0; i < pairs.length; i++) {
 			var pair = pairs[i].split("=");
-			params[decodeSpace(pair[0])] = pair[1] ? decodeSpace(pair[1]) : (pair.length === 1 ? true : "")
+			params[decodeSpace(pair[0])] = pair[1] ? decodeSpace(pair[1]) : ""
 		}
 		return params
 	}
@@ -742,7 +744,7 @@ Mithril = m = new function app(window, undefined) {
 		}
 
 		function thennable(then, successCallback, failureCallback, notThennableCallback) {
-			if (((promiseValue != null && type.call(promiseValue) == sObj) || typeof promiseValue == sFn) && typeof then == sFn) {
+			if (((promiseValue != null && type.call(promiseValue) == OBJECT) || typeof promiseValue == FUNCTION) && typeof then == FUNCTION) {
 				try {
 					// count protects against abuse calls from spec checker
 					var count = 0;
@@ -786,7 +788,7 @@ Mithril = m = new function app(window, undefined) {
 				fire()
 			}, function() {
 				try {
-					if (state == RESOLVING && typeof successCallback == sFn) {
+					if (state == RESOLVING && typeof successCallback == FUNCTION) {
 						promiseValue = successCallback(promiseValue)
 					}
 					else if (state == REJECTING && typeof failureCallback == "function") {
@@ -903,13 +905,13 @@ Mithril = m = new function app(window, undefined) {
 			if (options.deserialize == JSON.parse) {
 				xhr.setRequestHeader("Accept", "application/json, text/*");
 			}
-			if (typeof options.config == sFn) {
+			if (typeof options.config == FUNCTION) {
 				var maybeXhr = options.config(xhr, options);
 				if (maybeXhr != null) xhr = maybeXhr
 			}
 
 			var data = options.method == "GET" || !options.data ? "" : options.data
-			if (data && (type.call(data) != sStr && data.constructor != window.FormData)) {
+			if (data && (type.call(data) != STRING && data.constructor != window.FormData)) {
 				throw "Request data should be either be a string or FormData. Check the `serialize` option in `m.request`";
 			}
 			xhr.send(data);
@@ -954,7 +956,7 @@ Mithril = m = new function app(window, undefined) {
 				var unwrap = (e.type == "load" ? xhrOptions.unwrapSuccess : xhrOptions.unwrapError) || identity;
 				var response = unwrap(deserialize(extract(e.target, xhrOptions)));
 				if (e.type == "load") {
-					if (type.call(response) == sArr && xhrOptions.type) {
+					if (type.call(response) == ARRAY && xhrOptions.type) {
 						for (var i = 0; i < response.length; i++) response[i] = new xhrOptions.type(response[i])
 					}
 					else if (xhrOptions.type) response = new xhrOptions.type(response)
@@ -981,7 +983,7 @@ Mithril = m = new function app(window, undefined) {
 	m.deps.factory = app;
 
 	return m
-}(typeof window != "undefined" ? window : {});
+})(typeof window != "undefined" ? window : {});
 
-if (typeof module != "undefined" && module !== null) module.exports = m;
-if (typeof define == "function" && define.amd) define(function() {return m});
+if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
+else if (typeof define == "function" && define.amd) define(function() {return m});
