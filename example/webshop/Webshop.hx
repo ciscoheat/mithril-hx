@@ -15,6 +15,7 @@ class Webshop implements Module<Webshop>
     var cart : ShoppingCart;
     var menu : Menu;
     var search : Search;
+    var checkout : Checkout;
     var routes : Dynamic<MithrilModule<Dynamic>>;
 
     // Create menu and routes.
@@ -25,11 +26,13 @@ class Webshop implements Module<Webshop>
 
         var productList = new ProductList(cart, menu);
         var productPage = new ProductPage(cart, menu);
+        var checkout = new Checkout(cart);
 
         routes = {
             "/": this,
             "/category/:categoryId": productList,
-            "/product/:productId": productPage
+            "/product/:productId": productPage,
+            "/checkout": checkout
         };
     }
 
