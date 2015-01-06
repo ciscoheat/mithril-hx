@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.17.0",
-  "releasenote": "Mithril var removed from latest version, replaced with m.",
+  "version": "0.17.1",
+  "releasenote": "Updated Node.js patch with m instead of Mithril.",
   "contributors": ["ciscoheat"]
 }

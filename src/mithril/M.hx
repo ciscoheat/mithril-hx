@@ -167,7 +167,11 @@ extern class M
 		// to the inline function. It will be replaced with the var name.
 		untyped __js__("try {");
 		_patch(untyped Browser.window.m);
-		_patch(untyped __js__('require("mithril")'));
+		untyped __js__("} catch(_) {}");
+		// Node patch
+		untyped __js__("try {");
+		untyped __js__('GLOBAL.m = require("mithril")');
+		_patch(untyped __js__('GLOBAL.m'));
 		untyped __js__("} catch(_) {}");
 	}
 
@@ -175,7 +179,6 @@ extern class M
 		// Some extra properties that simplifies the API a lot.
 		// Also redefines Mithril.module to have access to the current module,
 		// and prevents deferred being resolved on Node.js.
-		untyped __js__("try {");
 		untyped __js__("(function(m) {
 			m.m =        m;
 			m.__module = m.module;
@@ -184,7 +187,6 @@ extern class M
 			if (typeof module !== 'undefined' && module.exports) 
 				m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);
-		untyped __js__("} catch(_) {}");
 	}
 
 	// Stores the current module so it can be used in module() calls (added automatically by macro).
