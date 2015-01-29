@@ -4,3 +4,5 @@
 /*.sublime-workspace
 /bin/webshop/webshop.js
 /docs
+/bin/mithril.js.map
+/bin/noderendering.js.map

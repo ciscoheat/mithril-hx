@@ -57,7 +57,7 @@ class TodoList implements Model
 	public function add(?description : Null<String>) {
 		if(description != null && description.length > 0) {
 			this.list.push(new Todo(description));
-			this.save();			
+			this.save();
 		}
 	}
 
@@ -95,7 +95,7 @@ class TodoModule implements Module<TodoModule>
 	public function controller() {}
 
 	public function view() {
-		return m("div", [
+		m("div", [
 			m("input", {
 				config: function(e : InputElement) if(input == null) input = e,
 				value: todo.description,

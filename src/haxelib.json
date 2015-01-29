@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.17.1",
-  "releasenote": "Updated Node.js patch with m instead of Mithril.",
+  "version": "0.18.0",
+  "releasenote": "View methods are now returning the last expression automatically.",
   "contributors": ["ciscoheat"]
 }

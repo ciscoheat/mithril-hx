@@ -99,11 +99,22 @@ class ModuleBuilder
 		}
 	}
 
+	/**
+	 * Return the last expr automatically, or return null if no expr exists.
+	 * Also add a "ctrl" argument to the view if no parameters exist.
+	 */
 	private static function implyViewArgument(f : Function, t : Type) {
-		// Inject "return null" to view()
 		if (f.expr != null) switch(f.expr.expr) {
 			case EBlock(exprs):
-				exprs.push(macro return null);
+				if (exprs.length > 0) {
+					var lastExpr = exprs[exprs.length - 1];
+					switch(lastExpr.expr) {
+						case EReturn(_):
+						case _: lastExpr.expr = EReturn({expr: lastExpr.expr, pos: lastExpr.pos});
+					}
+				} else {
+					exprs.push(macro return null);
+				}
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
 				implyViewArgument(f, t);

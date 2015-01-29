@@ -69,7 +69,8 @@ class TodoView implements View<TodoController>
     // The interface implementation.
     public function view(?ctrl : TodoController) : VirtualElement {
         // Remember to use "m" here instead of "M" for autocompletion:
-        return m("div", [
+		// (and it returns the last expression automatically)
+        m("div", [
             m("h1", "Welcome!"),
             m("table", model.map(function(todo) {
                 return m("tr", [
@@ -93,17 +94,15 @@ import js.Browser;
 class TodoModule implements Module<TodoModule>
 {
     public function new() {
-        ...
     }
 
     public function controller() {
-        ...
     }
 
-    // The argument to view() will be "this" in a Module, so you don't 
+    // The argument to view() will be "this" in a Module, so you don't
     // have to specify it unless you want to use it explicitly.
     public function view() {
-        ...
+        m("h1", "Hello world!");
     }
 
     // Finally, here's how to start everything:
@@ -127,7 +126,7 @@ Then select one of the following:
 
 A collection of two demo apps, available on the Mithril site.
 
-1. `haxe mithril.js` 
+1. `haxe mithril.js`
 1. Open `bin/index.html` in a browser.
 
 ## Webshop
@@ -146,7 +145,7 @@ If you prefer a bare-bones example (doesn't require cloning), create the followi
 ```html
 <!doctype html>
 <body>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.1.24/mithril.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.1.28/mithril.min.js"></script>
 <script src="example.js"></script>
 </body>
 ```
@@ -181,7 +180,7 @@ class Example implements Module<Example>
 
     public function view() {
         // Display an input field.
-        return m("input", {
+        m("input", {
             // Listens to the "onchange" event of the field and will
             // set user.name with the fields "value" attribute.
             onchange: M.withAttr("value", user.name),

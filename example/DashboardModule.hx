@@ -22,20 +22,19 @@ class DashboardModule implements Module<Dynamic>
 	}
 
 	public function controller() {
-		// Detect IP, but with a minimal delay so it won't stop the rendering.
-		if(ip().length == 0) haxe.Timer.delay(function() {
-			M.request({
-				method: "GET",
-				url: "http://ip.jsontest.com/"
-			}).then(
-				function(r : {ip : String}) ip(r.ip), 
-				function(_) ip("Don't know!")
-			);
-		}, 0);
+		// Detect IP in background so it won't stop the rendering.
+		M.request({
+			method: "GET",
+			url: "http://ip.jsontest.com/",
+			background: true
+		}).then(
+			function(r : { ip : String } ) { ip(r.ip); M.redraw(); },
+			function(_) { ip("Don't know!"); M.redraw(); }
+		);
 	}
 
 	public function view() {
-		return [
+		[
 			m("h1", "Welcome!"),
 			m("p", "Choose your app:"),
 			m("div", {style: {width: "300px"}}, [
@@ -66,9 +65,6 @@ class DashboardModule implements Module<Dynamic>
 		#if isomorphic
 		// Changing route mode to "pathname" to get urls without hash.
 		M.routeMode = "pathname";
-		// Changing redraw strategy to "current" to diff with existing DOM
-		// (not part of the official Mithril yet)
-		M.redrawStrategy("current");
 		#else
 		M.routeMode = "hash";
 		#end
@@ -82,6 +78,6 @@ class DashboardModule implements Module<Dynamic>
 	public static function main() {
 		Browser.document.addEventListener('DOMContentLoaded', function(e){
 			new DashboardModule().setRoutes(Browser.document.body);
-		});		
+		});
 	}
 }

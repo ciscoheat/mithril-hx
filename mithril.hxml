@@ -1,6 +1,7 @@
--cp src 
+-D source-map-content
+-cp src
 -cp example
 -js bin/mithril.js
 -main DashboardModule
-#-debug
+-debug
 #-cmd start bin/index.html
