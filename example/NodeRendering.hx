@@ -42,7 +42,7 @@ class NodeRendering
 
 		var render : MithrilNodeRenderer = require("mithril-node-render");
 
-		console.log(render(todoList.view(todoList)));
+		console.log(render(todoList.view()));
 	}
 
 	static function startServer() {
