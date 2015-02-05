@@ -75,7 +75,7 @@ class TodoList implements Model
 	}
 }
 
-class TodoModule implements Module<TodoModule>
+class TodoModule implements View
 {
 	public var todo : TodoList;
 
@@ -91,8 +91,6 @@ class TodoModule implements Module<TodoModule>
 		todo.clear();
 		M.endComputation();
 	}
-
-	public function controller() {}
 
 	public function view() {
 		m("div", [

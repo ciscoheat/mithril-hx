@@ -10,7 +10,7 @@ using StringTools;
 /**
  * A simple webshop to demonstrate the power of Mithril.
  */
-class Webshop implements Module<Webshop>
+class Webshop implements View
 {
     var cart : ShoppingCart;
     var menu : Menu;
@@ -53,8 +53,6 @@ class Webshop implements Module<Webshop>
             }, "Mithril Webshop")
         });
     }
-
-    public function controller() {}
 
     // Welcome text for the default route
     public function view() {

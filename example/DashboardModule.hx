@@ -43,7 +43,7 @@ class DashboardModule implements Module<Dynamic>
 				m("a[href='/dashboard/chain']", {config: M.route}, "Don't break the chain"),
 				m("hr"),
 				switch(M.routeParam("app")) {
-					case "todo": todo.view(todo);
+					case "todo": todo.view();
 					case "chain": chainView.view(chainController);
 					case _: m("#app");
 				},

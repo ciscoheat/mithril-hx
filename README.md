@@ -58,18 +58,43 @@ class Todo implements Controller<Todo>
 ## Views
 
 ```haxe
-class TodoView implements View<TodoController>
+class TodoView implements View
 {
     var model : Array<Todo>;
 
-    public function new() {
-        this.model = [new Todo("first"), new Todo("second")];
+    public function new(model) {
+        this.model = model;
     }
 
-    // The interface implementation.
+    // The interface implementation:
+    public function view() : VirtualElement {
+        // Remember to use "m" here instead of "M" for autocompletion.
+		// The method returns the last expression automatically.
+        m("div", [
+            m("h1", "Welcome!"),
+            m("table", model.map(function(todo) {
+                return m("tr", [
+                    m("td", m("input[type=checkbox]", { checked: todo.done() })),
+                    m("td", todo.description())
+                ]);
+            }))
+        ]);
+    }
+}
+```
+
+If you want to use another object as controller, for example when composing a module from different objects, implement `ControllerView`:
+
+```haxe
+class TodoView implements ControllerView<TodoController>
+{
+    var model : Array<Todo>;
+
+    public function new(model) {
+        this.model = model;
+    }
+
     public function view(?ctrl : TodoController) : VirtualElement {
-        // Remember to use "m" here instead of "M" for autocompletion:
-		// (and it returns the last expression automatically)
         m("div", [
             m("h1", "Welcome!"),
             m("table", model.map(function(todo) {
@@ -97,6 +122,7 @@ class TodoModule implements Module<TodoModule>
     }
 
     public function controller() {
+        // Do controller things here, managing child views for example.
     }
 
     // The argument to view() will be "this" in a Module, so you don't

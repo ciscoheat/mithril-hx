@@ -9,16 +9,12 @@ import webshop.models.*;
 using Lambda;
 using StringTools;
 
-class Search implements Module<Search>
+class Search implements View
 {
     @prop var results : Array<Product>;
 
     public function new() {
         this.results = M.prop([]);
-    }
-
-    public function controller() {
-
     }
 
     function search(phrase : String) {

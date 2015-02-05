@@ -28,8 +28,9 @@ class ModuleBuilder
 		for(field in fields) switch(field.kind) {
 			case FFun(f):
 				f.expr.iter(replaceM);
+				if (type & 1 == 1 && field.name == "view") returnLastExpr(f, Context.getLocalType());
 				if (type & 2 == 2 && field.name == "controller") injectModule(f);
-				if (type & 1 == 1 && field.name == "view") implyViewArgument(f, Context.getLocalType());
+				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
 				propWarning(field);
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
@@ -101,9 +102,8 @@ class ModuleBuilder
 
 	/**
 	 * Return the last expr automatically, or return null if no expr exists.
-	 * Also add a "ctrl" argument to the view if no parameters exist.
 	 */
-	private static function implyViewArgument(f : Function, t : Type) {
+	private static function returnLastExpr(f : Function, t : Type) {
 		if (f.expr != null) switch(f.expr.expr) {
 			case EBlock(exprs):
 				if (exprs.length > 0) {
@@ -117,10 +117,14 @@ class ModuleBuilder
 				}
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
-				implyViewArgument(f, t);
-				return;
+				returnLastExpr(f, t);
 		}
+	}
 
+	/**
+	 * Add a "ctrl" argument to the view if no parameters exist.
+	 */
+	private static function addViewArgument(f : Function, t : Type) {
 		if(f.args.length > 0) return;
 		f.args.push({
 			value: null,

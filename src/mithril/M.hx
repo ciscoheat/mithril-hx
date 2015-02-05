@@ -20,7 +20,11 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 @:autoBuild(mithril.macros.ModuleBuilder.build(0)) interface Model {}
 
-@:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface View<T> {
+@:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface View {
+	function view() : ViewOutput;
+}
+
+@:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface ControllerView<T> {
 	function view(?ctrl : T) : ViewOutput;
 }
 
@@ -110,7 +114,7 @@ extern class M
 {
 	public static function m(selector : String, ?attributes : Dynamic, ?children : Children) : VirtualElement;
 
-	public static function module<T>(element : Element, module : MithrilModule<T>) : T;
+	public static function module<T>(element : Element, module : T) : T;
 
 	public static function prop<T>(?initialValue : T) : GetterSetter<T>;
 

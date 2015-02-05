@@ -12,7 +12,7 @@ using Lambda;
 /**
  * Left-side menu, listing the categories in the webshop.
  */
-class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<ShoppingCart>
+class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
 {
     @prop var isOpen : Bool;
 
@@ -20,9 +20,6 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
         super();
         isOpen = M.prop(false);
         unserialize();
-    }
-
-    public function controller() {
     }
 
     public function serialize() {
@@ -92,7 +89,7 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements Module<Sho
     }
 
     public function view() : ViewOutput {
-        return [
+        [
             m("li", {
                 "class": isOpen() ? "dropdown open" : "dropdown",
                 config: function(el, isInit) {

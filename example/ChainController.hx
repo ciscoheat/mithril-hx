@@ -89,6 +89,7 @@ class ChainController implements Controller<ChainController>
 	}
 
 	public function controller() {
+		// Nothing to do, only used for demonstrating Controllers.		
 	}
 
 	public function clear() {
@@ -114,7 +115,7 @@ class ChainController implements Controller<ChainController>
 	}
 }
 
-class ChainView implements View<ChainController>
+class ChainView implements ControllerView<ChainController>
 {
 	var model : ChainModel;
 
