@@ -72,12 +72,12 @@ Marzipan applicake ice cream brownie tart donut cake. Sweet roll soufflé tirami
             case Done:
         }
 
-        var button = function() return 
+        var button = function()
             m("button.btn.btn-lg.btn-success[type='button']", {
                 onclick: cart_add.bind(_, product())
             },"Add to Cart");
 
-        return [
+        [
             m(".row", m(".col-xs-12", m("h1", product().name))),
             m(".row", [
                 m(".col-xs-12.col-sm-12.col-md-7.col-lg-6", [
@@ -90,7 +90,7 @@ Marzipan applicake ice cream brownie tart donut cake. Sweet roll soufflé tirami
                         m(".col-xs-4", m("h2", product().stock > 0 ? button() : m("h3", "Out of stock")))
                     ])
                 ]),
-                m(".col-xs-12.col-sm-12.col-md-5.col-lg-6", lorem().map(function(l) return m("p", l)))
+                m(".col-xs-12.col-sm-12.col-md-5.col-lg-6", lorem().map(function(l) m("p", l)))
             ])
         ];
     }

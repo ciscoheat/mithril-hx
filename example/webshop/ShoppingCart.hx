@@ -124,7 +124,8 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
             var subTotal = p.price * get(p);
             var name = ' ${p.name} | $$$subTotal';
             total += subTotal;
-            return m("li", m("a", [
+            
+            m("li", m("a", [
                 m("input[type=number]", {
                     min: 0, 
                     value: get(p), 

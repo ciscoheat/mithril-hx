@@ -40,7 +40,7 @@ class Search implements View
     }
 
     public function view() {
-        return [
+        [
             m("input.form-control", {
                 placeholder: "Search...",
                 oninput: M.withAttr("value", search),
@@ -54,7 +54,7 @@ class Search implements View
                     new JQuery('html').on("click.closeSearch", closeEvent);
                 }
             }, results().map(function(p) {
-                return m("li", {role: "presentation"},
+                m("li", {role: "presentation"},
                     m("a", {
                         role: "menuitem",
                         tabindex: -1,

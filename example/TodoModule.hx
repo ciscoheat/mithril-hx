@@ -110,7 +110,7 @@ class TodoModule implements View
 				var attribs : Dynamic = { onclick: M.withAttr("checked", task_checked.bind(task)) } ;
 				if(task.done) attribs.checked = "checked";
 
-				return m("tr", [
+				m("tr", [
 					m("td", [ m("input[type=checkbox]", attribs) ]),
 					m("td", { style: { textDecoration: task.done ? "line-through" : "none" }}, task.description)
 				]);

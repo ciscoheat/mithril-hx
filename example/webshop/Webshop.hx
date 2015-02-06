@@ -48,7 +48,7 @@ class Webshop implements View
         // An "inline module" just to create the home link.
         M.module(element("home-link"), {
             controller: function() return null,
-            view: function(?c) return m("a.navbar-brand[href='/']", {
+            view: function(?c) m("a.navbar-brand[href='/']", {
                 config: M.route
             }, "Mithril Webshop")
         });
@@ -63,7 +63,7 @@ class Webshop implements View
 
             m("ul.list-group", todo().map(function(t) {
                 var done = t.toLowerCase().startsWith("x ");
-                return m("li.list-group-item", 
+                m("li.list-group-item", 
                     { style: { textDecoration: done ? "line-through" : "none" }},
                     [
                         m("input[type=checkbox]", { checked: done ? "checked" : "" }), 

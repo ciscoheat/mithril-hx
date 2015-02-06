@@ -38,7 +38,7 @@ class Checkout implements Module<Checkout>
     }
 
     public function view() {
-        return [
+        [
             m("h1", "Checkout"),
             m("form.form-horizontal[role=form]", 
                 form.map(formFields).concat([
@@ -54,7 +54,7 @@ class Checkout implements Module<Checkout>
 
     function formFields(f : FormField) {
         var required = f.required != false;
-        return m(".form-group", [
+        m(".form-group", [
             m("label.col-sm-1.control-label", {"for": f.id}, f.label + (required ? "*" : "")),
             m(".col-sm-" + (f.width == null ? 5 : f.width), 
                 m("input.form-control" + (required ? "[required]" : ""), {

@@ -58,7 +58,7 @@ class ProductList implements Module<ProductList>
             case Done:
         }
 
-        return [
+        [
             m("h2.sub-header", category().name),
             m(".table-responsive", [
                 m("table.table.table-striped", [
@@ -71,7 +71,7 @@ class ProductList implements Module<ProductList>
                         ])
                     ]),
                     m("tbody#products", category().products.map(function(p) 
-                        return m("tr", [
+                        m("tr", [
                             m("td", m("a", {
                                 href: '/product/${p.id}',
                                 config: M.route

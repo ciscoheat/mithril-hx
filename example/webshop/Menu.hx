@@ -27,9 +27,9 @@ class Menu implements Module<Menu>
     }
 
     public function view() {
-        return m("ul.nav.nav-sidebar", 
+        m("ul.nav.nav-sidebar", 
             categories().array().map(function(c) {
-                return m("li", {"class": isActive(c) ? "active" : ""}, 
+                m("li", {"class": isActive(c) ? "active" : ""}, 
                     m("a", {
                         href: '/category/${c.slug()}',
                         config: M.route
