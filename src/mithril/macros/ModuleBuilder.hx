@@ -117,8 +117,6 @@ class ModuleBuilder
 			case EBlock(exprs):
 				if (exprs.length > 0)
 					returnMOrArrayMExpr(exprs[exprs.length - 1]);
-				else
-					exprs.push(macro return null);
 			case _:
 				returnMOrArrayMExpr(f.expr);
 		}
