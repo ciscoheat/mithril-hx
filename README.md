@@ -69,11 +69,11 @@ class TodoView implements View
     // The interface implementation:
     public function view() : VirtualElement {
         // Remember to use "m" here instead of "M" for autocompletion.
-		// The method returns the last expression automatically.
+		// The last m() expression (or Array of m()) is returned automatically.
         m("div", [
             m("h1", "Welcome!"),
             m("table", model.map(function(todo) {
-                return m("tr", [
+                m("tr", [
                     m("td", m("input[type=checkbox]", { checked: todo.done() })),
                     m("td", todo.description())
                 ]);
@@ -98,7 +98,7 @@ class TodoView implements ControllerView<TodoController>
         m("div", [
             m("h1", "Welcome!"),
             m("table", model.map(function(todo) {
-                return m("tr", [
+                m("tr", [
                     m("td", m("input[type=checkbox]", { checked: todo.done() })),
                     m("td", todo.description())
                 ]);
