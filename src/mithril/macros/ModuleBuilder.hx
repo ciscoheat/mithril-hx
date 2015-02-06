@@ -28,7 +28,8 @@ class ModuleBuilder
 		for(field in fields) switch(field.kind) {
 			case FFun(f):
 				f.expr.iter(replaceM);
-				if (type & 1 == 1 && field.name == "view") returnLastExpr(f, Context.getLocalType());
+				returnLastMExpr(f);
+				//if (type & 1 == 1 && field.name == "view") returnLastMExpr(f);
 				if (type & 2 == 2 && field.name == "controller") injectModule(f);
 				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
 				propWarning(field);
@@ -98,27 +99,63 @@ class ModuleBuilder
 			case _:
 				e.iter(replaceM);
 		}
+
+		switch(e.expr) {
+			case EFunction(_, f): returnLastMExpr(f);
+			case _:
+		}
 	}
 
 	/**
-	 * Return the last expr automatically, or return null if no expr exists.
+	 * Return the last m() call automatically, or an array with m() calls.
+	 * Returns null if no expr exists.
 	 */
-	private static function returnLastExpr(f : Function, t : Type) {
-		if (f.expr != null) switch(f.expr.expr) {
+	private static function returnLastMExpr(f : Function) {
+		if(f.expr == null) return;
+
+		switch(f.expr.expr) {
 			case EBlock(exprs):
-				if (exprs.length > 0) {
-					var lastExpr = exprs[exprs.length - 1];
-					switch(lastExpr.expr) {
-						case EReturn(_):
-						case _: lastExpr.expr = EReturn({expr: lastExpr.expr, pos: lastExpr.pos});
-					}
-				} else {
+				if (exprs.length > 0)
+					returnMOrArrayMExpr(exprs[exprs.length - 1]);
+				else
 					exprs.push(macro return null);
-				}
 			case _:
-				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
-				returnLastExpr(f, t);
+				returnMOrArrayMExpr(f.expr);
 		}
+	}
+
+	/**
+	 * Add return to m() calls, or an Array with m() calls.
+	 */
+	private static function returnMOrArrayMExpr(e : Expr) {
+		switch(e.expr) {
+			case EReturn(_):
+			case EArrayDecl(values):
+				if(values.length > 0) 
+					checkForM(values[0], e);
+				else
+					injectReturn(e);
+			case _:
+				checkForM(e, e);
+		}
+	}
+
+	/**
+	 * Check if e is a m() call, then add return to inject
+	 */
+	private static function checkForM(e : Expr, inject : Expr) {
+		switch(e) {
+			case macro mithril.M.m($a, $b, $c):
+			case macro mithril.M.m($a, $b):
+			case macro mithril.M.m($a):
+			case _: return;
+		}
+
+		injectReturn(inject);
+	}
+
+	private static function injectReturn(e : Expr) {
+		e.expr = EReturn({expr: e.expr, pos: e.pos});
 	}
 
 	/**
