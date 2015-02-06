@@ -19,7 +19,7 @@ class ModuleBuilder
 
 		var fields = Context.getBuildFields();
 
-		var propWarning = function(f : Field) {
+		var checkInvalidProp = function(f : Field) {
 			if (Lambda.exists(f.meta, function(m) return m.name == "prop")) {
 				Context.warning("@prop only works with var", f.pos);
 			}
@@ -29,10 +29,9 @@ class ModuleBuilder
 			case FFun(f):
 				f.expr.iter(replaceM);
 				returnLastMExpr(f);
-				//if (type & 1 == 1 && field.name == "view") returnLastMExpr(f);
 				if (type & 2 == 2 && field.name == "controller") injectModule(f);
 				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
-				propWarning(field);
+				checkInvalidProp(field);
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
 				if (prop != null) {
@@ -41,7 +40,7 @@ class ModuleBuilder
 					field.kind = propFunction(t, e);
 				}
 			case _:
-				propWarning(field);
+				checkInvalidProp(field);
 		}
 
 		return fields;
@@ -152,7 +151,7 @@ class ModuleBuilder
 		injectReturn(inject);
 	}
 
-	private static function injectReturn(e : Expr) {
+	private static inline function injectReturn(e : Expr) {
 		e.expr = EReturn({expr: e.expr, pos: e.pos});
 	}
 
