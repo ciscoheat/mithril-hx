@@ -27,18 +27,20 @@ class ModuleBuilder
 
 		for(field in fields) switch(field.kind) {
 			case FFun(f):
+				checkInvalidProp(field);
+				if(f.expr == null) continue;
+
 				f.expr.iter(replaceM);
 				returnLastMExpr(f);
 				if (type & 2 == 2 && field.name == "controller") injectModule(f);
 				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
-				checkInvalidProp(field);
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
-				if (prop != null) {
-					field.meta.remove(prop);
-					field.access.push(Access.ADynamic);
-					field.kind = propFunction(t, e);
-				}
+				if (prop == null) continue;
+				
+				field.meta.remove(prop);
+				field.access.push(Access.ADynamic);
+				field.kind = propFunction(t, e);
 			case _:
 				checkInvalidProp(field);
 		}
@@ -110,8 +112,6 @@ class ModuleBuilder
 	 * Returns null if no expr exists.
 	 */
 	private static function returnLastMExpr(f : Function) {
-		if(f.expr == null) return;
-
 		switch(f.expr.expr) {
 			case EBlock(exprs):
 				if (exprs.length > 0)
@@ -169,7 +169,6 @@ class ModuleBuilder
 	}
 
 	private static function injectModule(f : Function) {
-		if (f.expr == null) return;
 		switch(f.expr.expr) {
 			case EBlock(exprs):
 				// If an anonymous object is used, don't call it.

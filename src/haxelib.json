@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.19.2",
-  "releasenote": "Empty function blocks doesn't return automatically anymore.",
+  "version": "0.19.3",
+  "releasenote": "Fixed checking for functions without body.",
   "contributors": ["ciscoheat"]
 }
