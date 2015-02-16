@@ -2,6 +2,7 @@ package ;
 
 import js.html.Element;
 import mithril.M;
+import mithril.MithrilNodeRender;
 import nodejs.Process;
 import nodejs.Console;
 import nodejs.http.HTTP;
@@ -12,8 +13,6 @@ import nodejs.fs.File;
 import js.Browser;
 import js.html.Document;
 using StringTools;
-
-typedef MithrilNodeRenderer = ViewOutput -> String;
 
 class NodeRendering
 {
@@ -36,13 +35,11 @@ class NodeRendering
 		var todoList = new TodoModule();
 
 		todoList.todo.add("First one");
-		todoList.todo.add("Second one");
+		todoList.todo.add("Second <one>");
 
 		todoList.todo.list[0].done = true;
 
-		var render : MithrilNodeRenderer = require("mithril-node-render");
-
-		console.log(render(todoList.view()));
+		console.log(new MithrilNodeRender().render(todoList.view()));
 	}
 
 	static function startServer() {
@@ -128,7 +125,7 @@ class NodeRendering
 	}
 
 	static function dynamicRoute(url : String, resp : ServerResponse, then : Bool -> Void) {
-		var render : MithrilNodeRenderer = require("mithril-node-render");
+		var render = new MithrilNodeRender();
 		var path = require('path');
 		var test = url.split('/').filter(function(s) return s.length > 0).join('/');
 
@@ -136,7 +133,7 @@ class NodeRendering
 			case "dashboard", "dashboard/todo", "dashboard/chain":
 				var template = path.join(process.cwd(), "index.html");
 				File.readFile(template, function(err, html) {
-					var rendered = render(app.view(app));
+					var rendered = render.render(app.view(app));
 					var output : String = html.toString().replace("<!-- SERVERCONTENT -->", rendered);
 					resp.writeHead(200, {
 						"Content-Length": output.length,

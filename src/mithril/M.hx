@@ -57,13 +57,10 @@ typedef MithrilModule<T> = {
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
 
-typedef Children = Either4<BasicType, VirtualElement, {subtree: String},
-	Either3<Array<BasicType>, Array<VirtualElement>, Array<{subtree: String}>>>;
-
 typedef VirtualElement = {
 	var tag : String;
 	var attrs : Dynamic;
-	var children : Children;
+	var children : Dynamic;
 };
 
 typedef ViewOutput = Either4<VirtualElement, BasicType, Array<VirtualElement>, Array<BasicType>>;
@@ -112,7 +109,12 @@ typedef JSONPOptions = {
 @:final @:native("m")
 extern class M
 {
-	public static function m(selector : String, ?attributes : Dynamic, ?children : Children) : VirtualElement;
+	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<{subtree: String}>) : VirtualElement {})
+	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<VirtualElement>) : VirtualElement {})
+	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<String>) : VirtualElement {})
+	@:overload(function(selector : String, ?attributes : Dynamic, ?children : {subtree: String}) : VirtualElement {})
+	@:overload(function(selector : String, ?attributes : Dynamic, ?children : VirtualElement) : VirtualElement {})
+	public static function m(selector : String, ?attributes : Dynamic, ?children : String) : VirtualElement;
 
 	public static function module<T>(element : Element, module : T) : T;
 
@@ -134,8 +136,18 @@ extern class M
 
 	public static function trust(html : String) : String;
 
-	@:overload(function(rootElement : Document, children : Children, ?forceRecreation : Bool) : Void {})
-	public static function render(rootElement : Element, children : Children, ?forceRecreation : Bool) : Void;
+	@:overload(function(rootElement : Document, children : Array<{subtree: String}>, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Document, children : Array<VirtualElement>, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Document, children : Array<String>, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Document, children : {subtree: String}, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Document, children : VirtualElement, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Document, children : String, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Element, children : Array<{subtree: String}>, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Element, children : Array<VirtualElement>, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Element, children : Array<String>, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Element, children : {subtree: String}, ?forceRecreation : Bool) : Void {})
+	@:overload(function(rootElement : Element, children : VirtualElement, ?forceRecreation : Bool) : Void {})
+	public static function render(rootElement : Element, children : String, ?forceRecreation : Bool) : Void;
 
 	public static function redraw(?forceSync : Bool) : Void;
 
@@ -166,7 +178,7 @@ extern class M
 	///// Haxe specific stuff /////
 
 	static function __init__() : Void {
-		// Hacking time! For patching window.Mithril and the Node module.
+		// Hacking time! For patching window.m and the Node module.
 		// Pass a property of window with the same value as the @:native metadata
 		// to the inline function. It will be replaced with the var name.
 		untyped __js__("try {");
@@ -181,7 +193,7 @@ extern class M
 
 	@:noCompletion public static inline function _patch(__varName : Dynamic) : Void {
 		// Some extra properties that simplifies the API a lot.
-		// Also redefines Mithril.module to have access to the current module,
+		// Also redefines m.module to have access to the current module,
 		// and prevents deferred being resolved on Node.js.
 		untyped __js__("(function(m) {
 			m.m =        m;
