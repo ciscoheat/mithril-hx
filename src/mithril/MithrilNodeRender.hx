@@ -8,9 +8,9 @@ import mithril.M.VirtualElement;
  */
 class MithrilNodeRender
 {
-	static var voidTags : EReg = ~/^(AREA|BASE|BR|COL|COMMAND|EMBED|HR|IMG|INPUT|KEYGEN|LINK|META|PARAM|SOURCE|TRACK|WBR)$/;
-	static var voidTagsArray = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 
-								'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+	static var voidTags = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 
+						   'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 
+						   'track', 'wbr'];
 
 	public function new() {}
 
@@ -34,15 +34,11 @@ class MithrilNodeRender
 		var el : VirtualElement = cast view;
 
 		var children = createChildrenContent(el);
-		if(children.length == 0 && voidTagsArray.indexOf(el.tag) >= 0) {
-			return '<' + el.tag + createAttrString(el.attrs) + '>';
+		if(children.length == 0 && voidTags.indexOf(el.tag.toLowerCase()) >= 0) {
+			return '<${el.tag}${createAttrString(el.attrs)}>';
 		}
 
-		return [
-			'<', el.tag, createAttrString(el.attrs), '>',
-			children,
-			'</', el.tag, '>'
-		].join('');
+		return '<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>';
 	}
 
 	inline function createChildrenContent(el : VirtualElement) : String {
@@ -51,19 +47,28 @@ class MithrilNodeRender
 	}
 
 	function createAttrString(attrs : Dynamic) {
-		if(attrs == null || Reflect.fields(attrs).length == 0) return '';
+		if(attrs == null) return '';
 
 		return Reflect.fields(attrs).map(function(name) {
 			var value = Reflect.field(attrs, name);
 			if(Reflect.isFunction(value)) return '';
+			if(Std.is(value, Bool)) return cast(value, Bool) ? ' ' + name : '';
 
 			if(name == 'style') {
-				return ' style="' + Reflect.fields(value).map(function(property) {
-					return [camelToDash(property).toLowerCase(), Reflect.field(value, property)].join(':');
+				var styles = value;
+				if(Std.is(styles, String)) return ' style="' + escape(styles) + '"';
+
+				return ' style="' + Reflect.fields(styles).map(function(property) {
+					return camelToDash(property).toLowerCase() + ':' + 
+						   escape(Reflect.field(styles, property));
 				}).join(';') + '"';
 			}
-			return ' ' + (name == 'className' ? 'class' : name) + '="' + value + '"';
+			return ' ' + (name == 'className' ? 'class' : name) + '="' + escape(value) + '"';
 		}).join('');
+	}
+
+	inline function escape(s : String) {
+		return StringTools.htmlEscape(s, true);
 	}
 
 	inline function camelToDash(str : String) {

@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.20.0",
-  "releasenote": "Type and function signature impromevents. Added MithrilNodeRender.",
+  "version": "0.20.1",
+  "releasenote": "Security fixes and optimizations in MithrilNodeRender.",
   "contributors": ["ciscoheat"]
 }
