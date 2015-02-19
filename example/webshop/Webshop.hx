@@ -10,7 +10,7 @@ using StringTools;
 /**
  * A simple webshop to demonstrate the power of Mithril.
  */
-class Webshop implements View
+class Webshop implements Module<Dynamic>
 {
     var cart : ShoppingCart;
     var menu : Menu;
@@ -50,7 +50,7 @@ class Webshop implements View
     }
 
     // Welcome text for the default route
-    public function view() {
+    public function view(?ctrl : Dynamic) : ViewOutput {
         return [
             m("h1.page-header", "Welcome!"),
             m("p", "Select a category on the left."),
@@ -67,6 +67,9 @@ class Webshop implements View
                 );
             }))
         ];
+    }
+
+    public function controller() : Dynamic {
     }
 
     private function element(id : String) {

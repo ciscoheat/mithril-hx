@@ -152,7 +152,7 @@ Then select one of the following:
 
 A collection of two demo apps, available on the Mithril site.
 
-1. `haxe mithril.js`
+1. `haxe mithril.hxml`
 1. Open `bin/index.html` in a browser.
 
 ## Webshop
