@@ -19,7 +19,7 @@ class MithrilNodeRender
 			return "";
 
 		if(Std.is(view, String))
-			return StringTools.htmlEscape(view, true);
+			return escape(view);
 
 		if(Std.is(view, Int) || Std.is(view, Float) || Std.is(view, Bool))
 			return Std.string(view);
