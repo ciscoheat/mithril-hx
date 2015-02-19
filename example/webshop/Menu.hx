@@ -10,20 +10,19 @@ using Lambda;
  */
 class Menu implements Module<Menu>
 {
-    @prop public var active : Category;
     @prop var categories : Array<Category>;
 
     public function new() {
         this.categories = M.prop([]);
-        this.active = M.prop(null);
     }
 
     public function controller() {
         Category.all().then(categories).then(function(_) M.redraw());
     }
 
-    public function isActive(c : Category) {
-        return (active() != null && active().id == c.id);
+    function isActive(c : Category) {
+        if(c.slug() == M.routeParam('categoryId')) return true;
+        return c.products.exists(function(p) return p.id == M.routeParam('productId'));
     }
 
     public function view() {

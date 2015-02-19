@@ -24,33 +24,28 @@ class Webshop implements View
         cart = new ShoppingCart();
         search = new Search();
 
-        var productList = new ProductList(cart, menu);
-        var productPage = new ProductPage(cart, menu);
-        var checkout = new Checkout(cart);
-
         routes = {
             "/": this,
-            "/category/:categoryId": productList,
-            "/product/:productId": productPage,
-            "/checkout": checkout
+            "/category/:categoryId": new ProductList(cart),
+            "/product/:productId": new ProductPage(cart),
+            "/checkout": new Checkout(cart)
         };
     }
 
     // Call to start the whole site.
-    // Define the routes and render the menu and cart.
     public function start() {
+        // Define routes for the main page content
         M.route(element("content"), "/", routes);
 
+        // Define modules that should not change if the main content changes
         M.module(element("navigation"), menu);
         M.module(element("shopping-cart"), cart);
         M.module(element("search"), search);
 
         // An "inline module" just to create the home link.
         M.module(element("home-link"), {
-            controller: function() return null,
-            view: function(?c) m("a.navbar-brand[href='/']", {
-                config: M.route
-            }, "Mithril Webshop")
+            view: function() 
+                m("a.navbar-brand[href='/']", {config: M.route}, "Mithril Webshop")
         });
     }
 

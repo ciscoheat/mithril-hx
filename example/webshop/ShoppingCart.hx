@@ -58,8 +58,10 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
 
     override public function set(product : Product, v : Int) {
         var existing = products().find(function(p) return product.id == p.id);
+
         if(v <= 0 && existing != null) remove(product);
-        else super.set(product, v);
+        else if(v > 0) super.set(product, v);
+
         serialize();
     }
 
