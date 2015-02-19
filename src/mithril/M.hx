@@ -123,9 +123,10 @@ extern class M
 	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : EventHandler<T2>;
 
 	@:overload(function() : String {})
+	@:overload(function(element : Document, isInitialized : Bool) : Void {})
 	@:overload(function(element : Element, isInitialized : Bool) : Void {})
 	@:overload(function(path : String, ?params : Dynamic, ?shouldReplaceHistory : Bool) : Void {})
-	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<MithrilModule<Dynamic>>) : Void;
+	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
 	public static function request<T, T2>(options : XHROptions) : Promise<T, T2>;

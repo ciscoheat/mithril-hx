@@ -16,7 +16,7 @@ class Webshop implements View
     var menu : Menu;
     var search : Search;
     var checkout : Checkout;
-    var routes : Dynamic<MithrilModule<Dynamic>>;
+    var routes : Dynamic;
 
     // Create menu and routes.
     public function new() {
