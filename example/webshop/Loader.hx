@@ -22,14 +22,14 @@ enum LoadState {
 class Loader implements Model {
     @prop public var state : LoadState;
 
-    public function new(untilDelay = 1000, untilTimeout = 5000) {
-        var state = M.prop(Started);
+    public function new(untilDelay = 1000, untilError = 5000) {
+        var _state = M.prop(Started);
 
-        var delayTimer = Timer.delay(function() this.state(Delayed), untilDelay);
-        var errorTimer = Timer.delay(function() this.state(Error), untilTimeout);
+        var delayTimer = Timer.delay(function() state(Delayed), untilDelay);
+        var errorTimer = Timer.delay(function() state(Error), untilError);
 
         this.state = function(?s) { 
-            if(s == null) return state();
+            if(s == null) return _state();
 
             switch(s) {
                 case Delayed:
@@ -41,13 +41,16 @@ class Loader implements Model {
             }
 
             // Need to set state before redraw.
-            state(s);
+            _state(s);
             M.redraw();
 
             return s;
         };
 
     }
+
+    // done and error have an optional parameter so they can be
+    // used in ajax callbacks.
 
     public function done(?_) {
         state(Done);

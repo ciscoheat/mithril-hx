@@ -152,7 +152,7 @@ Then select one of the following:
 
 A collection of two demo apps, available on the Mithril site.
 
-1. `haxe mithril.js`
+1. `haxe mithril.hxml`
 1. Open `bin/index.html` in a browser.
 
 ## Webshop
@@ -171,7 +171,7 @@ If you prefer a bare-bones example (doesn't require cloning), create the followi
 ```html
 <!doctype html>
 <body>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.1.28/mithril.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.1.30/mithril.min.js"></script>
 <script src="example.js"></script>
 </body>
 ```
