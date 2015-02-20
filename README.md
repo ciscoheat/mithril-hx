@@ -205,15 +205,20 @@ class Example implements Module<Example>
     }
 
     public function view() {
-        // Display an input field.
-        m("input", {
-            // Listens to the "onchange" event of the field and will
-            // set user.name with the fields "value" attribute.
-            onchange: M.withAttr("value", user.name),
-            // The redraw triggered by the onchange event will
-            // get and display the latest value automatically.
-            value: user.name()
-        });
+        // Return an array of elements.
+        [
+            // Display an input field.
+            m("input", {
+                // Listens to the "oninput" event of the field and will
+                // set user.name with the fields "value" attribute.
+                oninput: M.withAttr("value", user.name),
+                // The redraw triggered by the event will
+                // get and display the latest value automatically.
+                value: user.name()
+            }),
+            // Display a div with class .user and some style
+            m(".user", {style: {margin: "15px"}}, user.name())
+        ];
     }
 
     // Program entry point
