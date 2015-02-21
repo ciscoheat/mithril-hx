@@ -40,7 +40,7 @@ class ModuleBuilder
 				
 				field.meta.remove(prop);
 				field.access.push(Access.ADynamic);
-				field.kind = propFunction(t, e);
+				field.kind = propFunction(t);
 			case _:
 				checkInvalidProp(field);
 		}
@@ -52,8 +52,8 @@ class ModuleBuilder
 	 * Change: @prop public var description : String;
 	 * To:     public dynamic function description(?v : String) : String return v;
 	 */
-	static private function propFunction(t : Null<ComplexType>, e : Expr) : FieldType {
-		var f = {
+	static private function propFunction(t : Null<ComplexType>) : FieldType {
+		return FFun({
 			ret: t,
 			params: null,
 			expr: macro return v,
@@ -63,29 +63,20 @@ class ModuleBuilder
 				opt: true,
 				name: "v"
 			}]
-		}
-
-		return FFun(f);
+		});
 	}
 
 	private static function replaceM(e : Expr) {
 		// Autocompletion for m()
-		if (Context.defined("display")) {
-			switch(e.expr) {
-				case ECall(e, params):
-					for (p in params) {
-						switch(p.expr) {
-							case EDisplay(e2, isCall):
-								switch(e2) {
-									case macro m:
-										e2.expr = (macro mithril.M.m).expr;
-									case _:
-								}
-							case _:
-						}
-					}
-				case _:
-			}
+		if (Context.defined("display")) switch e.expr {
+			case EDisplay(e2, isCall):
+				switch(e2) {
+					case macro m:
+						e2.expr = (macro mithril.M.m).expr;
+						return;
+					case _:
+				}
+			case _:
 		}
 
 		switch(e) {
@@ -151,7 +142,7 @@ class ModuleBuilder
 		injectReturn(inject);
 	}
 
-	private static inline function injectReturn(e : Expr) {
+	private static function injectReturn(e : Expr) {
 		e.expr = EReturn({expr: e.expr, pos: e.pos});
 	}
 
@@ -171,10 +162,12 @@ class ModuleBuilder
 	private static function injectCurrentModule(f : Function) {
 		switch(f.expr.expr) {
 			case EBlock(exprs):
-				// Mithril makes a "new module.controller()" call which complicates things.
-				// If the controller was called with m.module, M.__currMod is set
-				// and will be used to call the real controller (stored in M.__currMod)
-				// Also if an anonymous object is used, don't call it.
+				// Mithril makes a "new module.controller()" call in m.module which 
+				// complicates things. If the controller was called with m.module, 
+				// M.__currMod has stored the controller and will be used here.
+				// (instead of using an empty function object)
+				// This will only happen during the first call however, so controllers
+				// can call other controllers in the same method.
 				exprs.unshift(macro
 					if (mithril.M.__currMod != null && mithril.M.__currMod != this) {
 						var mod = mithril.M.__currMod;

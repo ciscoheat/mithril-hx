@@ -43,7 +43,7 @@ class MithrilNodeRender
 
 	inline function createChildrenContent(el : VirtualElement) : String {
 		if(el.children == null || !Std.is(el.children, Array)) return '';
-		return render(cast el.children);
+		return render(el.children);
 	}
 
 	function createAttrString(attrs : Dynamic) {

@@ -51,7 +51,7 @@ class Webshop implements View
 
     // Welcome text for the default route
     public function view() {
-        return [
+        [
             m("h1.page-header", "Welcome!"),
             m("p", "Select a category on the left."),
             m("h2", "Todo"),
