@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.20.2",
-  "releasenote": "Fixed m.route signature.",
+  "version": "0.20.3",
+  "releasenote": "Fixed stack overflow when a controller calls another controller.",
   "contributors": ["ciscoheat"]
 }

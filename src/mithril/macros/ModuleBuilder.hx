@@ -32,7 +32,7 @@ class ModuleBuilder
 
 				f.expr.iter(replaceM);
 				returnLastMExpr(f);
-				if (type & 2 == 2 && field.name == "controller") injectModule(f);
+				if (type & 2 == 2 && field.name == "controller") injectCurrentModule(f);
 				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
@@ -168,19 +168,24 @@ class ModuleBuilder
 		});
 	}
 
-	private static function injectModule(f : Function) {
+	private static function injectCurrentModule(f : Function) {
 		switch(f.expr.expr) {
 			case EBlock(exprs):
-				// If an anonymous object is used, don't call it.
+				// Mithril makes a "new module.controller()" call which complicates things.
+				// If the controller was called with m.module, M.__currMod is set
+				// and will be used to call the real controller (stored in M.__currMod)
+				// Also if an anonymous object is used, don't call it.
 				exprs.unshift(macro
-					if (mithril.M.__cm != this &&
-						Type.typeof(mithril.M.__cm) != Type.ValueType.TObject)
-							return mithril.M.__cm.controller()
+					if (mithril.M.__currMod != null && mithril.M.__currMod != this) {
+						var mod = mithril.M.__currMod;
+						mithril.M.__currMod = null;
+						return mod.controller();
+					}
 				);
 				exprs.push(macro return this);
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
-				injectModule(f);
+				injectCurrentModule(f);
 		}
 	}
 }

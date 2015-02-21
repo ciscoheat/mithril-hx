@@ -193,19 +193,23 @@ extern class M
 	}
 
 	@:noCompletion public static inline function _patch(__varName : Dynamic) : Void {
-		// Some extra properties that simplifies the API a lot.
-		// Also redefines m.module to have access to the current module,
-		// and prevents deferred being resolved on Node.js.
+		// Some extra properties that simplifies the API.
+		// Also redefines m.module to have access to the current module
+		// because m.module makes a "new controller.module()" call which
+		// removes the actual module from the scope.
+		// It also prevents deferred being resolved on Node.js, 
+		// to avoid server rendering issues.
 		untyped __js__("(function(m) {
-			m.m =        m;
-			m.__module = m.module;
-			m.__cm =     null;
-			m.module = function(root, module) { m.__cm = module; return m.__module(root, module); }
+			m.m =          m;
+			m.__module   = m.module;
+			m.__currMod  = null;
+			m.module = function(root, module) { m.__currMod = module; return m.__module(root, module); }
 			if (typeof module !== 'undefined' && module.exports) 
 				m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);
 	}
 
-	// Stores the current module so it can be used in module() calls (added automatically by macro).
-	@:noCompletion public static var __cm : Dynamic;
+	// Stores the current module so it can be used in controller() calls. See above.
+	// (injected automatically in macros.ModuleBuilder).
+	@:noCompletion public static var __currMod : Dynamic;
 }
