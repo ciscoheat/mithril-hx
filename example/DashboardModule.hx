@@ -6,6 +6,16 @@ import mithril.M.Module;
 import mithril.M.VirtualElement;
 import ChainController;
 
+// A class just to test the unwrapSuccess and 
+// type parameters for M.request.
+class IpWrapper
+{
+	public var ip : String;
+	public function new(data : String) {
+		this.ip = data.split('.').join(' . ');
+	}
+}
+
 class DashboardModule implements Module<Dynamic>
 {
 	var todo : TodoModule;
@@ -27,10 +37,10 @@ class DashboardModule implements Module<Dynamic>
 			method: "GET",
 			url: "http://ip.jsontest.com/",
 			background: true,
-			initialValue: '',
-			unwrapSuccess: function(data: {ip : String}) return data.ip
+			unwrapSuccess: function(data: {ip : String}) return data.ip,
+			type: IpWrapper
 		}).then(
-			function(currentIp : String) { ip(currentIp); M.redraw(); },
+			function(currentIp : IpWrapper) { ip(currentIp.ip); M.redraw(); },
 			function(_) { ip("Don't know!"); M.redraw(); }
 		);
 	}

@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.21.0",
-  "releasenote": "Added type parameters to XHROptions.",
+  "version": "0.21.1",
+  "releasenote": "Improved XHROptions, added Typedef for type option.",
   "contributors": ["ciscoheat"]
 }

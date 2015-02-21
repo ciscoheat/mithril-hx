@@ -10,6 +10,9 @@ import js.html.XMLHttpRequest;
 
 using Lambda;
 
+private abstract Either<T1, T2>(Dynamic)
+from T1 from T2 to T1 to T2 {}
+
 private abstract Either3<T1, T2, T3>(Dynamic)
 from T1 from T2 from T3 to T1 to T2 to T3 {}
 
@@ -76,6 +79,10 @@ typedef Deferred<T, T2> = {
 	function reject(value : T2) : Void;
 }
 
+typedef DataConstructible<T> = {
+	public function new(data : T) : Void;
+}
+
 /**
  * Plenty of optional fields for this one:
  * http://lhorie.github.io/mithril/mithril.request.html#signature
@@ -93,8 +100,29 @@ typedef XHROptions<T, T2, T3, T4> = {
 	@:optional var serialize : T3 -> T4;
 	@:optional var deserialize : T4 -> T3;
 	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> T4;
-	@:optional var type : (Dynamic -> Void) -> Void;
 	@:optional var config : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> Null<XMLHttpRequest>;
+};
+
+/**
+ * A limitation here is that you must specify the correct callback yourself.
+ * If you're returing Array<T5> from unwrapSuccess, make you're using
+ * then(Array<T5>).
+ */
+typedef XHRTypeOptions<T : Either<DataConstructible<T5>, Array<DataConstructible<T5>>>, T2, T3, T4, T5> = {
+	var method : String;
+	var url : String;
+	var type : Class<DataConstructible<T5>>;
+	@:optional var user : String;
+	@:optional var password : String;
+	@:optional var data : Dynamic;
+	@:optional var background : Bool;
+	@:optional var initialValue : T;
+	@:optional var unwrapSuccess : Dynamic -> Either<Array<T5>, T5>;
+	@:optional var unwrapError : Dynamic -> T2;
+	@:optional var serialize : T3 -> T4;
+	@:optional var deserialize : T4 -> T3;
+	@:optional var extract : XMLHttpRequest -> XHRTypeOptions<T, T2, T3, T4, T5> -> T4;
+	@:optional var config : XMLHttpRequest -> XHRTypeOptions<T, T2, T3, T4, T5> -> Null<XMLHttpRequest>;
 };
 
 typedef JSONPOptions = {
@@ -129,6 +157,7 @@ extern class M
 	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
+	@:overload(function<T, T2, T3, T4, T5>(options : XHRTypeOptions<T, T2, T3, T4, T5>) : Promise<T, T2> {})
 	public static function request<T, T2, T3, T4>(options : XHROptions<T, T2, T3, T4>) : Promise<T, T2>;
 
 	public static function deferred<T, T2>() : Deferred<T, T2>;
