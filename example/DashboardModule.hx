@@ -26,9 +26,11 @@ class DashboardModule implements Module<Dynamic>
 		M.request({
 			method: "GET",
 			url: "http://ip.jsontest.com/",
-			background: true
+			background: true,
+			initialValue: '',
+			unwrapSuccess: function(data: {ip : String}) return data.ip
 		}).then(
-			function(r : { ip : String } ) { ip(r.ip); M.redraw(); },
+			function(currentIp : String) { ip(currentIp); M.redraw(); },
 			function(_) { ip("Don't know!"); M.redraw(); }
 		);
 	}

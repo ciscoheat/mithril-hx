@@ -80,21 +80,21 @@ typedef Deferred<T, T2> = {
  * Plenty of optional fields for this one:
  * http://lhorie.github.io/mithril/mithril.request.html#signature
  */
-typedef XHROptions = {
+typedef XHROptions<T, T2, T3, T4> = {
 	var method : String;
 	var url : String;
 	@:optional var user : String;
 	@:optional var password : String;
 	@:optional var data : Dynamic;
 	@:optional var background : Bool;
-	@:optional var initialValue : Dynamic;
-	@:optional var unwrapSuccess : Dynamic -> Dynamic;
-	@:optional var unwrapError : Dynamic -> Dynamic;
-	@:optional var serialize : Dynamic -> String;
-	@:optional var deserialize : String -> Dynamic;
-	@:optional var extract : XMLHttpRequest -> XHROptions -> String;
-	@:optional var type : Dynamic -> Void;
-	@:optional var config : XMLHttpRequest -> XHROptions -> Null<XMLHttpRequest>;
+	@:optional var initialValue : T;
+	@:optional var unwrapSuccess : Dynamic -> T;
+	@:optional var unwrapError : Dynamic -> T2;
+	@:optional var serialize : T3 -> T4;
+	@:optional var deserialize : T4 -> T3;
+	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> T4;
+	@:optional var type : (Dynamic -> Void) -> Void;
+	@:optional var config : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> Null<XMLHttpRequest>;
 };
 
 typedef JSONPOptions = {
@@ -113,8 +113,8 @@ extern class M
 	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<VirtualElement>) : VirtualElement {})
 	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<String>) : VirtualElement {})
 	@:overload(function(selector : String, ?attributes : Dynamic, ?children : {subtree: String}) : VirtualElement {})
-	@:overload(function(selector : String, ?attributes : Dynamic, ?children : VirtualElement) : VirtualElement {})
-	public static function m(selector : String, ?attributes : Dynamic, ?children : String) : VirtualElement;
+	@:overload(function(selector : String, ?attributes : Dynamic, ?children : String) : VirtualElement {})
+	public static function m(selector : String, ?attributes : Dynamic, ?children : VirtualElement) : VirtualElement;
 
 	public static function module<T>(element : Element, module : T) : T;
 
@@ -129,7 +129,7 @@ extern class M
 	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
-	public static function request<T, T2>(options : XHROptions) : Promise<T, T2>;
+	public static function request<T, T2, T3, T4>(options : XHROptions<T, T2, T3, T4>) : Promise<T, T2>;
 
 	public static function deferred<T, T2>() : Deferred<T, T2>;
 
@@ -197,7 +197,7 @@ extern class M
 		// Also redefines m.module to have access to the current module
 		// because m.module makes a "new controller.module()" call which
 		// removes the actual module from the scope.
-		// It also prevents deferred being resolved on Node.js, 
+		// It also prevents deferred being resolved on Node.js
 		// to avoid server rendering issues.
 		untyped __js__("(function(m) {
 			m.m =          m;
@@ -209,7 +209,7 @@ extern class M
 		})")(__varName);
 	}
 
-	// Stores the current module so it can be used in controller() calls. See above.
-	// (injected automatically in macros.ModuleBuilder).
+	// Stores the current module so it can be used in controller.module() 
+	// calls. See above (injected automatically in macros.ModuleBuilder).
 	@:noCompletion public static var __currMod : Dynamic;
 }
