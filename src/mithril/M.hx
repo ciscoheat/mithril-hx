@@ -157,7 +157,7 @@ extern class M
 	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
-	@:overload(function<T, T2, T3, T4, T5>(options : XHRTypeOptions<T, T2, T3, T4, T5>) : Promise<T, T2> {})
+	@:overload(function<T : Either<DataConstructible<T5>, Array<DataConstructible<T5>>>, T2, T3, T4, T5>(options : XHRTypeOptions<T, T2, T3, T4, T5>) : Promise<T, T2> {})
 	public static function request<T, T2, T3, T4>(options : XHROptions<T, T2, T3, T4>) : Promise<T, T2>;
 
 	public static function deferred<T, T2>() : Deferred<T, T2>;
