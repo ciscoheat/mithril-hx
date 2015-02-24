@@ -79,8 +79,7 @@ class TodoModule implements View
 {
 	public var todo : TodoList;
 
-	var loader : SpanElement;
-	var input : InputElement;
+	var todoAdding : Bool;
 
 	public function new() {
 		this.todo = TodoList.load();
@@ -95,19 +94,15 @@ class TodoModule implements View
 	public function view() {
 		m("div", [
 			m("input", {
-				config: function(e : InputElement) if(input == null) input = e,
 				value: todo.description,
-				onkeyup: input_keyUp
+				onkeyup: todo_setDescription
 			}),
-			// The add button has a second delay to simulate a slow ajax request.
+			// The add button has a one second delay to simulate a slow ajax request.
 			m("button", { onclick: todo_add.bind(1000) }, "Add"),
-			m("span", {
-				config: function(e : SpanElement) if(loader == null) loader = e,
-				style: {display: "none"}
-			}, " Adding..."),
+			m("span", {style: {display: todoAdding ? "" : "none"}}, " Adding..."),
 			m("table", todo.list.map(function(task) {
 				// Prevent "checked" being added to a todo if not set
-				var attribs : Dynamic = { onclick: M.withAttr("checked", task_checked.bind(task)) } ;
+				var attribs : Dynamic = { onclick: M.withAttr("checked", setTaskStatus.bind(task)) } ;
 				if(task.done) attribs.checked = "checked";
 
 				m("tr", [
@@ -119,25 +114,31 @@ class TodoModule implements View
 	}
 
 	private function todo_add(delay = 0) {
-		// Calling the redrawing system because of the async delay.
-		// See http://lhorie.github.io/mithril/auto-redrawing.html
-		loader.style.display = "inline";
+		// M.startComputation is used automatically in a real call to 
+		// m.request, but here it's simulated.
+		todoAdding = true;
+		// First redraw to display the loading text:
+		M.redraw();
+		// Wait for request to finish:
 		M.startComputation();
 		deferMs(delay)
 		.then(function(ok) { todo.add(todo.description); return ok; }, function(error) return error)
 		.then(function(_) {
+			// Request completed, set appropriate state:
 			todo.description = "";
-			loader.style.display = "none";
+			todoAdding = false;
+			// End computation which will trigger a redraw unless more
+			// computations are queued.
 			M.endComputation();
 		});
 	}
 
-	private function input_keyUp(e : KeyboardEvent) {
+	private function todo_setDescription(e : KeyboardEvent) {
 		todo.description = cast(e.target, InputElement).value;
 		if (e.keyCode == 13) todo_add();
 	}
 
-	private function task_checked(task : Todo, checked : Bool) {
+	private function setTaskStatus(task : Todo, checked : Bool) {
 		task.done = checked;
 		todo.save();
 	}

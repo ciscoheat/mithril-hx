@@ -37,7 +37,9 @@ class DashboardModule implements Module<Dynamic>
 			method: "GET",
 			url: "http://ip.jsontest.com/",
 			background: true,
+			// Use unwrapSuccess to transform the requested data
 			unwrapSuccess: function(data: {ip : String}) return data.ip,
+			// Use type to construct an object from the (unwrapped) data
 			type: IpWrapper
 		}).then(
 			function(currentIp : IpWrapper) { ip(currentIp.ip); M.redraw(); },
