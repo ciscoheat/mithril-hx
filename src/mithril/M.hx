@@ -137,6 +137,9 @@ typedef JSONPOptions = {
 @:final @:native("m")
 extern class M
 {
+	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<Array<{subtree: String}>>) : VirtualElement {})
+	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<Array<VirtualElement>>) : VirtualElement {})
+	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<Array<String>>) : VirtualElement {})
 	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<{subtree: String}>) : VirtualElement {})
 	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<VirtualElement>) : VirtualElement {})
 	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<String>) : VirtualElement {})
