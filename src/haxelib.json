@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.21.2",
-  "releasenote": "XHRTypeOptions fix for Haxe 3.2.",
+  "version": "0.21.3",
+  "releasenote": "Allow nested arrays of children for m function.",
   "contributors": ["ciscoheat"]
 }
