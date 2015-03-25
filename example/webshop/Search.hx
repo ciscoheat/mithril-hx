@@ -1,6 +1,10 @@
 package webshop;
 
-import jQuery.JQuery;
+#if (haxe_ver >= 3.2)
+import js.html.DOMElement in Element;
+#else
+import js.html.Element;
+#end
 import js.html.Event;
 import js.html.InputElement;
 import js.html.KeyboardEvent;
@@ -18,23 +22,23 @@ class Search implements View
     }
 
     function search(phrase : String) {
-        if(phrase.length < 2) {
-            results([]);
-            return;
-        }
-        phrase = phrase.toLowerCase();
-        Product.all().then(function(products : Array<Product>) {
-            products = products.filter(function(p) {
-                return p.name.toLowerCase().indexOf(phrase) >= 0;
-            });
-            results(products);
-            M.redraw();
-        });
+        if(phrase.length < 2) 
+            clear();
+        else
+            Product.search(phrase.toLowerCase()).then(results).then(function(_) M.redraw());
     }
 
-    function closeEvent(e : Event) {
-        // Close cart if clicking outside it.
-        if(new JQuery(e.target).parents("#search").length > 0) return;
+    function closeEvent(parent : Element, e : Event) {
+        // Clear results (same as closing the dropdown menu) if clicking outside it.
+        var el : Element = cast e.target;
+        while(el != null) {
+            if(el == parent) return;
+            el = el.parentElement;
+        }
+        clear();
+    }
+
+    function clear() {
         results([]);
         M.redraw();
     }
@@ -49,11 +53,10 @@ class Search implements View
             m("ul.dropdown-menu.dropdown-menu-right", {
                 role: "menu",
                 style: {display: results().length > 0 ? "block" : "none"},
-                config: function(el, isInit) {
-                    if(isInit) return;
-                    new JQuery('html').on("click.closeSearch", closeEvent);
+                config: function(el, isInit, context) if(!isInit) {
+                    js.Browser.document.documentElement.addEventListener("click", closeEvent.bind(el.parentElement));
                 }
-            }, results().map(function(p) {
+            }, results().map(function(p)
                 m("li", {role: "presentation"},
                     m("a", {
                         role: "menuitem",
@@ -61,8 +64,8 @@ class Search implements View
                         href: '/product/${p.id}',
                         config: M.route
                     }, p.name)
-                );
-            }))
+                )
+            ))
         ];
     }
 }

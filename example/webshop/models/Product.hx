@@ -28,10 +28,17 @@ class Product
     }
 
     public static function all() : Promise<Array<Product>, String> {
-        return Category.all().then(function(cat) {
-            return cat.fold(function(c, products : Array<Product>) { 
-                return products.concat(c.products);
-            }, []);
-        });
+        return Category.all().then(function(cat)
+            return cat.fold(function(c, products : Array<Product>)
+                return products.concat(c.products), [])
+        );
+    }
+
+    public static function search(partialName : String) : Promise<Array<Product>, String> {
+        return all().then(function(products : Array<Product>)
+            return products.filter(function(p) 
+                return p.name.toLowerCase().indexOf(partialName) >= 0
+            )
+        );
     }
 }

@@ -3,7 +3,6 @@ package webshop;
 import js.Browser;
 import mithril.M;
 import webshop.models.*;
-import jQuery.*;
 using Lambda;
 using StringTools;
 
