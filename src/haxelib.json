@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.21.3",
-  "releasenote": "Allow nested arrays of children for m function.",
+  "version": "0.22.0",
+  "releasenote": "Fixed js.html.DOMElement reference for Haxe 3.2.0.",
   "contributors": ["ciscoheat"]
 }
