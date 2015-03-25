@@ -3,7 +3,11 @@ package mithril;
 import js.Browser;
 import js.html.Document;
 import js.html.DOMWindow;
+#if (haxe_ver >= 3.2)
+import js.html.DOMElement in Element;
+#else
 import js.html.Element;
+#end
 import js.Error;
 import js.html.Event;
 import js.html.XMLHttpRequest;
