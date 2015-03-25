@@ -58,12 +58,11 @@ class NodeRendering
 			cancelAnimationFrame: function(_) {},
 			XMLHttpRequest: {}
 		};
+		Reflect.setField(window.document, 'body', doc.createElement('body'));
 
 		// Need some extra functions on the element for everything to work.
 		untyped Element.prototype.addEventListener = Element.prototype.removeEventListener = 
 				Element.prototype.insertAdjacentHTML = function() {};
-
-		window.document.body = doc.createElement('body');
 
 		HTTP.createServer(function(req, resp) {
 			window.location = URL.Parse(req.url);
@@ -74,7 +73,7 @@ class NodeRendering
 
 			// Set the same routes as on clientside
 			// must be done after M.deps()
-			app.setRoutes(window.document.body);			
+			app.setRoutes(untyped window.document.body);			
 
 			//////////
 
