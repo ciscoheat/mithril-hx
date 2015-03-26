@@ -19,13 +19,12 @@ using Lambda;
  */
 class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
 {
-    @prop var isOpen : Bool;
+    var isOpen : Bool;
     var cartParent : Element;
     var dropDownMenu : Element;
 
     public function new() {
         super();
-        isOpen = M.prop(false);
         unserialize();
     }
 
@@ -45,14 +44,16 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
         var data = Browser.getLocalStorage().getItem("cart");
         if(data == null) return;
 
-        var cartData : Map<String, Int> = cast Unserializer.run(data);
-        
-        M.startComputation();
-        Product.all().then(function(products) {
-            products = products.filter(function(p) return cartData.exists(p.id));
-            for(p in products) this.set(p, cartData.get(p.id));
-            M.endComputation();
-        });
+        try {
+            var cartData : Map<String, Int> = cast Unserializer.run(data);
+            
+            M.startComputation();
+            Product.all().then(function(products) {
+                products = products.filter(function(p) return cartData.exists(p.id));
+                for(p in products) this.set(p, cartData.get(p.id));
+                M.endComputation();
+            });
+        } catch(e : Dynamic) {}
     }
 
     //////////////////////////////////////////////////////////
@@ -80,7 +81,7 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
         M.startComputation();
         var html = Browser.document.documentElement;
 
-        isOpen(true);
+        isOpen = true;
 
         // A little tweak to keep the menu size when removing items.
         // Set the width to auto and after a short delay its calculated width.
@@ -102,14 +103,14 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
             el = el.parentElement;
         }
 
-        isOpen(false);
-        M.redraw();
+        isOpen = false;
+        M.redraw(); // Need to redraw because it's not a Mithril handled event.
     }
 
     public function view() : ViewOutput {
         [
             m("li", {
-                "class": isOpen() ? "dropdown open" : "dropdown",
+                "class": isOpen ? "dropdown open" : "dropdown",
                 config: function(el, isInit) {
                     if(isInit) return;
                     cartParent = el.parentElement;

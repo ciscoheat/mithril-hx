@@ -21,40 +21,38 @@ class Search implements View
         this.results = M.prop([]);
     }
 
-    function search(phrase : String) {
+    function searchEvent(phrase : String) {
         if(phrase.length < 2) 
-            clear();
+            results([]);
         else
             Product.search(phrase.toLowerCase()).then(results).then(function(_) M.redraw());
     }
 
-    function closeEvent(parent : Element, e : Event) {
+    function documentClickEvent(parent : Element, e : Event) {
         // Clear results (same as closing the dropdown menu) if clicking outside it.
         var el : Element = cast e.target;
         while(el != null) {
             if(el == parent) return;
             el = el.parentElement;
         }
-        clear();
-    }
 
-    function clear() {
-        results([]);
-        M.redraw();
+        results([]);        
+        M.redraw(); // Need to redraw because it's not a Mithril handled event.
     }
 
     public function view() {
         [
             m("input.form-control", {
                 placeholder: "Search...",
-                oninput: M.withAttr("value", search),
-                onfocus: M.withAttr("value", search)
+                oninput: M.withAttr("value", searchEvent),
+                onfocus: M.withAttr("value", searchEvent)
             }),
             m("ul.dropdown-menu.dropdown-menu-right", {
                 role: "menu",
                 style: {display: results().length > 0 ? "block" : "none"},
-                config: function(el, isInit, context) if(!isInit) {
-                    js.Browser.document.documentElement.addEventListener("click", closeEvent.bind(el.parentElement));
+                config: function(el, isInit) if(!isInit) {
+                    js.Browser.document.documentElement.addEventListener("click", 
+                        documentClickEvent.bind(el.parentElement));
                 }
             }, results().map(function(p)
                 m("li", {role: "presentation"},
