@@ -1,6 +1,10 @@
 package ;
 
+#if (haxe_ver >= 3.2)
+import js.html.DOMElement in Element;
+#else
 import js.html.Element;
+#end
 import mithril.M;
 import mithril.MithrilNodeRender;
 import nodejs.Process;
