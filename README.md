@@ -16,7 +16,7 @@ The biggest difference! `import mithril.M` then use `M` instead of `m` for the w
 
 ## Implement an interface
 
-For classes that will be used in `M.module` it is required to implement one of the following interfaces. For others it's not, but it is recommended anyway to take advantage of some nice macro features:
+For objects that will be used in a call to `M.module` or `M.route` it is **required** to implement one of the following interfaces. For others it's not, but it is recommended anyway to take advantage of some nice macro features:
 
 * Simple syntax for `M.prop`
 * Automatically return `this` in `controller` methods
