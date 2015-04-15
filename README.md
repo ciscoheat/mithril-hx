@@ -14,7 +14,15 @@ Mithril has a great [getting started guide](http://lhorie.github.io/mithril/gett
 
 The biggest difference! `import mithril.M` then use `M` instead of `m` for the whole API. The only exception is when building the DOM tree with `m()`, if you want autocompletion you need to use lowercase m for that (though uppercase is still supported).
 
-You'll want to implement some interfaces as well to take advantage of the macro features:
+## Implement an interface
+
+For classes that will be used in `M.module` it is required to implement one of the following interfaces. For others it's not, but it is recommended anyway to take advantage of some nice macro features:
+
+* Simple syntax for `M.prop`
+* Automatically return `this` in `controller` methods
+* Automatically return `m()` in any function.
+
+You'll see how this works in the following code examples.
 
 ## Models
 
@@ -205,15 +213,15 @@ class Example implements Module<Example>
     }
 
     public function view() {
-        // Return an array of elements.
+        // Automatically return an array of m() elements:
         [
             // Display an input field.
             m("input", {
-                // Listens to the "oninput" event of the field and will
-                // set user.name with the fields "value" attribute.
+                // Listens to the "oninput" event of the input field and
+                // will set user.name to the field's "value" attribute:
                 oninput: M.withAttr("value", user.name),
-                // The redraw triggered by the event will
-                // get and display the latest value automatically.
+                // The redraw triggered by the above event will
+                // update the value from the model automatically:
                 value: user.name()
             }),
             // Display a div with class .user and some style
@@ -254,4 +262,4 @@ Starts a server on [http://localhost:6789](http://localhost:6789) that executes 
 
 # Feedback please!
 
-This is an early version, so feedback is always welcome! [Open an issue](https://github.com/ciscoheat/mithril-hx/issues) and give me a piece of your mind. :)
+Feedback is always welcome! [Open an issue](https://github.com/ciscoheat/mithril-hx/issues) and give me a piece of your mind. :)
