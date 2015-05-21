@@ -37,12 +37,12 @@ class Webshop implements View
         M.route(element("content"), "/", routes);
 
         // Define modules that should not change if the main content changes
-        M.module(element("navigation"), menu);
-        M.module(element("shopping-cart"), cart);
-        M.module(element("search"), search);
+        M.mount(element("navigation"), menu);
+        M.mount(element("shopping-cart"), cart);
+        M.mount(element("search"), search);
 
         // An "inline module" just to create the home link.
-        M.module(element("home-link"), {
+        M.mount(element("home-link"), {
             view: function() 
                 m("a.navbar-brand[href='/']", {config: M.route}, "Mithril Webshop")
         });

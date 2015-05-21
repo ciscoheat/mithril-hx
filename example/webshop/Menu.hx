@@ -17,7 +17,7 @@ class Menu implements Module<Menu>
     }
 
     public function controller() {
-        Category.all().then(categories).then(function(_) M.redraw());
+        Category.all().then(function(c) return categories(c)).then(function(_) M.redraw());
     }
 
     function isActive(c : Category) {
