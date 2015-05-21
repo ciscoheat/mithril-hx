@@ -151,6 +151,7 @@ extern class M
 	@:overload(function(selector : String, ?attributes : Dynamic, ?children : String) : VirtualElement {})
 	public static function m(selector : String, ?attributes : Dynamic, ?children : VirtualElement) : VirtualElement;
 
+	public static function mount<T>(element : Element, module : T) : T;
 	public static function module<T>(element : Element, module : T) : T;
 
 	public static function prop<T>(?initialValue : T) : GetterSetter<T>;
@@ -208,9 +209,9 @@ extern class M
 	static inline function get_routeMode() : String { return untyped __js__("m.route.mode"); }
 	static inline function set_routeMode(s : String) : String { return untyped __js__("m.route.mode = ") (s); }
 
-	public static var deferredOnerror(get, set) : Error -> Void;
-	static inline function get_deferredOnerror() : Error -> Void { return untyped __js__("m.deferred.onerror"); }
-	static inline function set_deferredOnerror(f : Error -> Void) : Error -> Void { return untyped __js__("m.deferred.onerror = ") (f); }
+	public static var deferredOnerror(get, set) : Dynamic -> Void;
+	static inline function get_deferredOnerror() : Dynamic -> Void { return untyped __js__("m.deferred.onerror"); }
+	static inline function set_deferredOnerror(f : Dynamic -> Void) : Dynamic -> Void { return untyped __js__("m.deferred.onerror = ") (f); }
 
 	///// Haxe specific stuff /////
 
@@ -236,10 +237,10 @@ extern class M
 		// It also prevents deferred being resolved on Node.js
 		// to avoid server rendering issues.
 		untyped __js__("(function(m) {
-			m.m =          m;
-			m.__module   = m.module;
-			m.__currMod  = null;
-			m.module = function(root, module) { m.__currMod = module; return m.__module(root, module); }
+			m.m         = m;
+			m.__mount   = m.mount;
+			m.__currMod = null;
+			m.mount = function(root, component) { m.__currMod = component; return m.__mount(root, component); }
 			if (typeof module !== 'undefined' && module.exports) 
 				m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);

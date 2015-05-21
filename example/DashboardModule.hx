@@ -35,7 +35,7 @@ class DashboardModule implements Module<Dynamic>
 		// Detect IP in background so it won't stop the rendering.
 		M.request({
 			method: "GET",
-			url: "http://ip.jsontest.com/",
+			url: "http://jsonip.com/",
 			background: true,
 			// Use unwrapSuccess to transform the requested data
 			unwrapSuccess: function(data: {ip : String}) return data.ip,
