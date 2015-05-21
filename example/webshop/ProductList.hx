@@ -9,7 +9,7 @@ using Lambda;
 /**
  * Product listing for a Category.
  */
-class ProductList implements Module<ProductList>
+class ProductList implements Component
 {
     @prop var category : Category;
     var loading : Loader;

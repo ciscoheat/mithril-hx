@@ -151,6 +151,6 @@ class TodoModule implements View
 
 	static function main()
 	{
-		M.module(Browser.document.body, new TodoModule());
+		M.mount(Browser.document.body, new TodoModule());
 	}
 }

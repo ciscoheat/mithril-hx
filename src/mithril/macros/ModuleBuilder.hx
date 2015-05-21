@@ -10,7 +10,7 @@ using Lambda;
 
 class ModuleBuilder
 {
-	// Types: 1 - View, 2 - Controller, 3 - Module
+	// Types: 0 - Model, 1 - View, 2 - Controller/Component, 3 - Module(deprecated)
 	@macro public static function build(type : Int) : Array<Field>
 	{
 		var c : ClassType = Context.getLocalClass().get();

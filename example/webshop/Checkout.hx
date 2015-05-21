@@ -15,7 +15,7 @@ private typedef FormField = {
 /**
  * Left-side menu, listing the categories in the webshop.
  */
-class Checkout implements Module<Checkout>
+class Checkout implements Component
 {
     var cart : ShoppingCart;
     var form : Array<FormField>;

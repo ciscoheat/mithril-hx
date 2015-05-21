@@ -8,7 +8,7 @@ using Lambda;
 /**
  * Left-side menu, listing the categories in the webshop.
  */
-class Menu implements Module<Menu>
+class Menu implements Component
 {
     @prop var categories : Array<Category>;
 

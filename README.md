@@ -1,32 +1,34 @@
 # Mithril for Haxe
 
-[Mithril](http://lhorie.github.io/mithril/index.html) is a nice little javascript MVC framework with lots of power under the hood. Here's the Haxe version, of course with some useful extra features thanks to macros and the type inference.
+[Mithril](http://lhorie.github.io/mithril/index.html) is a small, yet great javascript MVC framework that is faster and more flexible than most others. Here's the Haxe version, with some useful extra features thanks to macros and the type inference.
 
 # Installation
 
-The normal procedure: `haxelib install mithril` and then `-lib mithril` in your .hxml file.
+Standard procedure: `haxelib install mithril` and then `-lib mithril` in your .hxml file.
 
 # How to use
 
-Mithril has a great [getting started guide](http://lhorie.github.io/mithril/getting-started.html) and an astounding amount of documentation, so I'll only highlight the key differences here.
+Mithril has a great [getting started guide](http://lhorie.github.io/mithril/getting-started.html) and an astounding amount of documentation, so I'll only highlight what you need to get started with the Haxe version here.
 
 ## Use M, not m!
 
-The biggest difference! `import mithril.M` then use `M` instead of `m` for the whole API. The only exception is when building the DOM tree with `m()`, if you want autocompletion you need to use lowercase m for that (though uppercase is still supported).
+The biggest difference! `import mithril.M` then use `M` instead of `m` for the whole API. The only exception is when using `m()`, if you want autocompletion you must use lowercase m for that (uppercase still works).
 
-## Implement an interface
+## Implement one of the following interfaces
 
-For objects that will be used in a call to `M.module` or `M.route` it is **required** to implement one of the following interfaces. For others it's not, but it is recommended anyway to take advantage of some nice macro features:
+Because Javascript is so dynamic and Haxe is strongly typed, there will be a shifting balance between flexibility and compiler safety. When using Mithril, you will create objects that will be used in calls to for example `M.mount` or `M.route`. For those objects it is **required** to implement one of the following interfaces. When doing that you will also be able to take advantage of some nice macro features:
 
 * Simple syntax for `M.prop`
 * Automatically return `this` in `controller` methods
 * Automatically return `m()` in any function.
 
-You'll see how this works in the following code examples.
+If you're a seasoned Mithril user and/or just want to keep things simple and dynamic, skip to "The loosely-typed path" below. Otherwise keep reading for some helpful examples and more strict interfaces.
 
-## Models
+## The typesafe path
 
-The simplest way to create a model is to use `@prop` for the fields and `M.prop` in the constructor:
+### Model
+
+Use this interface when you only want to use `M.prop` in a class. Then you can use `@prop` for the fields and `M.prop` in the constructor:
 
 ```haxe
 import mithril.M;
@@ -45,9 +47,39 @@ class Todo implements Model
 
 **NOTE:** `@prop` and `M.prop` doesn't work well with Haxe serialization, so if you're using `haxe.Serializer` on a class like this, you cannot have such a property as a class field.
 
-## Controllers
+## View
 
-The Controller interface is simple:
+Use the View interface when you have a `view()` method in the object and want it to be a View. (Note that a [MVC View is an object](https://groups.google.com/d/msg/object-composition/glaWzT7yJJY/WlDPe60pTnIJ), so don't confuse a view template or a function named view with a real MVC View.)
+
+```haxe
+class TodoView implements View
+{
+    var model : Array<Todo>;
+
+    public function new(model) {
+        this.model = model;
+    }
+
+    // The interface implementation:
+    public function view() : VirtualElement {
+        // Remember to use "m" here instead of "M" for autocompletion.
+        // The last m() expression (or Array of m()) is returned automatically.
+        m("div", [
+            m("h1", "Welcome!"),
+            m("table", model.map(function(todo) {
+                m("tr", [
+                    m("td", m("input[type=checkbox]", { checked: todo.done() })),
+                    m("td", todo.description())
+                ]);
+            }))
+        ]);
+    }
+}
+```
+
+## Controller
+
+The Controller interface is simple, and when you implement it the `controller()` method will automatically return "this" (required for Mithril to work properly).
 
 ```haxe
 import mithril.M;
@@ -63,85 +95,70 @@ class Todo implements Controller<Todo>
 }
 ```
 
-## Views
+## Component
 
-```haxe
-class TodoView implements View
-{
-    var model : Array<Todo>;
+[Components](http://lhorie.github.io/mithril/mithril.component.html) are new from version 0.2.0 of Mithril, and is a way to encapsulate functionality into reusable units. There is a slight mismatch between them and traditional Haxe objects, again because of the dynamic, "classless" nature of Mithril and Javascript.
 
-    public function new(model) {
-        this.model = model;
-    }
-
-    // The interface implementation:
-    public function view() : VirtualElement {
-        // Remember to use "m" here instead of "M" for autocompletion.
-		// The last m() expression (or Array of m()) is returned automatically.
-        m("div", [
-            m("h1", "Welcome!"),
-            m("table", model.map(function(todo) {
-                m("tr", [
-                    m("td", m("input[type=checkbox]", { checked: todo.done() })),
-                    m("td", todo.description())
-                ]);
-            }))
-        ]);
-    }
-}
-```
-
-If you want to use another object as controller, for example when composing a module from different objects, implement `ControllerView`:
-
-```haxe
-class TodoView implements ControllerView<TodoController>
-{
-    var model : Array<Todo>;
-
-    public function new(model) {
-        this.model = model;
-    }
-
-    public function view(?ctrl : TodoController) : VirtualElement {
-        m("div", [
-            m("h1", "Welcome!"),
-            m("table", model.map(function(todo) {
-                m("tr", [
-                    m("td", m("input[type=checkbox]", { checked: todo.done() })),
-                    m("td", todo.description())
-                ]);
-            }))
-        ]);
-    }
-}
-```
-
-For simple or tightly coupled components, it's common to put the view and controller together in a Module:
-
-## Modules
+Usually a Component written in Haxe will look like this:
 
 ```haxe
 import mithril.M;
 import js.Browser;
 
-class TodoModule implements Module<TodoModule>
+class Todo implements Component
 {
-    public function new() {
+    // Model
+    var todos : Array<Todo>;
+
+    public function new(todos) {
+        this.todos = todos;
     }
 
     public function controller() {
+        // Called only once in the Component lifecycle, before rendering.
         // Do controller things here, managing child views for example.
     }
 
-    // The argument to view() will be "this" in a Module, so you don't
-    // have to specify it unless you want to use it explicitly.
     public function view() {
-        m("h1", "Hello world!");
+        m("h1", "Hello world!", /* Render Todos */);
     }
 
-    // Finally, here's how to start everything:
+    // Starting up with M.mount:
     static function main() {
-        M.module(Browser.document.body, new TodoModule());
+        M.mount(Browser.document.body, new Todo());
+    }
+}
+```
+
+Since most things you need are already encapsulated and passed to the object when instantiated, you may not need the parameterized components feature and such. In that case, just implement `Component` and you're done.
+
+## The loosely-typed path
+
+If you think that the `view` and `controller` methods are simple enough to implement without relying on a specific interface, or want to use some more advanced Component stuff, there's an easy way out:
+
+### Mithril
+
+Just implement Mithril and you can forget all the interface stuff above. :) Like this example:
+
+```haxe
+import mithril.M;
+import js.Browser;
+
+class HelloWorld implements Mithril
+{
+    public function new() {}
+
+    public function controller(?args : {color: String}) {
+        if(args == null) args = {color: "red"};
+    }
+
+    public function view(ctrl, args : {color : String}) {
+        m("h1", {style: {color: args.color}}, "Hello world!");
+    }
+
+    static function main() {
+        var hello = M.component(new HelloWorld(), {color: "teal"});
+        M.mount(Browser.document.body, hello);
     }
 }
 ```
@@ -179,7 +196,7 @@ If you prefer a bare-bones example (doesn't require cloning), create the followi
 ```html
 <!doctype html>
 <body>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.1.30/mithril.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.2.0/mithril.min.js"></script>
 <script src="example.js"></script>
 </body>
 ```
@@ -202,7 +219,7 @@ class User implements Model
     }
 }
 
-class Example implements Module<Example>
+class Example implements Component
 {
     var user : User;
 
@@ -258,8 +275,7 @@ Without too much hassle, it's possible to render a Mithril module/view serversid
 
 `node noderendering.js server`
 
-Starts a server on [http://localhost:6789](http://localhost:6789) that executes the same code on server and client. The server generates the HTML so the page is percieved to load quickly, then the client enables the functionality. Check [this article](http://artsy.github.io/blog/2013/11/30/rendering-on-the-server-and-client-in-node-dot-js/) for more about isomorphic code.
-
+Starts a server on [http://localhost:6789](http://localhost:6789) that executes the same code on server and client. The server generates the HTML so the page is percieved to load quickly and search engines can index it, then the client enables the functionality.
 # Feedback please!
 
 Feedback is always welcome! [Open an issue](https://github.com/ciscoheat/mithril-hx/issues) and give me a piece of your mind. :)

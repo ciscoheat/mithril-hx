@@ -10,7 +10,7 @@ using StringTools;
 /**
  * Product page.
  */
-class ProductPage implements Module<ProductPage>
+class ProductPage implements Component
 {
     var product : Product;
     var loading : Loader;

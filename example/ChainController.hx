@@ -111,7 +111,7 @@ class ChainController implements Controller<ChainController>
 
 	public static function main() {
 		var controller = new ChainController();
-		M.module(Browser.document.body, { controller: controller.controller, view: controller.view.view });
+		M.mount(Browser.document.body, { controller: controller.controller, view: controller.view.view });
 	}
 }
 

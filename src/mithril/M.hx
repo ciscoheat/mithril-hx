@@ -31,19 +31,38 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 	function view() : ViewOutput;
 }
 
+@:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Controller<T> {
+	function controller() : T;
+}
+
+/**
+ * Haxe-style Component
+ */
+@:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Component {
+	function controller() : Dynamic;
+	function view() : ViewOutput;
+}
+
+/**
+ * The loosely-typed path
+ */
+@:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Mithril {}
+
+///// Deprecated interfaces /////
+
+@:deprecated('ControllerView<T> is deprecated: Use MitrilComponent instead')
 @:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface ControllerView<T> {
 	function view(?ctrl : T) : ViewOutput;
 }
 
-@:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Controller<T> {
-	/**
-	 * When implementing Controller<T>, the method will automatically return "this"
-	 * unless otherwise specified.
-	 */
+@:deprecated('Module<T> interface is deprecated: Use Component or MithrilComponent instead') 
+@:autoBuild(mithril.macros.ModuleBuilder.build(3)) interface Module<T> {
 	function controller() : T;
+	function view(?ctrl : T) : ViewOutput;
 }
 
-@:autoBuild(mithril.macros.ModuleBuilder.build(3)) interface Module<T> {
+@:deprecated('MithrilModule<T> is deprecated and can be removed.')
+typedef MithrilModule<T> = {
 	function controller() : T;
 	function view(?ctrl : T) : ViewOutput;
 }
@@ -51,15 +70,6 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 ///// Typedefs /////
 
 typedef BasicType = Either4<Bool, Float, Int, String>;
-
-/**
- * A typedef of View<T> and Controller<T>, so it can be used by anonymous objects.
- * If you're using a class, implement Module<T> to get macro benefits.
- */
-typedef MithrilModule<T> = {
-	function controller() : T;
-	function view(?ctrl : T) : ViewOutput;
-}
 
 typedef GetterSetter<T> = ?T -> T;
 typedef EventHandler<T : Event> = T -> Void;
@@ -141,17 +151,19 @@ typedef JSONPOptions = {
 @:final @:native("m")
 extern class M
 {
-	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<Array<{subtree: String}>>) : VirtualElement {})
-	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<Array<VirtualElement>>) : VirtualElement {})
-	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<Array<String>>) : VirtualElement {})
-	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<{subtree: String}>) : VirtualElement {})
-	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<VirtualElement>) : VirtualElement {})
-	@:overload(function(selector : String, ?attributes : Dynamic, ?children : Array<String>) : VirtualElement {})
-	@:overload(function(selector : String, ?attributes : Dynamic, ?children : {subtree: String}) : VirtualElement {})
-	@:overload(function(selector : String, ?attributes : Dynamic, ?children : String) : VirtualElement {})
-	public static function m(selector : String, ?attributes : Dynamic, ?children : VirtualElement) : VirtualElement;
+	@:overload(function(selector : String) : VirtualElement {})
+	@:overload(function(selector : String, attributes : Dynamic) : VirtualElement {})
+	public static function m(selector : String, attributes : Dynamic, children : Dynamic) : VirtualElement;
 
-	public static function mount<T>(element : Element, module : T) : T;
+	@:overload(function<T, T2, T3, T4, T5>(component: T, args : T2, extra1 : T3, extra2 : T4, extra3 : T5) : T {})
+	@:overload(function<T, T2, T3, T4>(component: T, args : T2, extra1 : T3, extra2 : T4) : T {})
+	@:overload(function<T, T2, T3>(component: T, args : T2, extra1 : T3) : T {})
+	@:overload(function<T, T2>(component: T, args : T2) : T {})
+	public static function component<T>(component : T) : T;
+
+	public static function mount<T>(element : Element, component : T) : T;
+
+	@:deprecated("M.module is deprecated: Use M.mount instead") 
 	public static function module<T>(element : Element, module : T) : T;
 
 	public static function prop<T>(?initialValue : T) : GetterSetter<T>;
@@ -161,7 +173,9 @@ extern class M
 	@:overload(function() : String {})
 	@:overload(function(element : Document, isInitialized : Bool) : Void {})
 	@:overload(function(element : Element, isInitialized : Bool) : Void {})
-	@:overload(function(path : String, ?params : Dynamic, ?shouldReplaceHistory : Bool) : Void {})
+	@:overload(function(path : String) : Void {})
+	@:overload(function(path : String, params : Dynamic) : Void {})
+	@:overload(function(path : String, params : Dynamic, shouldReplaceHistory : Bool) : Void {})
 	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
@@ -174,18 +188,8 @@ extern class M
 
 	public static function trust(html : String) : String;
 
-	@:overload(function(rootElement : Document, children : Array<{subtree: String}>, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Document, children : Array<VirtualElement>, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Document, children : Array<String>, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Document, children : {subtree: String}, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Document, children : VirtualElement, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Document, children : String, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Element, children : Array<{subtree: String}>, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Element, children : Array<VirtualElement>, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Element, children : Array<String>, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Element, children : {subtree: String}, ?forceRecreation : Bool) : Void {})
-	@:overload(function(rootElement : Element, children : VirtualElement, ?forceRecreation : Bool) : Void {})
-	public static function render(rootElement : Element, children : String, ?forceRecreation : Bool) : Void;
+	@:overload(function(rootElement : Element, children : Dynamic) : Void {})
+	public static function render(rootElement : Element, children : Dynamic, forceRecreation : Bool) : Void;
 
 	public static function redraw(?forceSync : Bool) : Void;
 
