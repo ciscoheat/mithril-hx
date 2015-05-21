@@ -248,7 +248,7 @@ class Example implements Component
 
     // Program entry point
     static function main() {
-        M.module(js.Browser.document.body, new Example());
+        M.mount(js.Browser.document.body, new Example());
     }
 }
 ```
@@ -260,7 +260,7 @@ Compile and run with:
 
 ## Node.js
 
-Without too much hassle, it's possible to render a Mithril module/view serverside on Node.js. The repo contains two examples for that. Execute the following:
+Without too much hassle, it's possible to render a Mithril component/view serverside on Node.js. The repo contains two examples for that. Execute the following:
 
 1. `npm install`
 1. `haxelib install nodehx`
