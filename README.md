@@ -114,11 +114,13 @@ class Todo implements Component
         this.todos = todos;
     }
 
+    // One part of the Component interface:
     public function controller() {
         // Called only once in the Component lifecycle, before rendering.
         // Do controller things here, managing child views for example.
     }
 
+    // The other part of the Component interface:
     public function view() {
         m("h1", "Hello world!", /* Render Todos */);
     }
@@ -130,7 +132,7 @@ class Todo implements Component
 }
 ```
 
-Since most things you need are already encapsulated and passed to the object when instantiated, you may not need the parameterized components feature and such. In that case, just implement `Component` and you're done.
+Since most things you need are already encapsulated and passed to the object when instantiated, you may not need the parameterized components feature and such. In that case, like above, just implement `Component` and you're done.
 
 ## The loosely-typed path
 
