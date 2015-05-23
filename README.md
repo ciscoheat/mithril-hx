@@ -91,6 +91,8 @@ class Todo implements Controller<Todo>
     // The interface implementation.
     // It will automatically return "this" unless you specify otherwise.
     public function controller() : Todo {
+        // Called only once in the Component lifecycle, before rendering.
+        // Do controller things here, managing child views for example.
     }
 }
 ```
@@ -99,7 +101,16 @@ class Todo implements Controller<Todo>
 
 [Components](http://lhorie.github.io/mithril/mithril.component.html) are new from version 0.2.0 of Mithril, and is a way to encapsulate functionality into reusable units. There is a slight mismatch between them and traditional Haxe objects, again because of the dynamic, "classless" nature of Mithril and Javascript.
 
-Usually a Component written in Haxe will look like this:
+The `Component` interface is also very simple:
+
+```haxe
+interface Component {
+    function controller() : Dynamic;
+    function view() : ViewOutput;
+}
+```
+
+Implemented in a Haxe class, it could look like this:
 
 ```haxe
 import mithril.M;
@@ -116,8 +127,7 @@ class Todo implements Component
 
     // One part of the Component interface:
     public function controller() {
-        // Called only once in the Component lifecycle, before rendering.
-        // Do controller things here, managing child views for example.
+        // Not much to do here in this simple example.
     }
 
     // The other part of the Component interface:
@@ -132,11 +142,11 @@ class Todo implements Component
 }
 ```
 
-Since most things you need are already encapsulated and passed to the object when instantiated, you may not need the parameterized components feature and such. In that case, like above, just implement `Component` and you're done.
+The `controller` method works like a constructor in plain-js Mithril, but in Haxe most things you need could be passed to the real constructor instead. Because of that you may not need the [parameterized components](http://mithril.js.org/mithril.component.html#parameterized-components) feature and such. In that case, as in the class above, just implement `Component` and you're done. If the `controller` method won't do anything however, you can implement `View` instead, or keep reading for an alternative.
 
 ## The loosely-typed path
 
-If you think that the `view` and `controller` methods are simple enough to implement without relying on a specific interface, or want to use some more advanced Component stuff, there's an easy way out:
+If you think that the `view` and `controller` methods are simple enough to implement without relying on a specific interface, or if you want to use some more advanced Component stuff, there's an easy way out:
 
 ### Mithril
 
