@@ -19,7 +19,7 @@ class ModuleBuilder
 
 		var fields = Context.getBuildFields();
 
-		var checkInvalidProp = function(f : Field) {
+		function checkInvalidProp(f : Field) {
 			if (Lambda.exists(f.meta, function(m) return m.name == "prop")) {
 				Context.warning("@prop only works with var", f.pos);
 			}
@@ -30,8 +30,9 @@ class ModuleBuilder
 				checkInvalidProp(field);
 				if(f.expr == null) continue;
 
-				f.expr.iter(replaceM);
+				replaceM(f.expr);
 				returnLastMExpr(f);
+
 				if (type & 2 == 2 && field.name == "controller") injectCurrentModule(f);
 				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
 			case FVar(t, e):

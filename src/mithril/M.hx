@@ -139,11 +139,15 @@ typedef XHRTypeOptions<T : Either<DataConstructible<T5>, Array<DataConstructible
 	@:optional var config : XMLHttpRequest -> XHRTypeOptions<T, T2, T3, T4, T5> -> Null<XMLHttpRequest>;
 };
 
-typedef JSONPOptions = {
+typedef JSONPOptions<T, T2> = {
 	var dataType : String;
 	var url : String;
 	@:optional var callbackKey : String;
 	@:optional var data : Dynamic;
+	@:optional var background : Bool;
+	@:optional var initialValue : T;
+	@:optional var unwrapSuccess : Dynamic -> T;
+	@:optional var unwrapError : Dynamic -> T2;
 };
 
 //////////
@@ -178,7 +182,7 @@ extern class M
 	@:overload(function(path : String, params : Dynamic, shouldReplaceHistory : Bool) : Void {})
 	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic) : Void;
 
-	@:overload(function<T, T2>(options : JSONPOptions) : Promise<T, T2> {})
+	@:overload(function<T, T2>(options : JSONPOptions<T, T2>) : Promise<T, T2> {})
 	@:overload(function<T : Either<DataConstructible<T5>, Array<DataConstructible<T5>>>, T2, T3, T4, T5>(options : XHRTypeOptions<T, T2, T3, T4, T5>) : Promise<T, T2> {})
 	public static function request<T, T2, T3, T4>(options : XHROptions<T, T2, T3, T4>) : Promise<T, T2>;
 
