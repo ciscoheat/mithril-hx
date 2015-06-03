@@ -173,7 +173,8 @@ class ModuleBuilder
 					if (mithril.M.__currMod != null && mithril.M.__currMod != this) {
 						var mod = mithril.M.__currMod;
 						mithril.M.__currMod = null;
-						return mod.controller();
+						// Need to be untyped to avoid clashing with macros (especially HaxeContracts)
+						untyped __js__("return mod.controller()");
 					}
 				);
 				exprs.push(macro return this);
