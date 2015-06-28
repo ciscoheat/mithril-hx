@@ -31,7 +31,9 @@ class ModuleBuilder
 				checkInvalidProp(field);
 				if(f.expr == null) continue;
 
-				replaceSugarTags(f.expr);
+				if(!Context.defined('no-mithril-sugartags'))
+					replaceSugarTags(f.expr);
+
 				replaceM(f.expr);
 				returnLastMExpr(f);
 
@@ -70,13 +72,17 @@ class ModuleBuilder
 	}
 
 	private static function replaceSugarTags(e : Expr) {
-		//trace(e.expr);
+		//if(e.toString().indexOf('form-control') > 0) trace(e.expr);
 		switch(e.expr) {
-			case EBinop(Binop.OpSub, e1, {expr: ECall(e2, params), pos: _}):
-				//trace(e1.toString());
-				//trace(e2.toString());
-				var str = (e1.toString() + '-' + e2.toString()).replace(' ', '');
+			// TAG[attr=value]
+			case ECall({expr: EArray(e1, e2), pos: _}, params):
+				var str = e1.toString() + '[' + e2.toString() + ']';
 				replaceSugarTag(e, str, params);
+			// TAG.class
+			case EBinop(Binop.OpSub, e1, {expr: ECall(e2, params), pos: _}):
+				var str = e1.toString() + '-' + e2.toString();
+				replaceSugarTag(e, str, params);
+			// TAG
 			case ECall(e2, params):
 				replaceSugarTag(e, e2.toString(), params);
 			case _:
@@ -89,13 +95,17 @@ class ModuleBuilder
 	private static function replaceSugarTag(e : Expr, exprStr : String, params) {
 		e.iter(replaceSugarTags);
 
-		var pos = exprStr.indexOf('.');
-		var test = pos > 0 ? exprStr.substr(0, pos) : exprStr;
+		var dotPos = exprStr.indexOf('.'); if(dotPos == -1) dotPos = 10000;
+		var brPos  = exprStr.indexOf('['); if(brPos == -1) brPos = 10000;
+		var pos = Std.int(Math.min(dotPos, brPos));
+
+		var test = pos != 10000 ? exprStr.substr(0, pos) : exprStr;
+
+		if(Context.defined('lowercase-mithril-sugartags')) test = test.toUpperCase();
 
 		if(tagList.has(test)) {
-			//trace(test + ': ' + exprStr);
-			//trace(newParams);
-			var newParams = [macro $v{exprStr}].concat(params);
+			var outStr = exprStr.replace(' ', '');
+			var newParams = [macro $v{outStr}].concat(params);
 			e.expr = (macro mithril.M.m($a{newParams})).expr;
 		}
 	}

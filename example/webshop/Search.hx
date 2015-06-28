@@ -36,18 +36,18 @@ class Search implements View
             el = el.parentElement;
         }
 
-        results([]);        
+        results([]);
         M.redraw(); // Need to redraw because it's not a Mithril handled event.
     }
 
     public function view() {
         [
-            m("input.form-control", {
+            INPUT.form-control({
                 placeholder: "Search...",
                 oninput: M.withAttr("value", searchEvent),
                 onfocus: M.withAttr("value", searchEvent)
             }),
-            m("ul.dropdown-menu.dropdown-menu-right", {
+            UL.dropdown-menu.dropdown-menu-right({
                 role: "menu",
                 style: {display: results().length > 0 ? "block" : "none"},
                 config: function(el, isInit) if(!isInit) {
@@ -55,8 +55,8 @@ class Search implements View
                         documentClickEvent.bind(el.parentElement));
                 }
             }, results().map(function(p)
-                m("li", {role: "presentation"},
-                    m("a", {
+                LI({role: "presentation"},
+                    A({
                         role: "menuitem",
                         tabindex: -1,
                         href: '/product/${p.id}',

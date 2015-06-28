@@ -56,30 +56,30 @@ class ProductList implements Component
         }
 
         [
-            m("h2.sub-header", category().name),
-            m(".table-responsive", [
-                m("table.table.table-striped", [
-                    m("thead", [
-                        m("tr", [
-                            m("th", "Name"),
-                            m("th", "Price"),
-                            m("th", "Stock"),
-                            m("th")
+            H2.sub-header(category().name),
+            DIV.table-responsive([
+                TABLE.table.table-striped([
+                    THEAD([
+                        TR([
+                            TH("Name"),
+                            TH("Price"),
+                            TH("Stock"),
+                            TH()
                         ])
                     ]),
-                    m("tbody#products", category().products.map(function(p) 
-                        m("tr", [
-                            m("td", m("a", {
+                    TBODY[id=products](category().products.map(function(p) 
+                        TR([
+                            TD(A({
                                 href: '/product/${p.id}',
                                 config: M.route
                             }, p.name)),
-                            m("td", p.price >= 0 ? '$$${p.price}' : ""),
-                            m("td", {style: {color: p.stock < 10 ? "red" : ""}}, Std.string(p.stock)),
-                            m("td", p.stock == 0 ? null :
-                                m("button.btn.btn-success.btn-xs", {
+                            TD(p.price >= 0 ? '$$${p.price}' : ""),
+                            TD({style: {color: p.stock < 10 ? "red" : ""}}, Std.string(p.stock)),
+                            TD(p.stock == 0 ? null :
+                                BUTTON.btn.btn-success.btn-xs({
                                     onclick: cart_add.bind(_, p)
                                 }, [
-                                    m("span.glyphicon.glyphicon-shopping-cart", {"aria-hidden": "true"}),
+                                    SPAN.glyphicon.glyphicon-shopping-cart({"aria-hidden": "true"}),
                                     cast "Add to cart" // Need a cast since mixed Arrays aren't valid.
                                 ])
                             )

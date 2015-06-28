@@ -49,24 +49,20 @@ class Webshop implements View
     }
 
     // Welcome text for the default route
-    public function view() {
-        [
-            m("h1.page-header", "Welcome!"),
-            m("p", "Select a category on the left."),
-            m("h2", "Todo"),
-
-            m("ul.list-group", todo().map(function(t) {
-                var done = t.toLowerCase().startsWith("x ");
-                m("li.list-group-item", 
-                    { style: { textDecoration: done ? "line-through" : "none" }},
-                    [
-                        m("input[type=checkbox]", { checked: done ? "checked" : "" }), 
-                        m("span[style='margin-left:5px']", done ? t.substring(2) : t)
-                    ]
-                );
-            }))
-        ];
-    }
+    public function view() [
+        H1[id=welcome].test("Welcome!"),
+        P("Select a category on the left."),
+        H2("Todo"),
+        UL.list-group(todo().map(function(t) {
+            var done = t.toLowerCase().startsWith("x ");
+            LI.list-group-item({ 
+                style: { textDecoration: done ? "line-through" : "none" }
+            }, [
+                INPUT[type=checkbox]({ checked: done ? "checked" : "" }), 
+                SPAN[style='margin-left:5px'](done ? t.substring(2) : t)
+            ]);
+        }))
+    ];
 
     private function element(id : String) {
         return Browser.document.getElementById(id);

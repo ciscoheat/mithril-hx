@@ -52,32 +52,31 @@ Marzipan applicake ice cream brownie tart donut cake. Sweet roll soufflé tirami
             case Started:
                 return null;
             case Delayed:          
-                return m(".row", m(".col-xs-12", m("h1", "Loading...")));
+                return DIV.row(DIV.col-xs-12(H1("Loading...")));
             case Error:
-                return m(".row", m(".col-xs-12", m("h1", {style: {color: "red"}}, "Loading error, please reload page.")));
+                return DIV.row(DIV.col-xs-12(H1({style: {color: "red"}}, "Loading error, please reload page.")));
             case Done:
         }
 
-        var button = function() m(
-            "button.btn.btn-lg.btn-success[type='button']", 
+        var button = function() BUTTON.btn.btn-lg.btn-success[type=button](
             {onclick: cart_add.bind(_, product)},
             "Add to Cart"
         );
 
         [
-            m(".row", m(".col-xs-12", m("h1", product.name))),
-            m(".row", [
-                m(".col-xs-12.col-sm-12.col-md-7.col-lg-6", [
-                    m("img[data-src='holder.js/100%x450/auto/random']", {
+            DIV.row(DIV.col-xs-12(H1(product.name))),
+            DIV.row([
+                DIV.col-xs-12.col-sm-12.col-md-7.col-lg-6([
+                    IMG[data-src='holder.js/100%x450/auto/random']({
                         config: function(el, isInit) if(!isInit) untyped __js__("Holder.run()")
                     }),
-                    m(".clearfix", {style: {"margin": "10px"}}),
-                    m(".row", [
-                        m(".col-xs-2", m("h2", "$" + product.price)),
-                        m(".col-xs-4", m("h2", product.stock > 0 ? button() : m("h3", "Out of stock")))
+                    DIV.clearfix({style: {"margin": "10px"}}),
+                    DIV.row([
+                        DIV.col-xs-2(DIV.h2("$" + product.price)),
+                        DIV.col-xs-4(DIV.h2(product.stock > 0 ? button() : H3("Out of stock")))
                     ])
                 ]),
-                m(".col-xs-12.col-sm-12.col-md-5.col-lg-6", lorem().map(function(l) m("p", l)))
+                DIV.col-xs-12.col-sm-12.col-md-5.col-lg-6(lorem().map(function(l) P(l)))
             ])
         ];
     }

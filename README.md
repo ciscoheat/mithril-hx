@@ -21,6 +21,31 @@ Because Javascript is so dynamic and Haxe is strongly typed, there will be a shi
 * Simple syntax for `M.prop`
 * Automatically return `this` in `controller` methods
 * Automatically return `m()` in any function.
+* Sugartags syntax
+
+## Sugartags syntax?
+
+There is a nice alternative syntax for templates that you can use instead of `m(...)`. It looks like this:
+
+```haxe
+DIV([
+    H1("Welcome!"),
+    TABLE.some-class(todos.map(function(todo)
+        TR([
+            TD(INPUT[type=checkbox]({ checked: todo.done() })),
+            TD(todo.description())
+        ])
+    ))
+]);
+```
+
+The syntax is simple, just replace `m('tag', ...)` with `TAG(...)`, where TAG is a valid HTML5 tag. There are two compilation defines that you can use to configure it:
+
+`-D lowercase-mithril-sugartags` - If you don't like UPPERCASE. Understandable, but a bit risky since it may collide with variables.
+
+`-D no-mithril-sugartags` - To turn off this syntax completely, and only use `m('tag', ...)` for building view templates.
+
+# Going typesafe or flexible
 
 If you're a seasoned Mithril user and/or just want to keep things simple and dynamic, skip to "The loosely-typed path" below. Otherwise keep reading for some helpful examples and more strict interfaces.
 
@@ -60,10 +85,9 @@ class TodoView implements View
         this.model = model;
     }
 
-    // The interface implementation:
+    // The interface implementation.
+    // The last m() expression (or Array of m()) is returned automatically.
     public function view() : VirtualElement {
-        // Remember to use "m" here instead of "M" for autocompletion.
-        // The last m() expression (or Array of m()) is returned automatically.
         m("div", [
             m("h1", "Welcome!"),
             m("table", model.map(function(todo) {
@@ -132,7 +156,7 @@ class Todo implements Component
 
     // The other part of the Component interface:
     public function view() {
-        m("h1", "Hello world!", /* Render Todos */);
+        H1("Hello world!", /* Render Todos */);
     }
 
     // Starting up with M.mount:
@@ -160,13 +184,11 @@ class HelloWorld implements Mithril
 {
     public function new() {}
 
-    public function controller(?args : {color: String}) {
+    public function controller(?args : {color: String}) 
         if(args == null) args = {color: "red"};
-    }
 
-    public function view(ctrl, args : {color : String}) {
-        m("h1", {style: {color: args.color}}, "Hello world!");
-    }
+    public function view(ctrl, args : {color : String})
+        H1({style: {color: args.color}}, "Hello world!");
 
     static function main() {
         var hello = M.component(new HelloWorld(), {color: "teal"});
@@ -241,22 +263,21 @@ class Example implements Component
         this.user = new User("Thorin Oakenshield");
     }
 
-    public function view() {
-        // Automatically return an array of m() elements:
-        [
-            // Display an input field.
-            m("input", {
-                // Listens to the "oninput" event of the input field and
-                // will set user.name to the field's "value" attribute:
-                oninput: M.withAttr("value", user.name),
-                // The redraw triggered by the above event will
-                // update the value from the model automatically:
-                value: user.name()
-            }),
-            // Display a div with class .user and some style
-            m(".user", {style: {margin: "15px"}}, user.name())
-        ];
-    }
+    public function view() [
+        // Display an input field.
+        INPUT({
+            // Listens to the "oninput" event of the input field and
+            // will set user.name to the field's "value" attribute:
+            oninput: M.withAttr("value", user.name),
+
+            // The redraw triggered by the above event will
+            // update the value from the model automatically:
+            value: user.name()
+        }),
+        
+        // Display a div with class .user and some style
+        DIV.user({style: {margin: "15px"}}, user.name())
+    ];
 
     // Program entry point
     static function main() {

@@ -109,7 +109,7 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
 
     public function view() : ViewOutput {
         [
-            m("li", {
+            LI({
                 "class": isOpen ? "dropdown open" : "dropdown",
                 config: function(el, isInit) {
                     if(isInit) return;
@@ -118,28 +118,28 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
                     el.addEventListener("hide.bs.dropdown", function() return false);
                 }
             }, [
-                m("a.dropdown-toggle", {
+                A.dropdown-toggle({
                     href: "#",
                     role: "button", 
                     "aria-expanded": false,
                     onclick: open
                 }, [
                     cast "Shopping cart ",
-                    m("span.caret")
+                    SPAN.caret()
                 ]),
-                m("ul.dropdown-menu", {
+                UL.dropdown-menu({
                     role: "menu",
                     config: function(el, isInit) if(!isInit) dropDownMenu = el
                 }, items())
             ]),
-            m("li", this.empty() 
-                ? m("span", "Proceed to checkout")
-                : m("a[href='/checkout']", {config: M.route}, "Proceed to checkout"))
+            LI(this.empty() 
+                ? SPAN("Proceed to checkout")
+                : A[href='/checkout']({config: M.route}, "Proceed to checkout"))
         ];
     }
 
     function items() : Array<VirtualElement> {
-        if(this.empty()) return [m("li", m("a", "Empty"))];
+        if(this.empty()) return [LI(A("Empty"))];
 
         var total = 0.0;
 
@@ -148,7 +148,7 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
             var name = ' ${p.name} | $$$subTotal';
             total += subTotal;
             
-            m("li", m("a", [
+            LI(A([
                 m("input[type=number]", {
                     min: 0, 
                     value: get(p), 
@@ -158,8 +158,8 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
                 name
             ]));
         }).concat([
-            m("li.divider"),
-            m("li", m("a", 'Total: $$$total'))
+            LI.divider(),
+            LI(A('Total: $$$total'))
         ]);
 
         return products.array();        

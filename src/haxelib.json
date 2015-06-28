@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
   "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.23.3",
-  "releasenote": "A macro injection needed to be untyped to avoid clashing with other macros.",
+  "version": "0.24.0",
+  "releasenote": "Now with sweet sugartags syntax!",
   "contributors": ["ciscoheat"]
 }

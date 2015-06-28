@@ -26,10 +26,10 @@ class Menu implements Component
     }
 
     public function view() {
-        m("ul.nav.nav-sidebar", 
+        UL.nav.nav-sidebar(
             categories().array().map(function(c) {
-                m("li", {"class": isActive(c) ? "active" : ""}, 
-                    m("a", {
+                LI({"class": isActive(c) ? "active" : ""}, 
+                    A({
                         href: '/category/${c.slug()}',
                         config: M.route
                     }, c.name)
