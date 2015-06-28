@@ -7,6 +7,7 @@ import haxe.macro.Type;
 
 using haxe.macro.ExprTools;
 using Lambda;
+using StringTools;
 
 class ModuleBuilder
 {
@@ -30,6 +31,7 @@ class ModuleBuilder
 				checkInvalidProp(field);
 				if(f.expr == null) continue;
 
+				replaceSugarTags(f.expr);
 				replaceM(f.expr);
 				returnLastMExpr(f);
 
@@ -65,6 +67,37 @@ class ModuleBuilder
 				name: "v"
 			}]
 		});
+	}
+
+	private static function replaceSugarTags(e : Expr) {
+		//trace(e.expr);
+		switch(e.expr) {
+			case EBinop(Binop.OpSub, e1, {expr: ECall(e2, params), pos: _}):
+				//trace(e1.toString());
+				//trace(e2.toString());
+				var str = (e1.toString() + '-' + e2.toString()).replace(' ', '');
+				replaceSugarTag(e, str, params);
+			case ECall(e2, params):
+				replaceSugarTag(e, e2.toString(), params);
+			case _:
+				e.iter(replaceSugarTags);
+		}
+
+	}
+
+	private static var tagList = ["A","ABBR","ACRONYM","ADDRESS","AREA","ARTICLE","ASIDE","AUDIO","B","BDI","BDO","BIG","BLOCKQUOTE","BODY","BR","BUTTON","CANVAS","CAPTION","CITE","CODE","COL","COLGROUP","COMMAND","DATALIST","DD","DEL","DETAILS","DFN","DIV","DL","DT","EM","EMBED","FIELDSET","FIGCAPTION","FIGURE","FOOTER","FORM","FRAME","FRAMESET","H1","H2","H3","H4","H5","H6","HEAD","HEADER","HGROUP","HR","HTML","I","IFRAME","IMG","INPUT","INS","KBD","KEYGEN","LABEL","LEGEND","LI","LINK","MAP","MARK","META","METER","NAV","NOSCRIPT","OBJECT","OL","OPTGROUP","OPTION","OUTPUT","P","PARAM","PRE","PROGRESS","Q","RP","RT","RUBY","SAMP","SCRIPT","SECTION","SELECT","SMALL","SOURCE","SPAN","SPLIT","STRONG","STYLE","SUB","SUMMARY","SUP","TABLE","TBODY","TD","TEXTAREA","TFOOT","TH","THEAD","TIME","TITLE","TR","TRACK","TT","UL","VAR","VIDEO","WBR"];
+	private static function replaceSugarTag(e : Expr, exprStr : String, params) {
+		e.iter(replaceSugarTags);
+
+		var pos = exprStr.indexOf('.');
+		var test = pos > 0 ? exprStr.substr(0, pos) : exprStr;
+
+		if(tagList.has(test)) {
+			//trace(test + ': ' + exprStr);
+			//trace(newParams);
+			var newParams = [macro $v{exprStr}].concat(params);
+			e.expr = (macro mithril.M.m($a{newParams})).expr;
+		}
 	}
 
 	private static function replaceM(e : Expr) {
