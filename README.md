@@ -29,7 +29,7 @@ There is a nice alternative syntax for templates that you can use instead of `m(
 
 ```haxe
 DIV([
-    H1("Welcome!"),
+    H1[id=welcome]("Welcome!"),
     TABLE.some-class(todos.map(function(todo)
         TR([
             TD(INPUT[type=checkbox]({ checked: todo.done() })),
@@ -39,9 +39,9 @@ DIV([
 ]);
 ```
 
-The syntax is simple, just replace `m('tag', ...)` with `TAG(...)`, where TAG is a valid HTML5 tag. There are two compilation defines that you can use to configure it:
+The syntax is simple, just replace `m('tag', ...)` with `TAG(...)`, where TAG is a valid HTML5 tag. There are two compiler directives that you can use in your `.hxml` file to configure it:
 
-`-D lowercase-mithril-sugartags` - If you don't like UPPERCASE. Understandable, but a bit risky since it may collide with variables.
+`-D lowercase-mithril-sugartags` - If you don't like UPPERCASE tags. Understandable, but increases the risk for compilation errors since the lowercase tags may collide with variables.
 
 `-D no-mithril-sugartags` - To turn off this syntax completely, and only use `m('tag', ...)` for building view templates.
 
