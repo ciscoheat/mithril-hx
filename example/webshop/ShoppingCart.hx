@@ -111,8 +111,7 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
         [
             LI({
                 "class": isOpen ? "dropdown open" : "dropdown",
-                config: function(el, isInit) {
-                    if(isInit) return;
+                config: function(el, isInit) if(!isInit) {
                     cartParent = el.parentElement;
                     // Need to prevent dropdown from closing automatically:
                     el.addEventListener("hide.bs.dropdown", function() return false);
@@ -142,10 +141,8 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
         if(this.empty()) return [LI(A("Empty"))];
 
         var total = 0.0;
-
         var products = products().map(function(p) {
             var subTotal = p.price * get(p);
-            var name = ' ${p.name} | $$$subTotal';
             total += subTotal;
             
             LI(A([
@@ -155,11 +152,14 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
                     style: {width: "36px"},
                     oninput: M.withAttr("value", set.bind(p, _))
                 }),
-                name
+                SPAN(A({ 
+                    config: M.route, 
+                    href: '/product/${p.id}', 
+                }, ' ${p.name}'), " | $" + subTotal)
             ]));
         }).concat([
             LI.divider(),
-            LI(A('Total: $$$total'))
+            LI(A('Total: $' + total))
         ]);
 
         return products.array();        

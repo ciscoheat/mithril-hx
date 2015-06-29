@@ -2,4 +2,3 @@
 -lib mithril
 -js bin/webshop/webshop.js
 -main webshop.Webshop
--D lowercase-mithril-sugartags

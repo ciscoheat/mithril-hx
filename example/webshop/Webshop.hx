@@ -44,14 +44,18 @@ class Webshop implements View
         // An "inline module" just to create the home link.
         M.mount(element("home-link"), {
             view: function() 
-                m("a.navbar-brand[href='/']", {config: M.route}, "Mithril Webshop")
+                m("a.navbar-brand[href='/']", {config: M.route}, "Mithril/Haxe Webshop")
         });
     }
 
     // Welcome text for the default route
     public function view() [
-        H1[id=welcome].test("Welcome!"),
-        P("Select a category on the left."),
+        H1("Welcome!"),
+        P("Select a category on the left to start shopping."),
+        P("Built in Haxe & Mithril. Source code: ", 
+            A[href="https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop"][target="_blank"](
+                "https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop"
+        )),
         H2("Todo"),
         UL.list-group(todo().map(function(t) {
             var done = t.toLowerCase().startsWith("x ");
