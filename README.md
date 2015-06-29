@@ -45,6 +45,8 @@ The syntax is simple, just replace `m('tag', ...)` with `TAG(...)`, where TAG is
 
 `-D no-mithril-sugartags` - To turn off this syntax completely, and only use `m('tag', ...)` for building view templates.
 
+Based on [mithril.sugartags](https://github.com/jsguy/mithril.sugartags) by jsguy. Thanks!
+
 # Going typesafe or flexible
 
 If you're a seasoned Mithril user and/or just want to keep things simple and dynamic, skip to "The loosely-typed path" below. Otherwise keep reading for some helpful examples and more strict interfaces.
