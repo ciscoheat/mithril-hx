@@ -42,33 +42,14 @@ class ModuleBuilder
 			case FVar(t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
 				if (prop == null) continue;
-				
+
 				field.meta.remove(prop);
-				field.access.push(Access.ADynamic);
-				field.kind = propFunction(t);
+				field.kind = FVar(TFunction([TOptional(t)], t), e == null ? macro M.prop(null) : macro M.prop($e));
 			case _:
 				checkInvalidProp(field);
 		}
 
 		return fields;
-	}
-
-	/**
-	 * Change: @prop public var description : String;
-	 * To:     public dynamic function description(?v : String) : String return v;
-	 */
-	static private function propFunction(t : Null<ComplexType>) : FieldType {
-		return FFun({
-			ret: t,
-			params: null,
-			expr: macro return v,
-			args: [{
-				value: null,
-				type: t,
-				opt: true,
-				name: "v"
-			}]
-		});
 	}
 
 	private static function replaceSugarTags(e : Expr) {

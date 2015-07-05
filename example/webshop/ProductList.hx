@@ -11,12 +11,11 @@ using Lambda;
  */
 class ProductList implements Component
 {
-    @prop var category : Category;
+    @prop var category : Category = new Category();
     var loading : Loader;
     var cart : ShoppingCart;
 
     public function new(cart) {
-        this.category = M.prop(new Category());
         this.cart = cart;
     }
 

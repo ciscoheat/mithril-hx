@@ -10,11 +10,9 @@ using Lambda;
  */
 class Menu implements Component
 {
-    @prop var categories : Array<Category>;
+    @prop var categories : Array<Category> = [];
 
-    public function new() {
-        this.categories = M.prop([]);
-    }
+    public function new() {}
 
     public function controller() {
         Category.all().then(function(c) return categories(c)).then(function(_) M.redraw());

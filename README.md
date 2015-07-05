@@ -55,19 +55,22 @@ If you're a seasoned Mithril user and/or just want to keep things simple and dyn
 
 ### Model
 
-Use this interface when you only want to use `M.prop` in a class. Then you can use `@prop` for the fields and `M.prop` in the constructor:
+With this interface (and all others) you can use `@prop` for the fields:
 
 ```haxe
 import mithril.M;
 
 class Todo implements Model
 {
+    // Will create an M.prop(false)
+    @prop public var done : Bool = false;
+
+    // Will create an M.prop(null)
     @prop public var description : String;
-    @prop public var done : Bool;
 
     public function new(description) {
+        // If you need to create it in the constructor:
         this.description = M.prop(description);
-        this.done = M.prop(false);
     }
 }
 ```

@@ -15,11 +15,9 @@ using StringTools;
 
 class Search implements View
 {
-    @prop var results : Array<Product>;
+    @prop var results : Array<Product> = [];
 
-    public function new() {
-        this.results = M.prop([]);
-    }
+    public function new() {}
 
     function searchEvent(phrase : String) {
         if(phrase.length < 2) 

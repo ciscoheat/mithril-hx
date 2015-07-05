@@ -2,13 +2,11 @@ package webshop;
 
 import haxe.Timer;
 import mithril.M;
+
 using Lambda;
 
 enum LoadState {
-    Started;
-    Delayed;
-    Done;
-    Error;
+    Started; Delayed; Done; Error;
 }
 
 /**
@@ -20,43 +18,25 @@ enum LoadState {
  * See ProductList for an example how this class is used.
  */
 class Loader implements Model {
-    @prop public var state : LoadState;
+    var _state = Started;
+
+    function setState(s : LoadState) {
+        if(_state == Done || _state == Error) 
+            return;
+
+        _state = s;
+        M.redraw();
+    }
 
     public function new(untilDelay = 1000, untilError = 5000) {
-        var _state = M.prop(Started);
-
-        var delayTimer = Timer.delay(function() state(Delayed), untilDelay);
-        var errorTimer = Timer.delay(function() state(Error), untilError);
-
-        this.state = function(?s) { 
-            if(s == null) return _state();
-
-            switch(s) {
-                case Delayed:
-                    delayTimer.stop();
-                case Done, Error:
-                    delayTimer.stop();
-                    errorTimer.stop();
-                case _:
-            }
-
-            // Need to set state before redraw.
-            _state(s);
-            M.redraw();
-
-            return s;
-        };
-
+        Timer.delay(function() setState(Delayed), untilDelay);
+        Timer.delay(function() setState(Error), untilError);
     }
 
     // done and error have an optional parameter so they can be
     // used in ajax callbacks.
-
-    public function done(?_) {
-        state(Done);
-    }
-
-    public function error(?_) {
-        state(Error);
-    }
+    public function done(?_) setState(Done);
+    public function error(?_) setState(Error);
+    
+    public function state() return _state;
 }

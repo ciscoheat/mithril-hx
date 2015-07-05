@@ -1,10 +1,10 @@
 {
   "name": "mithril",
+  "description": "Haxe externs for Mithril, A javascript MVC framework.",
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "description": "Haxe externs for Mithril, A javascript MVC framework.",
-  "version": "0.24.0",
-  "releasenote": "Now with sweet sugartags syntax!",
+  "releasenote": "Easier way to use M.prop for class fields.",
+  "version": "0.25.0",
   "contributors": ["ciscoheat"]
 }
