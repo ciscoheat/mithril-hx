@@ -39,14 +39,14 @@ class ModuleBuilder
 
 				if (type & 2 == 2 && field.name == "controller") injectCurrentModule(f);
 				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
-			case FVar(t, e):
+				
+			case FVar(t, e), FProp(_, _, t, e):
 				var prop = field.meta.find(function(m) return m.name == "prop");
 				if (prop == null) continue;
 
-				field.meta.remove(prop);
-				field.kind = FVar(TFunction([TOptional(t)], t), e == null ? macro M.prop(null) : macro M.prop($e));
-			case _:
-				checkInvalidProp(field);
+				field.kind = FVar(TFunction([TOptional(t)], t), e == null 
+					? macro mihtril.M.prop(null) 
+					: macro mithril.M.prop($e));
 		}
 
 		return fields;
