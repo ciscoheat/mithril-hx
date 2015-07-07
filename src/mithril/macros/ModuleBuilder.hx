@@ -45,7 +45,7 @@ class ModuleBuilder
 				if (prop == null) continue;
 
 				field.kind = FVar(TFunction([TOptional(t)], t), e == null 
-					? macro mihtril.M.prop(null) 
+					? macro mithril.M.prop(null) 
 					: macro mithril.M.prop($e));
 		}
 
