@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Fixed M.prop generation when an optional value existed.",
-  "version": "0.25.2",
+  "releasenote": "Fixed M.component issue.",
+  "version": "0.25.3",
   "contributors": ["ciscoheat"]
 }

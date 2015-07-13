@@ -187,18 +187,14 @@ class ModuleBuilder
 	private static function injectCurrentModule(f : Function) {
 		switch(f.expr.expr) {
 			case EBlock(exprs):
-				// Mithril makes a "new module.controller()" call in m.module which 
-				// complicates things. If the controller was called with m.module, 
-				// M.__currMod has stored the controller and will be used here.
+				// Mithril makes a "new module.controller()" call in m.mount which 
+				// complicates things. If the controller was called with m.mount, 
+				// M.__haxecomponents has stored the controller and will be used here.
 				// (instead of using an empty function object)
-				// This will only happen during the first call however, so controllers
-				// can call other controllers in the same method.
 				exprs.unshift(macro
-					if (mithril.M.__currMod != null && mithril.M.__currMod != this) {
-						var mod = mithril.M.__currMod;
-						mithril.M.__currMod = null;
+					if(M.__haxecomponents.length && untyped !this.controller) {
 						// Need to be untyped to avoid clashing with macros (especially HaxeContracts)
-						untyped __js__("return mod.controller()");
+						untyped __js__("return m.__haxecomponents.pop().controller()");
 					}
 				);
 				exprs.push(macro return this);

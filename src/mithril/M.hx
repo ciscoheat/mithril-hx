@@ -247,8 +247,10 @@ extern class M
 		untyped __js__("(function(m) {
 			m.m         = m;
 			m.__mount   = m.mount;
-			m.__currMod = null;
-			m.mount = function(root, component) { m.__currMod = component; return m.__mount(root, component); }
+			m.__component = m.component;
+			m.__haxecomponents = [];
+			m.mount = function(root, component) { if(component.controller) m.__haxecomponents.push(component); return m.__mount(root, component); }
+			m.component = function(component) { if(component.controller) m.__haxecomponents.push(component); return m.__component(component); }
 			if (typeof module !== 'undefined' && module.exports) 
 				m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);
@@ -256,5 +258,5 @@ extern class M
 
 	// Stores the current module so it can be used in controller.module() 
 	// calls. See above (injected automatically in macros.ModuleBuilder).
-	@:noCompletion public static var __currMod : Dynamic;
+	@:noCompletion public static var __haxecomponents : Dynamic;
 }
