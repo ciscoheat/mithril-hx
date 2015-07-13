@@ -23,11 +23,13 @@ class DashboardModule implements Module<Dynamic>
 	var chainView : ChainView;
 
 	@prop var ip : String = "";
+	@prop var test : String;
 
 	public function new() {
 		todo = new TodoModule();
 		chainController = new ChainController();
 		chainView = new ChainView(new ChainModel());
+		test = M.prop("");
 	}
 
 	public function controller() {
