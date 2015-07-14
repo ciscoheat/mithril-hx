@@ -50,12 +50,12 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 ///// Deprecated interfaces /////
 
-@:deprecated('ControllerView<T> is deprecated: Use MitrilComponent instead')
+@:deprecated('ControllerView<T> is deprecated: Use Mitril instead')
 @:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface ControllerView<T> {
 	function view(?ctrl : T) : ViewOutput;
 }
 
-@:deprecated('Module<T> interface is deprecated: Use Component or MithrilComponent instead') 
+@:deprecated('Module<T> interface is deprecated: Use Component or Mithril instead') 
 @:autoBuild(mithril.macros.ModuleBuilder.build(3)) interface Module<T> {
 	function controller() : T;
 	function view(?ctrl : T) : ViewOutput;
@@ -159,11 +159,11 @@ extern class M
 	@:overload(function(selector : String, attributes : Dynamic) : VirtualElement {})
 	public static function m(selector : String, attributes : Dynamic, children : Dynamic) : VirtualElement;
 
-	@:overload(function<T, T2, T3, T4, T5>(component: T, args : T2, extra1 : T3, extra2 : T4, extra3 : T5) : T {})
-	@:overload(function<T, T2, T3, T4>(component: T, args : T2, extra1 : T3, extra2 : T4) : T {})
-	@:overload(function<T, T2, T3>(component: T, args : T2, extra1 : T3) : T {})
-	@:overload(function<T, T2>(component: T, args : T2) : T {})
-	public static function component<T>(component : T) : T;
+	@:overload(function<T, T2, T3, T4, T5>(component : T, args : T2, extra1 : T3, extra2 : T4, extra3 : T5) : Dynamic {})
+	@:overload(function<T, T2, T3, T4>(component : T, args : T2, extra1 : T3, extra2 : T4) : Dynamic {})
+	@:overload(function<T, T2, T3>(component : T, args : T2, extra1 : T3) : Dynamic {})
+	@:overload(function<T, T2>(component : T, args : T2) : Dynamic {})
+	public static function component<T>(component : T) : Dynamic;
 
 	public static function mount<T>(element : Element, component : T) : T;
 
@@ -239,9 +239,9 @@ extern class M
 
 	@:noCompletion public static inline function _patch(__varName : Dynamic) : Void {
 		// Some extra properties that simplifies the API.
-		// Also redefines m.module to have access to the current module
-		// because m.module makes a "new controller.module()" call which
-		// removes the actual module from the scope.
+		// Also makes a stack-based access to the current component
+		// because m.mount and m.component makes a "new component.controller()" call which
+		// removes the actual component from the scope.
 		// It also prevents deferred being resolved on Node.js
 		// to avoid server rendering issues.
 		untyped __js__("(function(m) {
@@ -251,12 +251,11 @@ extern class M
 			m.__haxecomponents = [];
 			m.mount = function(root, component) { if(component.controller) m.__haxecomponents.push(component); return m.__mount(root, component); }
 			m.component = function(component) { if(component.controller) m.__haxecomponents.push(component); return m.__component(component); }
-			if (typeof module !== 'undefined' && module.exports) 
-				m.request = function(xhrOptions) { return m.deferred().promise; };
+			if (typeof module !== 'undefined' && module.exports) m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);
 	}
 
-	// Stores the current module so it can be used in controller.module() 
+	// Stores the current component so it can be used in component.controller 
 	// calls. See above (injected automatically in macros.ModuleBuilder).
 	@:noCompletion public static var __haxecomponents : Dynamic;
 }

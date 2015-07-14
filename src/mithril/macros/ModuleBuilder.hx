@@ -184,16 +184,18 @@ class ModuleBuilder
 		});
 	}
 
+	/**
+	 * Mithril makes a "new component.controller()" call in m.mount and m.component which 
+	 * complicates things. If the controller was called with one of those,
+	 * M.__haxecomponents has stored the controller and will be used here.
+	 * (instead of using a newly constructed function object)
+	*/
 	private static function injectCurrentModule(f : Function) {
 		switch(f.expr.expr) {
 			case EBlock(exprs):
-				// Mithril makes a "new module.controller()" call in m.mount which 
-				// complicates things. If the controller was called with m.mount, 
-				// M.__haxecomponents has stored the controller and will be used here.
-				// (instead of using an empty function object)
 				exprs.unshift(macro
 					if(M.__haxecomponents.length && untyped !this.controller) {
-						// Need to be untyped to avoid clashing with macros (especially HaxeContracts)
+						// Need to be untyped to avoid clashing with macros that modify return (particularly HaxeContracts)
 						untyped __js__("return m.__haxecomponents.pop().controller()");
 					}
 				);
