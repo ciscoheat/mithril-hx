@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "M.component now returns Dynamic so it can be used in views.",
-  "version": "0.25.4",
+  "releasenote": "view now automatically returns Dynamic, to avoid casting multi-type arrays.",
+  "version": "0.25.5",
   "contributors": ["ciscoheat"]
 }

@@ -38,6 +38,10 @@ class ModuleBuilder
 				returnLastMExpr(f);
 
 				if (type & 2 == 2 && field.name == "controller") injectCurrentModule(f);
+				if (type & 2 == 2 && field.name == "view" && f.ret == null) {
+					// Return Dynamic so multi-type arrays can be used in view without casting
+					f.ret = macro : Dynamic;
+				} 
 				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
 				
 			case FVar(t, e), FProp(_, _, t, e):
