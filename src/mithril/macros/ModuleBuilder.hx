@@ -36,11 +36,25 @@ class ModuleBuilder
 
 				replaceM(f.expr);
 				returnLastMExpr(f);
+				
+				function keepField() {
+					field.meta.push({
+						pos: Context.currentPos(),
+						params: null,
+						name: ':keep'
+					});					
+				}
 
-				if (type & 2 == 2 && field.name == "controller") injectCurrentModule(f);
-				if (type & 2 == 2 && field.name == "view" && f.ret == null) {
-					// Return Dynamic so multi-type arrays can be used in view without casting
-					f.ret = macro : Dynamic;
+				if (type & 2 == 2 && field.name == "controller") {
+					keepField();
+					injectCurrentModule(f);
+				}
+				if ((type & 1 == 1 || type & 2 == 2) && field.name == "view") {
+					keepField();
+					if(f.ret == null) {
+						// Return Dynamic so multi-type arrays can be used in view without casting
+						f.ret = macro : Dynamic;
+					}
 				} 
 				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
 				
