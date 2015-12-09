@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "DCE fix: view and controller methods are now marked with @:keep.",
-  "version": "0.25.6",
+  "releasenote": "Prevented init code from executing twice.",
+  "version": "0.25.7",
   "contributors": ["ciscoheat"]
 }

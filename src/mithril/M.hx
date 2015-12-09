@@ -245,6 +245,7 @@ extern class M
 		// It also prevents deferred being resolved on Node.js
 		// to avoid server rendering issues.
 		untyped __js__("(function(m) {
+			if (m.__haxecomponents) return;
 			m.m         = m;
 			m.__mount   = m.mount;
 			m.__component = m.component;

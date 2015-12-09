@@ -217,7 +217,7 @@ class ModuleBuilder
 						untyped __js__("return m.__haxecomponents.pop().controller()");
 					}
 				);
-				exprs.push(macro return this);
+				exprs.push(macro return untyped this);
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
 				injectCurrentModule(f);
