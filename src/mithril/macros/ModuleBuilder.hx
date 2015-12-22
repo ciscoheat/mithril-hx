@@ -212,7 +212,7 @@ class ModuleBuilder
 		switch(f.expr.expr) {
 			case EBlock(exprs):
 				exprs.unshift(macro
-					if(M.__haxecomponents.length && untyped !this.controller) {
+					if(mithril.M.__haxecomponents.length && untyped !this.controller) {
 						// Need to be untyped to avoid clashing with macros that modify return (particularly HaxeContracts)
 						untyped __js__("return m.__haxecomponents.pop().controller()");
 					}
