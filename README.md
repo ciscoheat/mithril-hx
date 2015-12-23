@@ -217,13 +217,15 @@ Then select one of the following:
 A collection of two demo apps, available on the Mithril site.
 
 1. `haxe mithril.hxml`
-1. Open `bin/index.html` in a browser.
+1. `nekotools server -d bin`
+1. Open `http://localhost:2000/` in a browser.
 
 ## Webshop
 
 A simple (and incomplete) webshop to demonstrate the power of Mithril.
 
 1. `haxe webshop.hxml`
+1. `nekotools server -d bin/webshop`
 1. Open `bin/webshop/index.html` in a browser.
 
 **Live demo here:** [http://ciscoheat.github.io/webshop](http://ciscoheat.github.io/webshop)

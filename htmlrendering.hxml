@@ -1,0 +1,5 @@
+-cp src 
+-cp example
+-js bin/htmlrendering.js
+-main HtmlRendering
+-debug

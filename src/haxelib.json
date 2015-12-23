@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Fixed namespace problem.",
-  "version": "0.25.8",
+  "releasenote": "The view method now always returns its content.",
+  "version": "0.26.0",
   "contributors": ["ciscoheat"]
 }

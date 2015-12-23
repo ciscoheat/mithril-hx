@@ -6,3 +6,5 @@
 /docs
 /bin/mithril.js.map
 /bin/noderendering.js.map
+/bin/htmlrendering.js
+/bin/htmlrendering.js.map

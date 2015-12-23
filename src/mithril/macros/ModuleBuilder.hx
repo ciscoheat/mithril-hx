@@ -11,6 +11,8 @@ using StringTools;
 
 class ModuleBuilder
 {
+	static var viewField : Function;
+
 	// Types: 0 - Model, 1 - View, 2 - Controller/Component, 3 - Module(deprecated)
 	@macro public static function build(type : Int) : Array<Field>
 	{
@@ -33,6 +35,11 @@ class ModuleBuilder
 
 				if(!Context.defined('no-mithril-sugartags'))
 					replaceSugarTags(f.expr);
+
+				// Set viewField if current field is the view function.
+				// it will automatically return its content.
+				if(field.name == "view") viewField = f;
+				else viewField = null;
 
 				replaceM(f.expr);
 				returnLastMExpr(f);
@@ -149,25 +156,26 @@ class ModuleBuilder
 		switch(f.expr.expr) {
 			case EBlock(exprs):
 				if (exprs.length > 0)
-					returnMOrArrayMExpr(exprs[exprs.length - 1]);
+					returnMOrArrayMExpr(exprs[exprs.length - 1], f);
 			case _:
-				returnMOrArrayMExpr(f.expr);
+				returnMOrArrayMExpr(f.expr, f);
 		}
 	}
 
 	/**
 	 * Add return to m() calls, or an Array with m() calls.
 	 */
-	private static function returnMOrArrayMExpr(e : Expr) {
+	private static function returnMOrArrayMExpr(e : Expr, f : Function) {
 		switch(e.expr) {
 			case EReturn(_):
 			case EArrayDecl(values):
-				if(values.length > 0) 
+				if(values.length > 0 && f != viewField) 
 					checkForM(values[0], e);
 				else
 					injectReturn(e);
 			case _:
-				checkForM(e, e);
+				if(f != viewField) checkForM(e, e);
+				else injectReturn(e);
 		}
 	}
 
