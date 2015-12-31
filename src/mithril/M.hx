@@ -242,11 +242,17 @@ extern class M
 		// Also makes a stack-based access to the current component
 		// because m.mount and m.component makes a "new component.controller()" call which
 		// removes the actual component from the scope.
-		// It also prevents deferred being resolved on Node.js
-		// to avoid server rendering issues.
+		// It also prevents deferred being resolved on Node.js to avoid server rendering issues,
+		// and converts List to Array so Lambda.map can be used conveniently.
 		untyped __js__("(function(m) {
 			if (m.__haxecomponents) return;
-			m.m         = m;
+			m.m = function() {
+				if($hxClasses['List']) for(var i=0; i < arguments.length; ++i) if(arguments[i] instanceof List) {
+					var it = $iterator(arguments[i])();	arguments[i] = [];
+					while(it.hasNext())	arguments[i].push(it.next());
+				}
+				return m.apply(this, arguments);
+			}
 			m.__mount   = m.mount;
 			m.__component = m.component;
 			m.__haxecomponents = [];

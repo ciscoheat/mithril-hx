@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "The view method now always returns its content.",
-  "version": "0.26.0",
+  "releasenote": "Lists can now be used in M() calls.",
+  "version": "0.27.0",
   "contributors": ["ciscoheat"]
 }
