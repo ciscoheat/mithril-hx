@@ -247,7 +247,7 @@ extern class M
 		untyped __js__("(function(m) {
 			if (m.__haxecomponents) return;
 			m.m = function() {
-				if($hxClasses['List']) for(var i=0; i < arguments.length; ++i) if(arguments[i] instanceof List) {
+				if($hxClasses && $hxClasses['List']) for(var i=0; i < arguments.length; ++i) if(arguments[i] instanceof List) {
 					var it = $iterator(arguments[i])();	arguments[i] = [];
 					while(it.hasNext())	arguments[i].push(it.next());
 				}

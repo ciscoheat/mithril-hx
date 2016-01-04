@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Lists can now be used in M() calls.",
-  "version": "0.27.0",
+  "releasenote": "Fixed crash if no hxClasses defined.",
+  "version": "0.27.1",
   "contributors": ["ciscoheat"]
 }
