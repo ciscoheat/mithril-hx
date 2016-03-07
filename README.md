@@ -218,7 +218,7 @@ A collection of two demo apps, available on the Mithril site.
 
 1. `haxe mithril.hxml`
 1. `nekotools server -d bin`
-1. Open `http://localhost:2000/` in a browser.
+1. Open [http://localhost:2000/](http://localhost:2000/) in a browser.
 
 ## Webshop
 
@@ -226,7 +226,7 @@ A simple (and incomplete) webshop to demonstrate the power of Mithril.
 
 1. `haxe webshop.hxml`
 1. `nekotools server -d bin/webshop`
-1. Open `bin/webshop/index.html` in a browser.
+1. Open [http://localhost:2000/](http://localhost:2000/) in a browser.
 
 **Live demo here:** [http://ciscoheat.github.io/webshop](http://ciscoheat.github.io/webshop)
 
@@ -239,7 +239,7 @@ If you prefer a bare-bones example (doesn't require cloning), create the followi
 ```html
 <!doctype html>
 <body>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.2.0/mithril.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.2.3/mithril.min.js"></script>
 <script src="example.js"></script>
 </body>
 ```
@@ -305,7 +305,7 @@ Compile and run with:
 Without too much hassle, it's possible to render a Mithril component/view serverside on Node.js. The repo contains two examples for that. Execute the following:
 
 1. `npm install`
-1. `haxelib install nodehx`
+1. `haxelib install hxnodejs`
 1. `haxe noderendering.hxml`
 1. `cd bin`
 

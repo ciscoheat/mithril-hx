@@ -4,7 +4,7 @@
 -D isomorphic
 -cp src 
 -cp example
--lib nodehx
+-lib hxnodejs
 -js bin/noderendering.js
 -main NodeRendering
 -debug

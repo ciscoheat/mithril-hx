@@ -7,13 +7,13 @@ import js.html.Element;
 #end
 import mithril.M;
 import mithril.MithrilNodeRender;
-import nodejs.Process;
-import nodejs.Console;
-import nodejs.http.HTTP;
-import nodejs.http.URL;
-import nodejs.http.ServerResponse;
-import nodejs.http.URLData;
-import nodejs.fs.File;
+import js.Node;
+import js.node.Process;
+import js.node.Http;
+import js.node.Url;
+import js.node.http.ServerResponse;
+import js.node.Url.UrlData;
+import js.node.Fs;
 import js.Browser;
 import js.html.Document;
 using StringTools;
@@ -21,8 +21,8 @@ using StringTools;
 class NodeRendering
 {
 	static function require<T>(s : String) : T return untyped __js__('require(s)');
-	static var console(default,null) = Console;
-	static var process(default,null) : Process = untyped __js__('process');
+	static var console(default,null) = Node.console;
+	static var process(default,null) = Node.process;
 
 	static var app : DashboardModule;
 	static var window : Dynamic;
@@ -68,8 +68,8 @@ class NodeRendering
 		untyped Element.prototype.addEventListener = Element.prototype.removeEventListener = 
 				Element.prototype.insertAdjacentHTML = function() {};
 
-		HTTP.createServer(function(req, resp) {
-			window.location = URL.Parse(req.url);
+		Http.createServer(function(req, resp : ServerResponse) {
+			window.location = Url.parse(req.url);
 
 			// Replace the window object in Mithril
 			// must be done after window.location is set.
@@ -92,8 +92,8 @@ class NodeRendering
 
 				//trace('GET ${req.url} ($filename $uri)');
 
-				File.exists(filename, function(exists) {
-					if(!exists) {
+				Fs.stat(filename, function(err, stats) {
+					if(err != null) {
 						resp.writeHead(404, {"Content-Type": "text/plain"});
 						resp.write("Not Found: " + filename + "\n");
 						resp.write("Url:" + req.url + "\n");
@@ -102,13 +102,9 @@ class NodeRendering
 					}
 
 					// Static file
-					try {
-						if(File.statSync(filename).isDirectory()) filename += "/index.html";
-					} catch(e : Dynamic) {
-						return;
-					}
+					if(stats.isDirectory()) filename += "/index.html";
 
-					File.readFile(filename, function(err, file) {
+					Fs.readFile(filename, function(err, file) {
 						if(err != null) {
 							resp.writeHead(500, {"Content-Type": "text/plain"});
 							resp.write(err + "\n");
@@ -117,7 +113,7 @@ class NodeRendering
 						}
 
 						resp.writeHead(200);
-						resp.write(file, "binary");
+						resp.write(file);
 						resp.end();
 					});
 				});
@@ -135,7 +131,7 @@ class NodeRendering
 		switch(test) {
 			case "dashboard", "dashboard/todo", "dashboard/chain":
 				var template = path.join(process.cwd(), "index.html");
-				File.readFile(template, function(err, html) {
+				Fs.readFile(template, function(err, html) {
 					var rendered = render.render(app.view(app));
 					var output : String = html.toString().replace("<!-- SERVERCONTENT -->", rendered);
 					resp.writeHead(200, {
