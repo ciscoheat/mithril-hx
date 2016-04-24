@@ -57,6 +57,16 @@ class HtmlRendering implements Buddy<[HtmlRendering]> extends BuddySuite
 
 				view = m("p[title=\"bar bar\"]");
 				render(view).should.be('<p title="bar bar"></p>');
+
+				view = m("#layout");
+				render(view).should.be('<div id="layout"></div>');
+
+				view = m("span#layout", "ok");
+				render(view).should.be('<span id="layout">ok</span>');
+
+				// Attribute position could vary between platforms
+				view = m("a#google.external[href='http://google.com']", "Google"); 
+				render(view).should.be('<a href="http://google.com" class="external" id="google">Google</a>');
 			});
 			
 			it("should render self-closing tags properly", {
@@ -65,6 +75,34 @@ class HtmlRendering implements Buddy<[HtmlRendering]> extends BuddySuite
 				
 				view = m("meta[name=keywords][content='A test']");
 				render(view).should.be('<meta name="keywords" content="A test">');
+			});
+			
+			it("should render nested virtual elements properly", {
+				view = m("ul", [
+					m("li", "item 1"),
+					m("li", "item 2"),
+				]);
+				
+				render(view).should.be("<ul><li>item 1</li><li>item 2</li></ul>");
+				
+				var links = [
+					{title: "item 1", url: "/item1"},
+					{title: "item 2", url: "/item2"},
+					{title: "item 3", url: "/item3"}
+				];
+				
+				view = [
+					m('ul.nav', 
+						links.map(function(link) {
+							return m('li',
+								m('a', { href: link.url }, link.title)
+							);
+						})
+					)
+				];
+				
+				render(view).should.be(
+					'<ul class="nav"><li><a href="/item1">item 1</a></li><li><a href="/item2">item 2</a></li><li><a href="/item3">item 3</a></li></ul>');
 			});
 		});		
 	}

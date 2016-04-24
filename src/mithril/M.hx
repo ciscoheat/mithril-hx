@@ -281,11 +281,12 @@ extern class M
 class M 
 {
 	public static function m(tag : String, ?attrs : Dynamic, ?children : Dynamic) : VirtualElement {
-		// tag could be a Mithril object in original Mithril, but keep it simple for now.
+		// tag could be a Mithril object in original Mithril, but keeping it simple for now.
 		
 		var args = if(attrs == null) [] else if(children == null) [attrs] else [attrs, children];
 		
-		var hasAttrs = attrs != null && !Std.is(attrs, String) && Reflect.isObject(attrs) &&
+		// Simplify?
+		var hasAttrs = attrs != null && !Std.is(attrs, String) && !Std.is(attrs, Array) && Reflect.isObject(attrs) &&
 			!(Reflect.hasField(attrs, "tag") || Reflect.hasField(attrs, "view") || Reflect.hasField(attrs, "subtree"));
 		
 		attrs = hasAttrs ? attrs : { };
