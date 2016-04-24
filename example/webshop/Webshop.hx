@@ -1,6 +1,8 @@
 package webshop;
 
+#if js
 import js.Browser;
+#end
 import mithril.M;
 import webshop.models.*;
 using Lambda;
@@ -11,6 +13,7 @@ using StringTools;
  */
 class Webshop implements View
 {
+	#if js
     var cart : ShoppingCart;
     var menu : Menu;
     var search : Search;
@@ -48,6 +51,19 @@ class Webshop implements View
         });
     }
 
+    private inline function element(id : String) {
+        return Browser.document.getElementById(id);
+    }
+
+    // Program entry point
+    static function main() {
+        new Webshop().start();
+    }
+
+	#else
+	public function new() {}
+	#end
+
     // Welcome text for the default route
     public function view() [
         H1("Welcome!"),
@@ -68,10 +84,6 @@ class Webshop implements View
         }))
     ];
 
-    private function element(id : String) {
-        return Browser.document.getElementById(id);
-    }
-
     ///////////////////////////
 
     function todo() {
@@ -84,10 +96,5 @@ class Webshop implements View
             "Fix css for navbar and cart for low-res devices",
             "Administration section..."
         ];
-    }
-
-    // Program entry point
-    static function main() {
-        new Webshop().start();
     }
 }

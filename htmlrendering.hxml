@@ -1,5 +1,6 @@
+-lib buddy
 -cp src 
 -cp example
--js bin/htmlrendering.js
+-neko bin/htmlrendering.n
 -main HtmlRendering
 -debug

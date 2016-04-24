@@ -1,7 +1,6 @@
 package mithril;
 
-import mithril.M.ViewOutput;
-import mithril.M.VirtualElement;
+import mithril.M;
 
 /**
  * Haxe port of https://github.com/StephanHoyer/mithril-node-render
@@ -12,7 +11,7 @@ class MithrilNodeRender
 						   'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 
 						   'track', 'wbr'];
 
-	public function new() {}
+	public function new() { }
 
 	public function render(view : ViewOutput) : String {
 		if(view == null) 
@@ -30,8 +29,8 @@ class MithrilNodeRender
 		if(Reflect.hasField(view, "$trusted")) 
 			return Std.string(view);
 
-		// view must be a VirtualElement now.
-		var el : VirtualElement = cast view;
+		// view must be a VirtualElementObject now.
+		var el : VirtualElementObject = cast view;
 
 		var children = createChildrenContent(el);
 		if(children.length == 0 && voidTags.indexOf(el.tag.toLowerCase()) >= 0) {
@@ -41,7 +40,7 @@ class MithrilNodeRender
 		return '<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>';
 	}
 
-	inline function createChildrenContent(el : VirtualElement) : String {
+	inline function createChildrenContent(el : VirtualElementObject) : String {
 		if(el.children == null || !Std.is(el.children, Array)) return '';
 		return render(el.children);
 	}
@@ -68,7 +67,8 @@ class MithrilNodeRender
 	}
 
 	inline function escape(s : String) {
-		return StringTools.htmlEscape(s, true);
+		return s;
+		//return StringTools.htmlEscape(s, true);
 	}
 
 	inline function camelToDash(str : String) {

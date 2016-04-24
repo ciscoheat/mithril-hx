@@ -1,5 +1,8 @@
 package mithril;
 
+using Lambda;
+
+#if js
 import js.Browser;
 import js.html.Document;
 import js.html.DOMWindow;
@@ -11,8 +14,11 @@ import js.html.Element;
 import js.Error;
 import js.html.Event;
 import js.html.XMLHttpRequest;
-
-using Lambda;
+#else
+// Mock js classes not used on server when rendering
+typedef XMLHttpRequest = Dynamic;
+typedef Event = Dynamic;
+#end
 
 private abstract Either<T1, T2>(Dynamic)
 from T1 from T2 to T1 to T2 {}
@@ -71,16 +77,18 @@ typedef MithrilModule<T> = {
 
 typedef BasicType = Either4<Bool, Float, Int, String>;
 
-typedef GetterSetter<T> = ?T -> T;
-typedef EventHandler<T : Event> = T -> Void;
-
-typedef VirtualElement = {
+typedef VirtualElementObject = {
 	var tag : String;
 	var attrs : Dynamic;
 	var children : Dynamic;
 };
 
-typedef ViewOutput = Either4<VirtualElement, BasicType, Array<VirtualElement>, Array<BasicType>>;
+typedef VirtualElement = Either<VirtualElement, Array<VirtualElement>>;
+
+typedef ViewOutput = Either3<VirtualElement, BasicType, Array<BasicType>>;
+
+typedef GetterSetter<T> = ?T -> T;
+typedef EventHandler<T : Event> = T -> Void;
 
 typedef Promise<T, T2> = {
 	// Haxe limitation: Cannot expose the GetterSetter directly. then() is required to get value.
@@ -152,6 +160,7 @@ typedef JSONPOptions<T, T2> = {
 
 //////////
 
+#if js
 @:final @:native("m")
 extern class M
 {
@@ -268,3 +277,98 @@ extern class M
 	// calls. See above (injected automatically in macros.ModuleBuilder).
 	@:noCompletion public static var __haxecomponents : Dynamic;
 }
+#else
+class M 
+{
+	public static function m(tag : String, attrs : Dynamic, ?children : Dynamic) : VirtualElement {
+		// tag could be a Mithril object in original Mithril, but keep it simple for now.
+		
+		var args = children == null ? [attrs] : [attrs, children];
+		
+		var hasAttrs = attrs != null && !Std.is(attrs, String) && Reflect.isObject(attrs) &&
+			!(Reflect.hasField(attrs, "tag") || Reflect.hasField(attrs, "view") || Reflect.hasField(attrs, "subtree"));
+		
+		attrs = hasAttrs ? attrs : { };
+		
+		var cell = {
+			tag: "div",
+			attrs: { },
+			children: getVirtualChildren(args, hasAttrs)
+		}
+		
+		assignAttrs(cell.attrs, attrs, parseTagAttrs(cell, tag));
+		
+		return cell;
+	}
+	
+	static function getVirtualChildren(args : Array<Dynamic>, hasAttrs : Bool) : Dynamic {
+		var children = hasAttrs ? args.slice(1) : args;
+		return children.length == 1 && Std.is(children[0], Array) ? children[0]	: children;
+	}
+
+	static function assignAttrs(target : Dynamic, attrs : Dynamic, classes : Array<String>) : Void {
+		var classAttr = Reflect.hasField(attrs, "class") ? "class" : "className";
+
+		for (attrName in Reflect.fields(attrs)) {
+			if (Reflect.hasField(attrs, attrName)) {
+				var currentAttribute : String = cast Reflect.field(attrs, attrName);
+				if (attrName == classAttr && currentAttribute != null && currentAttribute.length > 0) {
+					classes.push(currentAttribute);
+					// create key in correct iteration order
+					Reflect.setField(target, attrName, "");
+				} else {
+					Reflect.setField(target, attrName, currentAttribute);
+				}
+			}
+		}
+
+		if (classes.length > 0) Reflect.setField(target, classAttr, classes.join(" "));		
+	}
+	
+	static function parseTagAttrs(cell : Dynamic, tag : String) : Array<String> {
+		var classes = [];
+		var parser = ~/(?:(^|#|\.)([^#\.\[\]]+))|(\[.+?\])/g;
+		if (!parser.match(tag)) return classes;
+		
+		var match1 = parser.matched(1);
+		var match2 = try parser.matched(2) catch (e : Dynamic) null;
+		
+		if (match1 == "" && match2 != null)
+			cell.tag = match2;
+		else if (match1 == "#")
+			cell.attrs.id = match2;
+		else if (match1 == ".")
+			classes.push(match2);
+		else if (parser.matched(3).charAt(0) == "[") {
+			var pair = ~/\[(.+?)(?:=("|'|)(.*?)\2)?\]/;
+			pair.match(parser.matched(3));
+			var pair3 = try pair.matched(3) catch (e : Dynamic) "";
+			Reflect.setField(cell.attrs, pair.matched(1), pair3);
+		}
+		
+		return classes;
+	}
+	
+	/*
+	static function parameterize(component : Dynamic, args : Array<Dynamic>) : Dynamic {
+		var controller = Reflect.hasField(component, "controller")
+			? Reflect.field(component, "controller")
+			: function() { };
+			
+		var view = function(ctrl) {
+			var currentArgs = [ctrl].concat(args);
+			return component.view(currentArgs);
+		}
+		
+		Reflect.setField(view, "$original", component.view);
+		var output = { controller: controller, view: view, attrs: null };
+		if (args.length > 0 && args[0].key != null) output.attrs = { key: args[0].key };
+		return output;
+	}
+
+	static function fixSelector(s : String) : String {
+		return ~/^[a-zA-Z]/.match(s) ? s : 'div';
+	}
+	*/
+}
+#end
