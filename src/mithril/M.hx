@@ -280,10 +280,10 @@ extern class M
 #else
 class M 
 {
-	public static function m(tag : String, attrs : Dynamic, ?children : Dynamic) : VirtualElement {
+	public static function m(tag : String, ?attrs : Dynamic, ?children : Dynamic) : VirtualElement {
 		// tag could be a Mithril object in original Mithril, but keep it simple for now.
 		
-		var args = children == null ? [attrs] : [attrs, children];
+		var args = if(attrs == null) [] else if(children == null) [attrs] else [attrs, children];
 		
 		var hasAttrs = attrs != null && !Std.is(attrs, String) && Reflect.isObject(attrs) &&
 			!(Reflect.hasField(attrs, "tag") || Reflect.hasField(attrs, "view") || Reflect.hasField(attrs, "subtree"));
@@ -327,23 +327,30 @@ class M
 	
 	static function parseTagAttrs(cell : Dynamic, tag : String) : Array<String> {
 		var classes = [];
+		//trace("===== " + tag);
 		var parser = ~/(?:(^|#|\.)([^#\.\[\]]+))|(\[.+?\])/g;
-		if (!parser.match(tag)) return classes;
-		
-		var match1 = parser.matched(1);
-		var match2 = try parser.matched(2) catch (e : Dynamic) null;
-		
-		if (match1 == "" && match2 != null)
-			cell.tag = match2;
-		else if (match1 == "#")
-			cell.attrs.id = match2;
-		else if (match1 == ".")
-			classes.push(match2);
-		else if (parser.matched(3).charAt(0) == "[") {
-			var pair = ~/\[(.+?)(?:=("|'|)(.*?)\2)?\]/;
-			pair.match(parser.matched(3));
-			var pair3 = try pair.matched(3) catch (e : Dynamic) "";
-			Reflect.setField(cell.attrs, pair.matched(1), pair3);
+
+		while(parser.match(tag)) {		
+			var match1 = parser.matched(1);
+			var match2 = try parser.matched(2) catch (e : Dynamic) null;
+			var match3 = try parser.matched(3) catch (e : Dynamic) null;
+			
+			//trace(match1); trace(match2); trace(match3);
+			
+			if (match1 == "" && match2 != null)
+				cell.tag = match2;
+			else if (match1 == "#")
+				cell.attrs.id = match2;
+			else if (match1 == ".")
+				classes.push(match2);
+			else if (match3.charAt(0) == "[") {
+				var pair = ~/\[(.+?)(?:=("|'|)(.*?)\2)?\]/;
+				pair.match(match3);
+				var pair3 = try pair.matched(3) catch (e : Dynamic) "";
+				Reflect.setField(cell.attrs, pair.matched(1), pair3);
+			}
+			
+			tag = parser.matchedRight();
 		}
 		
 		return classes;

@@ -50,6 +50,8 @@ class MithrilNodeRender
 
 		return Reflect.fields(attrs).map(function(name) {
 			var value = Reflect.field(attrs, name);
+			if (value == null) return ' ' + (name == 'className' ? 'class' : name);
+			
 			if(Reflect.isFunction(value)) return '';
 			if(Std.is(value, Bool)) return cast(value, Bool) ? ' ' + name : '';
 
@@ -66,10 +68,7 @@ class MithrilNodeRender
 		}).join('');
 	}
 
-	inline function escape(s : String) {
-		return s;
-		//return StringTools.htmlEscape(s, true);
-	}
+	inline function escape(s : String) return StringTools.htmlEscape(s, true);
 
 	inline function camelToDash(str : String) {
 		str = (~/\W+/g).replace(str, '-');
