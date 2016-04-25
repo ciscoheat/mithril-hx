@@ -9,3 +9,5 @@
 /bin/htmlrendering.js
 /bin/htmlrendering.js.map
 /bin/htmlrendering.n
+/bin/serverrendering-tests.n
+/bin/serverrendering.n

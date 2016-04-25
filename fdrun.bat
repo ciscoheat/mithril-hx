@@ -1,3 +1,3 @@
 @echo off
-neko bin/htmlrendering.n
+neko bin/serverrendering-tests.n
 pause

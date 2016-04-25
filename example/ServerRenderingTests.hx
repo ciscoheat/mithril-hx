@@ -8,7 +8,7 @@ import mithril.MithrilNodeRender;
 using StringTools;
 using buddy.Should;
 
-class HtmlRendering implements Buddy<[HtmlRendering]> extends BuddySuite
+class ServerRenderingTests implements Buddy<[ServerRenderingTests]> extends BuddySuite
 {
 	public function new() {
 		var render = new MithrilNodeRender().render;
@@ -127,7 +127,18 @@ class HtmlRendering implements Buddy<[HtmlRendering]> extends BuddySuite
 				render(view).should.be("<p><trusted&></p>");
 			});
 			
-			///// Messy test ////////////////////////////////////////////////////////////////////////
+			///// Messy tests ////////////////////////////////////////////////////////////////////////			
+			
+			it("should stub most m.methods", {
+				var todoList = new TodoModule();
+		
+				todoList.todo.add("First one");
+				todoList.todo.add("Second <one>");
+		
+				todoList.todo.list[0].done = true;
+		
+				render(todoList.view()).should.be('<div><input value=""><button>Add</button><span style="display:none"> Adding...</span><table><tr><td><input type="checkbox" checked="checked"></td><td style="text-decoration:line-through">First one</td></tr><tr><td><input type="checkbox"></td><td style="text-decoration:none">Second &lt;one&gt;</td></tr></table></div>');
+			});
 			
 			it("should render complex compositions with indentation properly", {
 				var render = new MithrilNodeRender("  ").render;
@@ -173,20 +184,4 @@ class HtmlRendering implements Buddy<[HtmlRendering]> extends BuddySuite
 			});
 		});		
 	}
-	
-	///////////////////////////////////////////////////////////////
-	
-	static function dump(v : VirtualElement, depth = 0) {
-		if (Std.is(v, Array)) {
-			var arr : Array<VirtualElement> = cast v;
-			for (v2 in arr) dump(v2, depth);
-		} else {
-			var v2 : VirtualElementObject = cast v;
-			var indent = StringTools.lpad("", "  ", depth);
-			Sys.println(v2.tag);
-			//Sys.println(indent + v.tag + " " + v.attrs);
-			//Sys.println(v.children);
-			dump(v2.children, depth + 1);
-		}
-	}	
 }

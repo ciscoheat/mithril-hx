@@ -1,6 +1,0 @@
--lib buddy
--cp src 
--cp example
--neko bin/htmlrendering.n
--main HtmlRendering
--debug

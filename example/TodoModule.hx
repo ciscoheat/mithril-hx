@@ -1,17 +1,22 @@
-package  ;
+import haxe.Timer;
+import mithril.M;
 
-#if !nodejs
+#if (js && !nodejs)
 import haxe.Serializer;
 import haxe.Unserializer;
 #end
-import haxe.Timer;
+
+#if js
 import js.Browser;
 import js.html.Event;
 import js.html.InputElement;
 import js.html.KeyboardEvent;
 import js.html.SpanElement;
-import mithril.M;
 import js.Lib;
+#else
+typedef KeyboardEvent = Dynamic;
+typedef InputElement = Dynamic;
+#end
 
 /**
 * Cannot use @prop and M.prop(), doesn't work well with
@@ -30,12 +35,12 @@ class Todo implements Model
 
 class TodoList implements Model
 {
-	#if !nodejs
+	#if (js && !nodejs)
 	static var storage = Browser.window.localStorage;
 	#end
 
 	public static function load() : TodoList {
-		#if nodejs
+		#if (sys || nodejs)
 		return new TodoList();
 		#else
 		var list = storage.getItem("todo-app-list");
@@ -67,7 +72,7 @@ class TodoList implements Model
 	}
 
 	public function save() {
-		#if !nodejs
+		#if (js && !nodejs)
 		var ser = new Serializer();
 		ser.serialize(list);
 		storage.setItem("todo-app-list", ser.toString());
@@ -134,7 +139,8 @@ class TodoModule implements View
 	}
 
 	private function todo_setDescription(e : KeyboardEvent) {
-		todo.description = cast(e.target, InputElement).value;
+		var input : InputElement = cast e.target;
+		todo.description = input.value;
 		if (e.keyCode == 13) todo_add();
 	}
 
@@ -145,12 +151,15 @@ class TodoModule implements View
 
 	private function deferMs(delay : Int) : Promise<Bool, Bool> {
 		var d = M.deferred();
+		#if js
 		Timer.delay(d.resolve.bind(true), delay);
+		#end
 		return d.promise;
 	}
 
-	static function main()
-	{
+	#if js
+	static function main() {
 		M.mount(Browser.document.body, new TodoModule());
 	}
+	#end
 }

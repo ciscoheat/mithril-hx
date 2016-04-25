@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="htmlrendering.hxml" />
+    <movie path="serverrendering-tests.hxml" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
@@ -23,7 +23,7 @@
     <option directives="" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
-    <option mainClass="HtmlRendering" />
+    <option mainClass="ServerRenderingTests" />
     <option enabledebug="False" />
     <option additional="-debug " />
   </build>

@@ -6,11 +6,13 @@ using Lambda;
 import js.Browser;
 import js.html.Document;
 import js.html.DOMWindow;
+
 #if (haxe_ver >= 3.2)
 import js.html.DOMElement in Element;
 #else
 import js.html.Element;
 #end
+
 import js.Error;
 import js.html.Event;
 import js.html.XMLHttpRequest;
@@ -278,8 +280,42 @@ extern class M
 	@:noCompletion public static var __haxecomponents : Dynamic;
 }
 #else
+
+/*
+typedef Promise<T, T2> = {
+	// Haxe limitation: Cannot expose the GetterSetter directly. then() is required to get value.
+	function then<T3, T4>(?success : T -> T3, ?error : T2 -> T4) : Promise<T3, T4>;
+}
+
+typedef Deferred<T, T2> = {
+	var promise : Promise<T, T2>;
+	function resolve(value : T) : Void;
+	function reject(value : T2) : Void;
+}
+
+typedef EventHandler<T : Event> = T -> Void;
+
+typedef GetterSetter<T> = ?T -> T;
+*/ 
+
 class M 
 {
+	///// Stubs /////
+	
+	public static function redraw(?forceSync : Bool) {}
+	public static function startComputation() {}
+	public static function endComputation() {}	
+	public static function deferred<T, T2>() : Deferred<T, T2> return {
+		promise: { then: function(?success, ?error) return null },
+		resolve: function(v) {},
+		reject: function(v) {}
+	}	
+	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : EventHandler<T2> {
+		return function(e) {}
+	}
+	
+	///// Rendering /////
+	
 	public static function m(tag : String, ?attrs : Dynamic, ?children : Dynamic) : VirtualElement {
 		// tag could be a Mithril object in original Mithril, but keeping it simple for now.
 		
@@ -365,27 +401,5 @@ class M
 		
 		return classes;
 	}
-	
-	/*
-	static function parameterize(component : Dynamic, args : Array<Dynamic>) : Dynamic {
-		var controller = Reflect.hasField(component, "controller")
-			? Reflect.field(component, "controller")
-			: function() { };
-			
-		var view = function(ctrl) {
-			var currentArgs = [ctrl].concat(args);
-			return component.view(currentArgs);
-		}
-		
-		Reflect.setField(view, "$original", component.view);
-		var output = { controller: controller, view: view, attrs: null };
-		if (args.length > 0 && args[0].key != null) output.attrs = { key: args[0].key };
-		return output;
-	}
-
-	static function fixSelector(s : String) : String {
-		return ~/^[a-zA-Z]/.match(s) ? s : 'div';
-	}
-	*/
 }
 #end

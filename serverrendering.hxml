@@ -1,0 +1,5 @@
+-cp src 
+-cp example
+-neko bin/serverrendering.n
+-main ServerRendering
+-cmd neko bin/serverrendering.n

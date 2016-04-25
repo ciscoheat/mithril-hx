@@ -300,9 +300,34 @@ Compile and run with:
 1. `haxe -lib mithril -js example.js -main Example`
 1. Open index.html in a browser.
 
-## Node.js
+## Server side - All targets
 
-Without too much hassle, it's possible to render a Mithril component/view serverside on Node.js. The repo contains two examples for that. Execute the following:
+The rendering part of Mithril has been ported to Haxe, so you can now enjoy writing Mithril templates, and have them rendered to HTML anywhere. You can test it like this:
+
+`haxe serverrendering.hxml`
+
+And here's a class if you want to get started:
+
+```haxe
+import mithril.MithrilNodeRender;
+import mithril.M.m;
+
+class Main {
+	static function main() {
+		var view = m("ul", [
+			m("li", "item 1"),
+			m("li", "item 2"),
+		]);
+
+		// <ul><li>item 1</li><li>item 2</li></ul>
+		Sys.println(new MithrilNodeRender().render(view)); 
+	}
+}
+```
+
+## Server side - Node.js, routes & isomorphism
+
+Without too much hassle, it's possible to render a Mithril component/view serverside on Node.js, using the Mithril routes both on client and server. Execute the following:
 
 1. `npm install`
 1. `haxelib install hxnodejs`
