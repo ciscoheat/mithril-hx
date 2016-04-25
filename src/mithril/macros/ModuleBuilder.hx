@@ -109,8 +109,9 @@ class ModuleBuilder
 
 		if(Context.defined('lowercase-mithril-sugartags')) test = test.toUpperCase();
 
-		if(tagList.has(test)) {
-			var outStr = exprStr.replace(' ', '');
+		if (tagList.has(test)) {
+			// Convert tag to lowercase
+			var outStr = test.toLowerCase() + exprStr.substr(test.length).replace(' ', '');			
 			var newParams = [macro $v{outStr}].concat(params);
 			e.expr = (macro mithril.M.m($a{newParams})).expr;
 		}

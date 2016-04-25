@@ -1,6 +1,9 @@
 package mithril;
 
+import haxe.Constraints.Function;
 import mithril.M;
+
+using StringTools;
 
 /**
  * Haxe port of https://github.com/StephanHoyer/mithril-node-render
@@ -11,11 +14,22 @@ class MithrilNodeRender
 						   'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 
 						   'track', 'wbr'];
 
-	public function new() { }
+	var indent : String;
+	var newLine : String;
+	var indentMode : Bool;
+						   
+	public function new(?indent : String, ?newLine : String) {
+		this.indent = indent == null ? "" : indent;
+		this.newLine = newLine == null ? (this.indent.length > 0 ? "\n" : "") : newLine;
+		this.indentMode = this.indent.length > 0;
+	}
 
 	public function render(view : ViewOutput) : String {
-		if(view == null) 
-			return "";
+		return _render(view, 0).trim();
+	}
+	
+	public function _render(view : ViewOutput, indentDepth : Int) : String {
+		if(view == null) return "";
 
 		if(Std.is(view, String))
 			return escape(view);
@@ -23,26 +37,36 @@ class MithrilNodeRender
 		if(Std.is(view, Int) || Std.is(view, Float) || Std.is(view, Bool))
 			return Std.string(view);
 
-		if(Std.is(view, Array)) 
-			return cast(view, Array<Dynamic>).map(render).join('');
-
-		if(Reflect.hasField(view, "$trusted")) 
-			return Std.string(view);
+		if(Std.is(view, Array))
+			return cast(view, Array<Dynamic>).map(_render.bind(_, indentDepth)).join('');
 
 		// view must be a VirtualElementObject now.
 		var el : VirtualElementObject = cast view;
 
-		var children = createChildrenContent(el);
-		if(children.length == 0 && voidTags.indexOf(el.tag.toLowerCase()) >= 0) {
-			return '<${el.tag}${createAttrString(el.attrs)}>';
+		if (Reflect.hasField(el, "$trusted")) {
+			// If created on server, the value is in el.tag, otherwise it's a String.
+			return Std.is(el, String) ? (cast el) : el.tag;
 		}
 
-		return '<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>';
+		var children = createChildrenContent(el, indentDepth + 1);
+		
+		var currentIndent = indentMode ? "".lpad(this.indent, indentDepth * this.indent.length) : "";
+
+		if(children.length == 0 && voidTags.indexOf(el.tag.toLowerCase()) >= 0) {
+			return '$currentIndent<${el.tag}${createAttrString(el.attrs)}>$newLine$currentIndent';
+		}
+		
+		var indentChild = indentMode && children.ltrim().startsWith("<");
+		
+		if (indentChild) children = newLine + children + currentIndent;
+		var startIndent = indentChild ? currentIndent : "";
+
+		return '$startIndent<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>$newLine';
 	}
 
-	inline function createChildrenContent(el : VirtualElementObject) : String {
+	inline function createChildrenContent(el : VirtualElementObject, newIndentDepth : Int) : String {
 		if(el.children == null || !Std.is(el.children, Array)) return '';
-		return render(el.children);
+		return _render(el.children, newIndentDepth);
 	}
 
 	function createAttrString(attrs : Dynamic) {

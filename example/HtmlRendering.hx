@@ -13,8 +13,6 @@ class HtmlRendering implements Buddy<[HtmlRendering]> extends BuddySuite
 	public function new() {
 		var render = new MithrilNodeRender().render;
 		var view : VirtualElement;
-		//var webshop = new webshop.Webshop();
-		//var view = webshop.view();
 		
 		describe("MithrilNodeRender", {
 			it("should render basic types to html", {
@@ -63,10 +61,24 @@ class HtmlRendering implements Buddy<[HtmlRendering]> extends BuddySuite
 
 				view = m("span#layout", "ok");
 				render(view).should.be('<span id="layout">ok</span>');
+				
+				//view = m("input", {readOnly: true});
+				//render(view).should.be("<input readonly>");
 
 				// Attribute position could vary between platforms
 				view = m("a#google.external[href='http://google.com']", "Google"); 
 				render(view).should.be('<a href="http://google.com" class="external" id="google">Google</a>');
+			});
+			
+			it("should render combinations of static and dynamic attributes properly", {
+				view = m(".foo", {className: "bar"});
+				render(view).should.be('<div class="foo bar"></div>');
+
+				view = m(".foo", {className: ""});
+				render(view).should.be('<div class="foo"></div>');
+
+				view = m(".foo", {"class": "bar"});
+				render(view).should.be('<div class="foo bar"></div>');				
 			});
 			
 			it("should render self-closing tags properly", {
@@ -101,8 +113,63 @@ class HtmlRendering implements Buddy<[HtmlRendering]> extends BuddySuite
 					)
 				];
 				
-				render(view).should.be(
-					'<ul class="nav"><li><a href="/item1">item 1</a></li><li><a href="/item2">item 2</a></li><li><a href="/item3">item 3</a></li></ul>');
+				render(view).should.be('<ul class="nav"><li><a href="/item1">item 1</a></li><li><a href="/item2">item 2</a></li><li><a href="/item3">item 3</a></li></ul>');
+			});
+			
+			it("should render trusted text as html", {
+				view = m('p', '<not trusted>');
+				render(view).should.be("<p>&lt;not trusted&gt;</p>");
+				
+				view = m('p', ['<not trusted>']);
+				render(view).should.be("<p>&lt;not trusted&gt;</p>");
+				
+				view = m('p', M.trust('<trusted&>'));
+				render(view).should.be("<p><trusted&></p>");
+			});
+			
+			///// Messy test ////////////////////////////////////////////////////////////////////////
+			
+			it("should render complex compositions with indentation properly", {
+				var render = new MithrilNodeRender("  ").render;
+				var webshop = new webshop.Webshop();
+				//File.saveContent("e:\\temp\\test.html", render(webshop.view()));
+				render(webshop.view()).replace("\n", "\r\n").should.be('
+<h1>Welcome!</h1>
+<p>Select a category on the left to start shopping.</p>
+<p>Built in Haxe &amp; Mithril. Source code: <a href="https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop" target="_blank">https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop</a>
+</p>
+<h2>Todo</h2>
+<ul class="list-group">
+  <li class="list-group-item" style="text-decoration:none">
+    <input type="checkbox" checked="">
+    <span style="margin-left:5px">Checkout page</span>
+  </li>
+  <li class="list-group-item" style="text-decoration:none">
+    <input type="checkbox" checked="">
+    <span style="margin-left:5px">Thank you page</span>
+  </li>
+  <li class="list-group-item" style="text-decoration:line-through">
+    <input type="checkbox" checked="checked">
+    <span style="margin-left:5px">Make cart not change size when open and items are deleted</span>
+  </li>
+  <li class="list-group-item" style="text-decoration:none">
+    <input type="checkbox" checked="">
+    <span style="margin-left:5px">Enable use of arrow keys when navigating search results</span>
+  </li>
+  <li class="list-group-item" style="text-decoration:none">
+    <input type="checkbox" checked="">
+    <span style="margin-left:5px">URL slugs for products</span>
+  </li>
+  <li class="list-group-item" style="text-decoration:none">
+    <input type="checkbox" checked="">
+    <span style="margin-left:5px">Fix css for navbar and cart for low-res devices</span>
+  </li>
+  <li class="list-group-item" style="text-decoration:none">
+    <input type="checkbox" checked="">
+    <span style="margin-left:5px">Administration section...</span>
+  </li>
+</ul>
+'.trim());
 			});
 		});		
 	}

@@ -302,6 +302,15 @@ class M
 		return cell;
 	}
 	
+	public static function trust(html : String) : VirtualElementObject {
+		return {
+			tag: html,
+			attrs: null,
+			children: null,
+			"$trusted": true
+		}
+	}
+	
 	static function getVirtualChildren(args : Array<Dynamic>, hasAttrs : Bool) : Dynamic {
 		var children = hasAttrs ? args.slice(1) : args;
 		return children.length == 1 && Std.is(children[0], Array) ? children[0]	: children;
