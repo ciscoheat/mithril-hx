@@ -113,7 +113,10 @@ class ServerRenderingTests implements Buddy<[ServerRenderingTests]> extends Budd
 					)
 				];
 				
-				render(view).should.be('<ul class="nav"><li><a href="/item1">item 1</a></li><li><a href="/item2">item 2</a></li><li><a href="/item3">item 3</a></li></ul>');
+				render(view).should.be(
+					'<ul class="nav"><li><a href="/item1">item 1</a></li>' +
+					'<li><a href="/item2">item 2</a></li><li><a href="/item3">item 3</a></li></ul>'
+				);				
 			});
 			
 			it("should render trusted text as html", {
@@ -125,6 +128,15 @@ class ServerRenderingTests implements Buddy<[ServerRenderingTests]> extends Budd
 				
 				view = m('p', M.trust('<trusted&>'));
 				render(view).should.be("<p><trusted&></p>");
+			});
+			
+			it("should use the same structure as original mithril", {
+				// Thanks to https://www.npmjs.com/package/mithril-objectify
+				var virtualObject : VirtualElementObject = cast m(".fooga.wooga.booga");
+				Reflect.fields(virtualObject.attrs).length.should.be(1);
+				virtualObject.attrs.className.should.be("fooga wooga booga");
+				virtualObject.children.length.should.be(0);
+				virtualObject.tag.should.be("div");
 			});
 			
 			///// Messy tests ////////////////////////////////////////////////////////////////////////			
