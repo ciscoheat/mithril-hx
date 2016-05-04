@@ -259,9 +259,9 @@ extern class M
 			if (m.__haxecomponents) return;
 			m.m = function() {
 				try { 
-					if($hxClasses['List']) for(var i=0; i < arguments.length; ++i) if(arguments[i] instanceof List) {
-						var it = $iterator(arguments[i])();	arguments[i] = [];
-						while(it.hasNext())	arguments[i].push(it.next());
+					for(var i=0; i < arguments.length; ++i) if(arguments[i] instanceof List) {
+						var l = arguments[i].h; arguments[i] = [];
+						while(l != null) { arguments[i].push(l[0]); l = l[1]; }
 					}
 				} catch(e) {}
 				return m.apply(this, arguments);

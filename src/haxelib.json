@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Another attempt to fix crash if no hxClasses defined.",
-  "version": "0.27.2",
+  "releasenote": "List is now auto-converted to Array when rendering templates.",
+  "version": "0.27.3",
   "contributors": ["ciscoheat"]
 }
