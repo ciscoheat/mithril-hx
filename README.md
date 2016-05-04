@@ -239,7 +239,7 @@ If you prefer a bare-bones example (doesn't require cloning), create the followi
 ```html
 <!doctype html>
 <body>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/mithril/0.2.3/mithril.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mithril/0.2.4/mithril.min.js"></script>
 <script src="example.js"></script>
 </body>
 ```
