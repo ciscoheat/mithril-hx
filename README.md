@@ -43,7 +43,7 @@ The syntax is simple, just replace `m('tag', ...)` with `TAG(...)`, where TAG is
 
 `-D lowercase-mithril-sugartags` - If you don't like UPPERCASE tags. Understandable, but increases the risk for compilation errors since the lowercase tags may collide with variables.
 
-`-D no-mithril-sugartags` - To turn off this syntax completely, and only use `m('tag', ...)` for building view templates.
+`-D no-mithril-sugartags` - If you want to prevent usage of this syntax completely, and only use `m('tag', ...)` for building view templates.
 
 Based on [mithril.sugartags](https://github.com/jsguy/mithril.sugartags) by jsguy. Thanks!
 
@@ -239,7 +239,7 @@ If you prefer a bare-bones example (doesn't require cloning), create the followi
 ```html
 <!doctype html>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mithril/0.2.4/mithril.min.js"></script>
+<script src="https://cdn.jsdelivr.net/mithril/0.2.4/mithril.min.js"></script>
 <script src="example.js"></script>
 </body>
 ```
@@ -343,6 +343,7 @@ Without too much hassle, it's possible to render a Mithril component/view server
 `node noderendering.js server`
 
 Starts a server on [http://localhost:6789](http://localhost:6789) that executes the same code on server and client. The server generates the HTML so the page is percieved to load quickly and search engines can index it, then the client enables the functionality.
+
 # Feedback please!
 
 Feedback is always welcome! [Open an issue](https://github.com/ciscoheat/mithril-hx/issues) and give me a piece of your mind. :)
