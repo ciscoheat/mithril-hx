@@ -5,7 +5,6 @@ using Lambda;
 #if js
 import js.Browser;
 import js.html.Document;
-import js.html.DOMWindow;
 
 #if (haxe_ver >= 3.2)
 import js.html.DOMElement in Element;
@@ -17,10 +16,12 @@ import js.Error;
 import js.html.Event;
 import js.html.XMLHttpRequest;
 #else
-// Mock js classes not used on server when rendering
+// Mock js classes for server rendering
 typedef XMLHttpRequest = Dynamic;
 typedef Event = Dynamic;
 #end
+
+/////////////////////////////////////////////////////////////
 
 private abstract Either<T1, T2>(Dynamic)
 from T1 from T2 to T1 to T2 {}
@@ -85,7 +86,7 @@ typedef VirtualElementObject = {
 	var children : Dynamic;
 };
 
-typedef VirtualElement = Either<VirtualElement, Array<VirtualElement>>;
+typedef VirtualElement = Either<VirtualElementObject, Array<VirtualElementObject>>;
 
 typedef ViewOutput = Either3<VirtualElement, BasicType, Array<BasicType>>;
 
@@ -101,10 +102,6 @@ typedef Deferred<T, T2> = {
 	var promise : Promise<T, T2>;
 	function resolve(value : T) : Void;
 	function reject(value : T2) : Void;
-}
-
-typedef DataConstructible<T> = {
-	public function new(data : T) : Void;
 }
 
 /**
@@ -125,28 +122,6 @@ typedef XHROptions<T, T2, T3, T4> = {
 	@:optional var deserialize : T4 -> T3;
 	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> T4;
 	@:optional var config : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> Null<XMLHttpRequest>;
-};
-
-/**
- * A limitation here is that you must specify the correct callback yourself.
- * If you're returing Array<T5> from unwrapSuccess, make you're using
- * then(Array<T5>).
- */
-typedef XHRTypeOptions<T : Either<DataConstructible<T5>, Array<DataConstructible<T5>>>, T2, T3, T4, T5> = {
-	var method : String;
-	var url : String;
-	var type : Class<DataConstructible<T5>>;
-	@:optional var user : String;
-	@:optional var password : String;
-	@:optional var data : Dynamic;
-	@:optional var background : Bool;
-	@:optional var initialValue : T;
-	@:optional var unwrapSuccess : Dynamic -> Either<Array<T5>, T5>;
-	@:optional var unwrapError : Dynamic -> T2;
-	@:optional var serialize : T3 -> T4;
-	@:optional var deserialize : T4 -> T3;
-	@:optional var extract : XMLHttpRequest -> XHRTypeOptions<T, T2, T3, T4, T5> -> T4;
-	@:optional var config : XMLHttpRequest -> XHRTypeOptions<T, T2, T3, T4, T5> -> Null<XMLHttpRequest>;
 };
 
 typedef JSONPOptions<T, T2> = {
@@ -194,7 +169,6 @@ extern class M
 	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic) : Void;
 
 	@:overload(function<T, T2>(options : JSONPOptions<T, T2>) : Promise<T, T2> {})
-	@:overload(function<T : Either<DataConstructible<T5>, Array<DataConstructible<T5>>>, T2, T3, T4, T5>(options : XHRTypeOptions<T, T2, T3, T4, T5>) : Promise<T, T2> {})
 	public static function request<T, T2, T3, T4>(options : XHROptions<T, T2, T3, T4>) : Promise<T, T2>;
 
 	public static function deferred<T, T2>() : Deferred<T, T2>;

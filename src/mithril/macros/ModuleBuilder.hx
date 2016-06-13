@@ -27,13 +27,16 @@ class ModuleBuilder
 				Context.warning("@prop only works with var", f.pos);
 			}
 		}
+		
+		if(Context.defined('no-mithril-sugartags'))
+			Context.warning('-D no-mithril-sugartags is deprecated, it is now disabled by default.', c.pos);
 
 		for(field in fields) switch(field.kind) {
 			case FFun(f):
 				checkInvalidProp(field);
 				if(f.expr == null) continue;
 
-				if(!Context.defined('no-mithril-sugartags'))
+				if(Context.defined('mithril-sugartags'))
 					replaceSugarTags(f.expr);
 
 				// Set viewField if current field is the view function.
@@ -58,10 +61,12 @@ class ModuleBuilder
 				}
 				if ((type & 1 == 1 || type & 2 == 2) && field.name == "view") {
 					keepField();
+					#if (haxe_ver < 3.3)
 					if(f.ret == null) {
 						// Return Dynamic so multi-type arrays can be used in view without casting
 						f.ret = macro : Dynamic;
 					}
+					#end
 				} 
 				if (type & 3 == 3 && field.name == "view") addViewArgument(f, Context.getLocalType());
 				

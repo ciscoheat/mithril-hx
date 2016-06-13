@@ -16,7 +16,7 @@ class IpWrapper
 	}
 }
 
-class DashboardModule implements Module<Dynamic>
+class DashboardModule implements Component
 {
 	var todo : TodoModule;
 	var chainController : ChainController;
@@ -39,9 +39,7 @@ class DashboardModule implements Module<Dynamic>
 			url: "http://jsonip.com/",
 			background: true,
 			// Use unwrapSuccess to transform the requested data
-			unwrapSuccess: function(data: {ip : String}) return data.ip,
-			// Use type to construct an object from the (unwrapped) data
-			type: IpWrapper
+			unwrapSuccess: function(data: {ip : String}) return new IpWrapper(data.ip)
 		}).then(
 			function(currentIp : IpWrapper) { ip(currentIp.ip); M.redraw(); },
 			function(_) { ip("Don't know!"); M.redraw(); }

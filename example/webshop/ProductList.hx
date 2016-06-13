@@ -11,7 +11,7 @@ using Lambda;
  */
 class ProductList implements Component
 {
-    @prop var category : Category = new Category();
+    var category = new Category();
     var loading : Loader;
     var cart : ShoppingCart;
 
@@ -31,7 +31,7 @@ class ProductList implements Component
         // It has background = true to allow navigation to update, so a call 
         // to M.redraw (executed in loading.done) is required when it finishes.
         Category.all().then(function(c) { 
-            category(getCurrentCategory(c));
+            category = getCurrentCategory(c);
             loading.done();
         }, 
             loading.error
@@ -43,19 +43,16 @@ class ProductList implements Component
         cart.open();
     }
 
-    public function view() : ViewOutput {
-        switch(loading.state()) {
-            case Started:
-                return null;
-            case Delayed:          
-                return m("h2.sub-header", "Loading...");
-            case Error:
-                return m("h2.sub-header", {style: {color: "red"}}, "Loading error, please reload page.");
-            case Done:
+    public function view() {
+        var template = switch(loading.state()) {
+            case Started: m("h2.sub-header", "");
+            case Delayed: m("h2.sub-header", "Loading...");
+            case Error: m("h2.sub-header", {style: {color: "red"}}, "Loading error, please reload page.");
+            case Done: null;
         }
-
-        [
-            H2.sub-header(category().name),
+		
+		return if(template != null) template else [
+            H2.sub-header(category.name),
             DIV.table-responsive([
                 TABLE.table.table-striped([
                     THEAD([
@@ -66,7 +63,7 @@ class ProductList implements Component
                             TH()
                         ])
                     ]),
-                    TBODY[id=products](category().products.map(function(p) 
+                    TBODY[id=products](category.products.map(function(p) 
                         TR([
                             TD(A({
                                 href: '/product/${p.id}',

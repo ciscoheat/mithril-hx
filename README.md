@@ -21,31 +21,7 @@ Because Javascript is so dynamic and Haxe is strongly typed, there will be a shi
 * Simple syntax for `M.prop`
 * Automatically return `this` in `controller` methods
 * Automatically return `m()` in any function.
-* Sugartags syntax
-
-## Sugartags syntax?
-
-There is a nice alternative syntax for templates that you can use instead of `m(...)`. It looks like this:
-
-```haxe
-DIV([
-    H1[id=welcome]("Welcome!"),
-    TABLE.some-class(todos.map(function(todo)
-        TR([
-            TD(INPUT[type=checkbox]({ checked: todo.done() })),
-            TD(todo.description())
-        ])
-    ))
-]);
-```
-
-The syntax is simple, just replace `m('tag', ...)` with `TAG(...)`, where TAG is a valid HTML5 tag. There are two compiler directives that you can use in your `.hxml` file to configure it:
-
-`-D lowercase-mithril-sugartags` - If you don't like UPPERCASE tags. Understandable, but increases the risk for compilation errors since the lowercase tags may collide with variables.
-
-`-D no-mithril-sugartags` - If you want to prevent usage of this syntax completely, and only use `m('tag', ...)` for building view templates.
-
-Based on [mithril.sugartags](https://github.com/jsguy/mithril.sugartags) by jsguy. Thanks!
+* Sugartags syntax (see further down)
 
 # Going typesafe or flexible
 
@@ -204,6 +180,28 @@ class HelloWorld implements Mithril
 
 That should hopefully be enough for you to get started. Remember, plenty of documentation over at the [Mithril](http://lhorie.github.io/mithril/index.html) site.
 
+## Sugartags syntax
+
+There is an alternative syntax for templates that you can use instead of `m(...)`. Enable it with `-D mithril-sugartags`. It looks like this:
+
+```haxe
+DIV([
+    H1[id=welcome]("Welcome!"),
+    TABLE.some-class(todos.map(function(todo)
+        TR([
+            TD(INPUT[type=checkbox]({ checked: todo.done() })),
+            TD(todo.description())
+        ])
+    ))
+]);
+```
+
+The syntax is simple, just replace `m('tag', ...)` with `TAG(...)`, where TAG is a valid HTML5 tag. These is one compiler directive that you can use in your `.hxml` file to configure it:
+
+`-D lowercase-mithril-sugartags` - If you don't like UPPERCASE tags. Understandable, but increases the risk for compilation errors since the lowercase tags may collide with variables.
+
+Based on [mithril.sugartags](https://github.com/jsguy/mithril.sugartags) by jsguy. Thanks!
+
 # Haxe examples
 
 After [installing Haxe](http://haxe.org/download/), this repo has some examples that can be interesting to test. Clone it, open a prompt in the directory and execute:
@@ -239,7 +237,7 @@ If you prefer a bare-bones example (doesn't require cloning), create the followi
 ```html
 <!doctype html>
 <body>
-<script src="https://cdn.jsdelivr.net/mithril/0.2.4/mithril.min.js"></script>
+<script src="https://cdn.jsdelivr.net/mithril/0.2.5/mithril.min.js"></script>
 <script src="example.js"></script>
 </body>
 ```
@@ -250,42 +248,36 @@ If you prefer a bare-bones example (doesn't require cloning), create the followi
 package;
 import mithril.M;
 
-class User implements Model
+class User
 {
-    @prop public var name : String;
+    public var name : String;
 
     public function new(name) {
-        // Using M.prop, this.name is now a method similar to
-        // jQuery's methods. If called with no parameters the
-        // value is returned, otherwise the value is set.
-        this.name = M.prop(name);
+        this.name = name;
     }
 }
 
-class Example implements Component
+class Example implements Mithril
 {
     var user : User;
 
-    public function new() {}
-
-    public function controller() {
-        this.user = new User("Thorin Oakenshield");
+    public function new() {
+        this.user = new User("Thorin Oakenshield");    	
     }
 
     public function view() [
-        // Display an input field.
-        INPUT({
-            // Listens to the "oninput" event of the input field and
-            // will set user.name to the field's "value" attribute:
-            oninput: M.withAttr("value", user.name),
+        // Display an input field
+        m('input', {
+        	// Updates the model on input
+            oninput: function(e) user.name = e.target.value,
 
-            // The redraw triggered by the above event will
-            // update the value from the model automatically:
-            value: user.name()
+            // The redraw triggered by the oninput event will update
+            // the input field value from the model automatically
+            value: user.name
         }),
         
         // Display a div with class .user and some style
-        DIV.user({style: {margin: "15px"}}, user.name())
+        m('.user', {style: {margin: "15px"}}, user.name)
     ];
 
     // Program entry point
@@ -342,7 +334,7 @@ Without too much hassle, it's possible to render a Mithril component/view server
 
 `node noderendering.js server`
 
-Starts a server on [http://localhost:6789](http://localhost:6789) that executes the same code on server and client. The server generates the HTML so the page is percieved to load quickly and search engines can index it, then the client enables the functionality.
+Starts a server on [http://localhost:2000](http://localhost:2000) that executes the same code on server and client. The server generates the HTML so the page is percieved to load quickly and search engines can index it, then the client enables the functionality.
 
 # Feedback please!
 

@@ -16,6 +16,7 @@ import js.node.Url.UrlData;
 import js.node.Fs;
 import js.Browser;
 import js.html.Document;
+
 using StringTools;
 
 class NodeRendering
@@ -118,9 +119,9 @@ class NodeRendering
 					});
 				});
 			});				
-		}).listen(6789);
+		}).listen(2000);
 
-		console.log("Server started on http://localhost:6789");
+		console.log("Server started on http://localhost:2000");
 	}
 
 	static function dynamicRoute(url : String, resp : ServerResponse, then : Bool -> Void) {
@@ -132,10 +133,10 @@ class NodeRendering
 			case "dashboard", "dashboard/todo", "dashboard/chain":
 				var template = path.join(process.cwd(), "index.html");
 				Fs.readFile(template, function(err, html) {
-					var rendered = render.render(app.view(app));
+					var rendered = render.render(app.view());
 					var output : String = html.toString().replace("<!-- SERVERCONTENT -->", rendered);
 					resp.writeHead(200, {
-						"Content-Length": output.length,
+						"Content-Length": Std.string(output.length),
 						"Content-Type": "text/html"
 					});  
 					resp.write(output);

@@ -34,23 +34,20 @@ class ProductPage implements Component
         cart.open();
     }
 
-    public function view() : ViewOutput {
-        switch(loading.state()) {
-            case Started:
-                return null;
-            case Delayed:          
-                return DIV.row(DIV.col-xs-12(H1("Loading...")));
-            case Error:
-                return DIV.row(DIV.col-xs-12(H1({style: {color: "red"}}, "Loading error, please reload page.")));
-            case Done:
+    public function view() {
+        var template = switch loading.state() {
+            case Started: DIV.row("");
+            case Delayed: DIV.row(DIV.col-xs-12(H1("Loading...")));
+            case Error: DIV.row(DIV.col-xs-12(H1({style: {color: "red"}}, "Loading error, please reload page.")));
+            case Done: null;
         }
-
-        var button = function() BUTTON.btn.btn-lg.btn-success[type=button](
+		
+		var button = function() BUTTON.btn.btn-lg.btn-success[type=button](
             {onclick: addToCart.bind(product)},
             "Add to Cart"
         );
 
-        [
+		return if (template != null) template else [
             DIV.row(DIV.col-xs-12(H1(product.name))),
             DIV.row([
                 DIV.col-xs-12.col-sm-12.col-md-7.col-lg-6([

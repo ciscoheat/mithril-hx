@@ -1,3 +1,4 @@
+-D mithril-sugartags
 -cp example
 -lib mithril
 -js bin/webshop/webshop.js

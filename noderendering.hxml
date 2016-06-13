@@ -1,6 +1,4 @@
-# -D nodejs is only required here to remove 
-# some browser-specific stuff in the examples.
--D nodejs 
+-D nodejs
 -D isomorphic
 -cp src 
 -cp example

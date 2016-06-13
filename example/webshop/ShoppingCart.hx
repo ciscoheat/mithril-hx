@@ -107,35 +107,33 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
         M.redraw(); // Need to redraw because it's not a Mithril handled event.
     }
 
-    public function view() : ViewOutput {
-        [
-            LI({
-                "class": isOpen ? "dropdown open" : "dropdown",
-                config: function(el, isInit) if(!isInit) {
-                    cartParent = el.parentElement;
-                    // Need to prevent dropdown from closing automatically:
-                    el.addEventListener("hide.bs.dropdown", function() return false);
-                }
-            }, [
-                A.dropdown-toggle({
-                    href: "#",
-                    role: "button", 
-                    "aria-expanded": false,
-                    onclick: open
-                }, [
-                    cast "Shopping cart ",
-                    SPAN.caret()
-                ]),
-                UL.dropdown-menu({
-                    role: "menu",
-                    config: function(el, isInit) if(!isInit) dropDownMenu = el
-                }, items())
-            ]),
-            LI(this.empty() 
-                ? SPAN("Proceed to checkout")
-                : A[href='/checkout']({config: M.route}, "Proceed to checkout"))
-        ];
-    }
+    public function view() [
+		LI({
+			"class": isOpen ? "dropdown open" : "dropdown",
+			config: function(el, isInit) if(!isInit) {
+				cartParent = el.parentElement;
+				// Need to prevent dropdown from closing automatically:
+				el.addEventListener("hide.bs.dropdown", function() return false);
+			}
+		}, [
+			A.dropdown-toggle({
+				href: "#",
+				role: "button", 
+				"aria-expanded": false,
+				onclick: open
+			}, [
+				cast "Shopping cart ",
+				SPAN.caret()
+			]),
+			UL.dropdown-menu({
+				role: "menu",
+				config: function(el, isInit) if(!isInit) dropDownMenu = el
+			}, items())
+		]),
+		LI(this.empty() 
+			? SPAN("Proceed to checkout")
+			: A[href='/checkout']({config: M.route}, "Proceed to checkout"))
+	];
 
     function items() : Array<VirtualElement> {
         if(this.empty()) return [LI(A("Empty"))];

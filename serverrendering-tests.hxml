@@ -1,3 +1,4 @@
+-D mithril-sugartags
 -lib buddy
 -cp src 
 -cp example

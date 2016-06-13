@@ -28,7 +28,7 @@ class MithrilNodeRender
 		return _render(view, 0).trim();
 	}
 	
-	public function _render(view : ViewOutput, indentDepth : Int) : String {
+	function _render(view : ViewOutput, indentDepth : Int) : String {
 		if(view == null) return "";
 
 		if(Std.is(view, String))
