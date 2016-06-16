@@ -137,7 +137,7 @@ class Todo implements Component
 
     // The other part of the Component interface:
     public function view() {
-        H1("Hello world!", /* Render Todos */);
+        m("h1", "Hello world!", /* Render Todos */);
     }
 
     // Starting up with M.mount:
@@ -169,7 +169,7 @@ class HelloWorld implements Mithril
         if(args == null) args = {color: "red"};
 
     public function view(ctrl, args : {color : String})
-        H1({style: {color: args.color}}, "Hello world!");
+        m("h1", {style: {color: args.color}}, "Hello world!");
 
     static function main() {
         var hello = M.component(new HelloWorld(), {color: "teal"});
@@ -196,7 +196,7 @@ DIV([
 ]);
 ```
 
-The syntax is simple, just replace `m('tag', ...)` with `TAG(...)`, where TAG is a valid HTML5 tag. These is one compiler directive that you can use in your `.hxml` file to configure it:
+The syntax is simple, just replace `m('tag', ...)` with `TAG(...)`, where TAG is a valid HTML5 tag. These is one compiler directive that you can use to configure it:
 
 `-D lowercase-mithril-sugartags` - If you don't like UPPERCASE tags. Understandable, but increases the risk for compilation errors since the lowercase tags may collide with variables.
 
