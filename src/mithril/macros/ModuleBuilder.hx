@@ -177,7 +177,7 @@ class ModuleBuilder
 			case EArrayDecl(values):
 				if(values.length > 0 && f != viewField) 
 					checkForM(values[0], e);
-				else
+				else if(f == viewField)
 					injectReturn(e);
 			case _:
 				if(f != viewField) checkForM(e, e);

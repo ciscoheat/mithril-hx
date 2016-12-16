@@ -190,6 +190,9 @@ extern class M
 
 	///// Properties that uses function properties /////
 
+	public static inline function buildQueryString(data : Dynamic) : String { return untyped __js__("m.route.buildQueryString({0})", data); }
+	public static inline function parseQueryString(querystring : String) : Dynamic { return untyped __js__("m.route.parseQueryString({0})", querystring); }
+
 	public static var routeParam(get, set) : String -> String;
 	static inline function get_routeParam() : String -> String { return untyped __js__("m.route.param"); }
 	static inline function set_routeParam(f : String -> String) : String -> String { return untyped __js__("m.route.param = ") (f); }
