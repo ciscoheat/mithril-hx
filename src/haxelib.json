@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "3.3 compatibility.",
-  "version": "0.28.0",
+  "releasenote": "Added build/parseQueryString. Fixed return issue for the view function.",
+  "version": "0.29.0",
   "contributors": ["ciscoheat"]
 }
