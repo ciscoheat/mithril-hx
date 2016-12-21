@@ -1,9 +1,6 @@
-package  ;
 
 import js.Browser;
 import mithril.M;
-import mithril.M.Module;
-import mithril.M.VirtualElement;
 import ChainController;
 
 // A class just to test the unwrapSuccess and 
@@ -16,34 +13,37 @@ class IpWrapper
 	}
 }
 
-class DashboardModule implements Component
+class DashboardModule implements Mithril
 {
 	var todo : TodoModule;
 	var chainController : ChainController;
 	var chainView : ChainView;
 
-	@prop var ip : String = "";
-	@prop var test : String;
+	var ip : String = "";
+	var test : String = "";
+
+	var currentApp : String = "";
 
 	public function new() {
 		todo = new TodoModule();
 		chainController = new ChainController();
 		chainView = new ChainView(new ChainModel());
-		test = M.prop("");
 	}
 
-	public function controller() {
-		// Detect IP in background so it won't stop the rendering.
+	public function oninit() {
 		M.request({
 			method: "GET",
 			url: "http://jsonip.com/",
-			background: true,
 			// Use unwrapSuccess to transform the requested data
 			unwrapSuccess: function(data: {ip : String}) return new IpWrapper(data.ip)
 		}).then(
-			function(currentIp : IpWrapper) { ip(currentIp.ip); M.redraw(); },
-			function(_) { ip("Don't know!"); M.redraw(); }
+			function(currentIp : IpWrapper) ip = currentIp.ip,
+			function(_) ip = "Don't know!"
 		);
+	}
+
+	public function onupdate(vnode : VNode<DashboardModule>) {
+		currentApp = vnode.attrs.app;
 	}
 
 	public function view() {
@@ -51,35 +51,32 @@ class DashboardModule implements Component
 			m("h1", "Welcome!"),
 			m("p", "Choose your app:"),
 			m("div", {style: {width: "300px"}}, [
-				m("a[href='/dashboard/todo']", {config: M.route}, "Todo list"),
+				m("a[href='/dashboard/todo']", {oncreate: M.routeLink}, "Todo list"),
 				m("span", M.trust("&nbsp;")),
-				m("a[href='/dashboard/chain']", {config: M.route}, "Don't break the chain"),
+				m("a[href='/dashboard/chain']", {oncreate: M.routeLink}, "Don't break the chain"),
 				m("hr"),
-				switch(M.routeParam("app")) {
+				switch(currentApp) {
 					case "todo": todo.view();
 					case "chain": chainView.view(chainController);
 					case _: m("#app");
 				},
 				m("hr"),
-				m("div", ip().length == 0 ? "Retreiving IP..." : "Your IP: " + ip()),
+				m("div", ip.length == 0 ? "Retreiving IP..." : "Your IP: " + ip),
 				m("button", { onclick: clearData }, "Clear stored data")
 			])
 		];
 	}
 
 	public function clearData() {
-		M.startComputation();
 		todo.clear();
 		chainController.clear();
-		M.endComputation();
 	}
 
 	public function setRoutes(body : js.html.Element) {
 		#if isomorphic
+		trace('Isomorphic mode active');
 		// Changing route mode to "pathname" to get urls without hash.
-		M.routeMode = "pathname";
-		#else
-		M.routeMode = "hash";
+		M.routePrefix("");
 		#end
 
 		M.route(body, "/dashboard", {

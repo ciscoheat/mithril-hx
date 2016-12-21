@@ -1,5 +1,6 @@
 package webshop.models;
 
+import js.Promise;
 import mithril.M;
 using StringTools;
 
@@ -21,27 +22,28 @@ class Category
 
     ///// Data access /////
 
-    public static function all() : Promise<Array<Category>, String> {
+    public static function all() : Promise<Array<Category>> {
         // Simulate a short delay, but every once in a while a long delay.
         var delay = Std.random(100);
         if(Math.random() > 0.87) delay = 2000;
 
         var mapData = function(data : Array<Dynamic>) {
             return data.map(function(d : Dynamic) {
-                var c = new Category(d);
-                c.products = d.products.map(function(p) return new Product(p, c));
-                return c;
+                var category = new Category(d);
+                category.products = d.products.map(function(p) return new Product(p, category));
+                return category;
             });
         };
 
-        var def = M.deferred();
-        haxe.Timer.delay(function() def.resolve(data()), delay);
-
-        return def.promise.then(mapData);
+        return new Promise(function(resolve, reject) {
+            haxe.Timer.delay(function() {
+                var newData = mapData(data());
+                resolve(newData);
+            }, delay);
+        });
 
         // See http://beta.json-generator.com/A0FlQeQ for content
         // (and a great site for generating JSON-data)
-
         /*
         var request = M.request({
             method: "GET",

@@ -9,22 +9,23 @@ using Lambda;
 /**
  * Product listing for a Category.
  */
-class ProductList implements Component
+class ProductList implements Mithril
 {
     var category = new Category();
-    var loading : Loader;
+    var loading = new Loader();
     var cart : ShoppingCart;
 
     public function new(cart) {
         this.cart = cart;
     }
 
-    public function controller() {
-        loading = new Loader();
+    public function onbeforeupdate(vnode : VNode<ProductList>) {
+        //trace('onbeforeupdate ProductList');
+        trace(vnode.attrs);
 
         // Get category based on the current route.
         var getCurrentCategory = function(categories : Array<Category>) {
-            return categories.find(function(c) return c.slug() == M.routeParam("categoryId"));
+            return categories.find(function(c) return c.slug() == vnode.attrs.categoryId);
         };
 
         // Load products with an Ajax request.
@@ -33,6 +34,8 @@ class ProductList implements Component
         Category.all().then(function(c) { 
             category = getCurrentCategory(c);
             loading.done();
+            trace('New category loaded: ' + category.name);
+            M.redraw();
         }, 
             loading.error
         );
@@ -52,30 +55,30 @@ class ProductList implements Component
         }
 		
 		return if(template != null) template else [
-            H2.sub-header(category.name),
-            DIV.table-responsive([
-                TABLE.table.table-striped([
-                    THEAD([
-                        TR([
-                            TH("Name"),
-                            TH("Price"),
-                            TH("Stock"),
-                            TH()
+            m('H2.sub-header', category.name),
+            m('div.table-responsive', [
+                m('table.table.table-striped', [
+                    m('thead', [
+                        m('tr', [
+                            m('th', "Name"),
+                            m('th', "Price"),
+                            m('th', "Stock"),
+                            m('th', null)
                         ])
                     ]),
-                    TBODY[id=products](category.products.map(function(p) 
-                        TR([
-                            TD(A({
+                    m('tbody[id=products]', category.products.map(function(p) 
+                        m('tr', [
+                            m('td', m('a', {
                                 href: '/product/${p.id}',
-                                config: M.route
+                                oncreate: M.routeLink
                             }, p.name)),
-                            TD(p.price >= 0 ? '$$${p.price}' : ""),
-                            TD({style: {color: p.stock < 10 ? "red" : ""}}, Std.string(p.stock)),
-                            TD(p.stock == 0 ? null :
-                                BUTTON.btn.btn-success.btn-xs({
+                            m('td', p.price >= 0 ? '$$${p.price}' : ""),
+                            m('td', {style: {color: p.stock < 10 ? "red" : ""}}, Std.string(p.stock)),
+                            m('td', p.stock == 0 ? null :
+                                m('button.btn.btn-success.btn-xs', {
                                     onclick: cart_add.bind(_, p)
                                 }, [
-                                    SPAN.glyphicon.glyphicon-shopping-cart({"aria-hidden": "true"}),
+                                    m('span.glyphicon.glyphicon-shopping-cart', {"aria-hidden": "true"}),
                                     cast "Add to cart" // Need a cast since mixed Arrays aren't valid.
                                 ])
                             )

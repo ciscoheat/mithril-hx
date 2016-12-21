@@ -7,7 +7,7 @@ import webshop.models.*;
 using Lambda;
 using StringTools;
 
-class ProductPage implements Component
+class ProductPage implements Mithril
 {
     var product : Product;
     var loading : Loader;
@@ -18,11 +18,11 @@ class ProductPage implements Component
         this.cart = cart;
     }
 
-    public function controller() {
+    public function oninit(vnode : VNode<ProductPage>) {
         loading = new Loader();
 
-        Product.all().then(function(products) { 
-            product = products.find(function(p) return p.id == M.routeParam("productId"));
+        Product.all().then(function(products : Array<Product>) { 
+            product = products.find(function(p) return p.id == vnode.attrs.productId);
             loading.done();
         }, 
             loading.error
@@ -36,31 +36,31 @@ class ProductPage implements Component
 
     public function view() {
         var template = switch loading.state() {
-            case Started: DIV.row("");
-            case Delayed: DIV.row(DIV.col-xs-12(H1("Loading...")));
-            case Error: DIV.row(DIV.col-xs-12(H1({style: {color: "red"}}, "Loading error, please reload page.")));
+            case Started: m('div.row', "");
+            case Delayed: m('div.row', m('div.col-xs-12', m('h1', "Loading...")));
+            case Error: m('div.row', m('div.col-xs-12', m('h1', {style: {color: "red"}}, "Loading error, please reload page.")));
             case Done: null;
         }
 		
-		var button = function() BUTTON.btn.btn-lg.btn-success[type=button](
+		var button = function() m('button.btn.btn-lg.btn-success[type=button]', 
             {onclick: addToCart.bind(product)},
             "Add to Cart"
         );
 
 		return if (template != null) template else [
-            DIV.row(DIV.col-xs-12(H1(product.name))),
-            DIV.row([
-                DIV.col-xs-12.col-sm-12.col-md-7.col-lg-6([
-                    IMG[data-src='holder.js/100px450?auto=yes&random=yes']({
-                        config: function(el, isInit) if(!isInit) untyped __js__("Holder.run()")
+            m('div.row', m('div.col-xs-12', m('h1', product.name))),
+            m('div.row', [
+                m('div.col-xs-12.col-sm-12.col-md-7.col-lg-6', [
+                    m("img[data-src='holder.js/100px450?auto=yes&random=yes']", {
+                        oncreate: function() untyped __js__("Holder.run()")
                     }),
-                    DIV.clearfix({style: {"margin": "10px"}}),
-                    DIV.row([
-                        DIV.col-xs-2(DIV.h2("$" + product.price)),
-                        DIV.col-xs-4(DIV.h2(product.stock > 0 ? button() : H3("Out of stock")))
+                    m('div.clearfix', {style: {"margin": "10px"}}),
+                    m('div.row', [
+                        m('div.col-xs-2', m('div.h2', "$" + product.price)),
+                        m('div.col-xs-4', m('div.h2', product.stock > 0 ? button() : m('h3', "Out of stock")))
                     ])
                 ]),
-                DIV.col-xs-12.col-sm-12.col-md-5.col-lg-6(lorem.map(function(l) P(l)))
+                m('div.col-xs-12.col-sm-12.col-md-5.col-lg-6', lorem.map(function(l) m('p', l)))
             ])
         ];
     }

@@ -17,7 +17,7 @@ enum LoadState {
  *
  * See ProductList for an example how this class is used.
  */
-class Loader implements Model {
+class Loader {
     var _state = Started;
 
     function setState(s : LoadState) {

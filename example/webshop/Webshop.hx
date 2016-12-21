@@ -11,7 +11,7 @@ using StringTools;
 /**
  * A simple webshop to demonstrate the power of Mithril.
  */
-class Webshop implements View
+class Webshop implements Mithril
 {
 	#if js
     var cart : ShoppingCart;
@@ -22,14 +22,18 @@ class Webshop implements View
 
     // Create menu and routes.
     public function new() {
-        menu = new Menu();
-        cart = new ShoppingCart();
         search = new Search();
+        cart = new ShoppingCart();
+        
+        var productList = new ProductList(cart);
+        var productPage = new ProductPage(cart);
+
+        menu = new Menu(productList, productPage);
 
         routes = {
             "/": this,
-            "/category/:categoryId": new ProductList(cart),
-            "/product/:productId": new ProductPage(cart),
+            "/category/:categoryId": productList,
+            "/product/:productId": productPage,
             "/checkout": new Checkout(cart)
         };
     }
@@ -47,7 +51,7 @@ class Webshop implements View
         // An "inline module" just to create the home link.
         M.mount(element("home-link"), {
             view: function() 
-                m("a.navbar-brand[href='/']", {config: M.route}, "Mithril/Haxe Webshop")
+                m("a.navbar-brand[href='/']", {oncreate: M.routeLink}, "Mithril/Haxe Webshop")
         });
     }
 
@@ -65,24 +69,27 @@ class Webshop implements View
 	#end
 
     // Welcome text for the default route
-    public function view() [
-        H1("Welcome!"),
-        P("Select a category on the left to start shopping."),
-        P("Built in Haxe & Mithril. Source code: ", 
-            A[href="https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop"][target="_blank"](
+    public function view() { if(this.todo == null) trace('OBJECT SCHIZOPHRENIA');
+        return [
+        m('H1', "Welcome!"),
+        m('p', "Select a category on the left to start shopping."),
+        m('p', "Built in Haxe & Mithril. Source code: ", 
+            m('a', 
+                {href: "https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop", target: "_blank"}, 
                 "https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop"
-        )),
-        H2("Todo"),
-        UL.list-group(todo().map(function(t) {
+            )
+        ),
+        m('h2', "Todo"),
+        m('ul.list-group', todo().map(function(t) {
             var done = t.toLowerCase().startsWith("x ");
-            LI.list-group-item({ 
+            m('li.list-group-item', { 
                 style: { textDecoration: done ? "line-through" : "none" }
             }, [
-                INPUT[type=checkbox]({ checked: done ? "checked" : "" }), 
-                SPAN[style='margin-left:5px'](done ? t.substring(2) : t)
+                m('input[type=checkbox]', { checked: done ? "checked" : "" }),
+                m("span[style='margin-left:5px']", (done ? t.substring(2) : t))
             ]);
         }))
-    ];
+    ];}
 
     ///////////////////////////
 

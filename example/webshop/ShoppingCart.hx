@@ -17,14 +17,15 @@ using Lambda;
 /**
  * Left-side menu, listing the categories in the webshop.
  */
-class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
+class ShoppingCart implements Mithril
 {
     var isOpen : Bool;
     var cartParent : Element;
     var dropDownMenu : Element;
 
+    var content : haxe.ds.ObjectMap<Product, Int> = new haxe.ds.ObjectMap<Product, Int>();
+
     public function new() {
-        super();
         unserialize();
     }
 
@@ -34,7 +35,7 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
         var output = new Map<String, Int>();
 
         for (p in products())
-            output.set(p.id, this.get(p));
+            output.set(p.id, content.get(p));
 
         js.Browser.getLocalStorage()
         .setItem("cart", haxe.Serializer.run(output));
@@ -47,11 +48,10 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
         try {
             var cartData : Map<String, Int> = cast Unserializer.run(data);
             
-            M.startComputation();
-            Product.all().then(function(products) {
+            Product.all().then(function(products : Array<Product>) {
                 products = products.filter(function(p) return cartData.exists(p.id));
                 for(p in products) this.set(p, cartData.get(p.id));
-                M.endComputation();
+                M.redraw();
             });
         } catch(e : Dynamic) {}
     }
@@ -59,26 +59,25 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
     //////////////////////////////////////////////////////////
 
     function products() {
-        return {iterator: this.keys};
+        return {iterator: content.keys};
     }
 
     public function add(product : Product) {
         var existing = products().find(function(p) return p.id == product.id);
-        if(existing != null) set(existing, get(existing)+1);
+        if(existing != null) set(existing, content.get(existing)+1);
         else set(product, 1);
     }
 
-    override public function set(product : Product, v : Int) {
+    public function set(product : Product, v : Int) {
         var existing = products().find(function(p) return product.id == p.id);
 
-        if(v <= 0 && existing != null) remove(product);
-        else if(v > 0) super.set(product, v);
+        if(v <= 0 && existing != null) content.remove(product);
+        else if(v > 0) content.set(product, v);
 
         serialize();
     }
 
     public function open() {
-        M.startComputation();
         var html = Browser.document.documentElement;
 
         isOpen = true;
@@ -91,7 +90,7 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
         Timer.delay(function() {
             html.addEventListener("click", clickOutsideCart);
             dropDownMenu.style.width = Std.string(dropDownMenu.offsetWidth) + "px";
-            M.endComputation();
+            M.redraw();
         }, 10);
     }
 
@@ -108,56 +107,57 @@ class ShoppingCart extends haxe.ds.ObjectMap<Product, Int> implements View
     }
 
     public function view() [
-		LI({
+		m('li', {
 			"class": isOpen ? "dropdown open" : "dropdown",
-			config: function(el, isInit) if(!isInit) {
-				cartParent = el.parentElement;
+			oncreate: function(vnode : VNode<ShoppingCart>) {
+				cartParent = vnode.dom.parentElement;
 				// Need to prevent dropdown from closing automatically:
-				el.addEventListener("hide.bs.dropdown", function() return false);
+				vnode.dom.addEventListener("hide.bs.dropdown", function() return false);
 			}
 		}, [
-			A.dropdown-toggle({
+			m('a.dropdown-toggle', {
 				href: "#",
 				role: "button", 
 				"aria-expanded": false,
 				onclick: open
 			}, [
 				cast "Shopping cart ",
-				SPAN.caret()
+				m('span.caret', null)
 			]),
-			UL.dropdown-menu({
+			m('ul.dropdown-menu', {
 				role: "menu",
 				config: function(el, isInit) if(!isInit) dropDownMenu = el
 			}, items())
 		]),
-		LI(this.empty() 
-			? SPAN("Proceed to checkout")
-			: A[href='/checkout']({config: M.route}, "Proceed to checkout"))
+		m('li', content.empty() 
+			? m('span', "Proceed to checkout")
+			: m("a[href='/checkout']", {oncreate: M.routeLink}, "Proceed to checkout")
+        )
 	];
 
     function items() : Array<VirtualElement> {
-        if(this.empty()) return [LI(A("Empty"))];
+        if(content.empty()) return [m('li', m('a', "Empty"))];
 
         var total = 0.0;
         var products = products().map(function(p) {
-            var subTotal = p.price * get(p);
+            var subTotal = p.price * content.get(p);
             total += subTotal;
             
-            LI(A([
+            m('li', m('a', [
                 m("input[type=number]", {
                     min: 0, 
-                    value: get(p), 
+                    value: content.get(p), 
                     style: {width: "36px"},
                     oninput: M.withAttr("value", set.bind(p, _))
                 }),
-                SPAN(A({ 
-                    config: M.route, 
+                m('span', m('a', { 
+                    oncreate: M.routeLink, 
                     href: '/product/${p.id}', 
                 }, ' ${p.name}'), " | $" + subTotal)
             ]));
         }).concat([
-            LI.divider(),
-            LI(A('Total: $' + total))
+            m('li.divider', null),
+            m('li', m('a', 'Total: $' + total))
         ]);
 
         return products.array();        

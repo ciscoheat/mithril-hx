@@ -22,7 +22,7 @@ typedef InputElement = Dynamic;
 * Cannot use @prop and M.prop(), doesn't work well with
 * Haxe serialization.
 */
-class Todo implements Model
+class Todo
 {
 	public var description : String;
 	public var done : Bool;
@@ -33,7 +33,7 @@ class Todo implements Model
 	}
 }
 
-class TodoList implements Model
+class TodoList
 {
 	#if (js && !nodejs)
 	static var storage = Browser.window.localStorage;
@@ -80,7 +80,7 @@ class TodoList implements Model
 	}
 }
 
-class TodoModule implements View
+class TodoModule implements Mithril
 {
 	public var todo : TodoList;
 
@@ -91,9 +91,7 @@ class TodoModule implements View
 	}
 
 	public function clear() {
-		M.startComputation();
 		todo.clear();
-		M.endComputation();
 	}
 
 	public function view() {
@@ -125,17 +123,14 @@ class TodoModule implements View
 		// First redraw to display the loading text:
 		M.redraw();
 		// Wait for request to finish:
-		M.startComputation();
-		deferMs(delay)
-		.then(function(ok) { todo.add(todo.description); return ok; }, function(error) return error)
-		.then(function(_) {
+		Timer.delay(function() { 
+			trace('Todo delay $delay done');
+			todo.add(todo.description);
 			// Request completed, set appropriate state:
 			todo.description = "";
 			todoAdding = false;
-			// End computation which will trigger a redraw unless more
-			// computations are queued.
-			M.endComputation();
-		});
+			M.redraw();
+		}, delay);
 	}
 
 	private function todo_setDescription(e : KeyboardEvent) {
@@ -147,14 +142,6 @@ class TodoModule implements View
 	private function setTaskStatus(task : Todo, checked : Bool) {
 		task.done = checked;
 		todo.save();
-	}
-
-	private function deferMs(delay : Int) : Promise<Bool, Bool> {
-		var d = M.deferred();
-		#if js
-		Timer.delay(d.resolve.bind(true), delay);
-		#end
-		return d.promise;
 	}
 
 	#if js

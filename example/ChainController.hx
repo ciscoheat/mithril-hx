@@ -12,7 +12,6 @@ import js.html.InputElement;
 import js.html.Storage;
 import js.Lib;
 import mithril.M;
-import mithril.M.Module;
 import mithril.M.VirtualElement;
 
 class ChainModel extends IntMap<Bool>
@@ -78,7 +77,7 @@ class ChainModel extends IntMap<Bool>
 	}
 }
 
-class ChainController implements Controller<ChainController>
+class ChainController implements Mithril
 {
 	var list : ChainModel;
 	public var view : ChainView;
@@ -93,9 +92,7 @@ class ChainController implements Controller<ChainController>
 	}
 
 	public function clear() {
-		M.startComputation();
 		list.clear();
-		M.endComputation();
 	}
 
 	public function isChecked(index) {
@@ -115,7 +112,7 @@ class ChainController implements Controller<ChainController>
 	}
 }
 
-class ChainView implements ControllerView<ChainController>
+class ChainView implements Mithril
 {
 	var model : ChainModel;
 

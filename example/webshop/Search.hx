@@ -13,17 +13,17 @@ import webshop.models.*;
 using Lambda;
 using StringTools;
 
-class Search implements View
+class Search implements Mithril
 {
-    @prop var results : Array<Product> = [];
+    var results : Array<Product> = [];
 
     public function new() {}
 
     function searchEvent(phrase : String) {
         if(phrase.length < 2) 
-            results([]);
+            results = [];
         else
-            Product.search(phrase.toLowerCase()).then(results).then(function(_) M.redraw());
+            Product.search(phrase.toLowerCase()).then(function(r) return results = r).then(function(_) M.redraw());
     }
 
     function documentClickEvent(parent : Element, e : Event) {
@@ -34,27 +34,27 @@ class Search implements View
             el = el.parentElement;
         }
 
-        results([]);
+        results = [];
         M.redraw(); // Need to redraw because it's not a Mithril handled event.
     }
 
     public function view() {
         [
-            INPUT.form-control({
+            m('input.form-control', {
                 placeholder: "Search...",
                 oninput: M.withAttr("value", searchEvent),
                 onfocus: M.withAttr("value", searchEvent)
             }),
-            UL.dropdown-menu.dropdown-menu-right({
+            m('UL.dropdown-menu.dropdown-menu-right', {
                 role: "menu",
-                style: {display: results().length > 0 ? "block" : "none"},
+                style: {display: results.length > 0 ? "block" : "none"},
                 config: function(el, isInit) if(!isInit) {
                     js.Browser.document.documentElement.addEventListener("click", 
                         documentClickEvent.bind(el.parentElement));
                 }
-            }, results().map(function(p)
-                LI({role: "presentation"},
-                    A({
+            }, results.map(function(p)
+                m('li', {role: "presentation"},
+                    m('a', {
                         role: "menuitem",
                         tabindex: -1,
                         href: '/product/${p.id}',
