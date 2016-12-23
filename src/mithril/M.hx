@@ -137,7 +137,7 @@ typedef JSONPOptions<T, T2> = {
 
 //////////
 
-#if js
+#if (js && !no_extern_mithril)
 @:final @:native("m")
 extern class M
 {

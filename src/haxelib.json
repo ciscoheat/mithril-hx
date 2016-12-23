@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Added build/parseQueryString. Fixed return issue for the view function.",
-  "version": "0.29.0",
+  "releasenote": "Added define for using Haxe ported code on js serverside",
+  "version": "0.30.0",
   "contributors": ["ciscoheat"]
 }
