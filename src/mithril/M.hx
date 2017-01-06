@@ -44,34 +44,26 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 
 ///// Typedefs /////
 
+typedef Component = {};
+
 typedef VNode<T> = {
 	var state : T;
 	var attrs : Dynamic<String>;
 	#if js
-	var dom : Null<js.html.Element>;
-	#end
-}
-
-typedef Component<T> = {
-	@:optional function view(?vnode : VNode<T>) : VirtualElement;
-	@:optional function oninit(?vnode : VNode<T>) : Void;
-	@:optional function oncreate(?vnode : VNode<T>) : Void;
-	@:optional function onbeforeupdate(?vnode : VNode<T>, ?old : VNode<T>) : Bool;
-	@:optional function onupdate(?vnode : VNode<T>) : Void;
-	#if js
-	@:optional function onbeforeremove(?vnode : VNode<T>) : Promise<Bool>;
+	var dom : Null<Element>;
 	#else
-	@:optional function onbeforeremove(?vnode : VNode<T>) : Dynamic;
+	var dom : Null<Dynamic>;
 	#end
-	@:optional function onremove(?vnode : VNode<T>) : Void;
 }
 
 private typedef BasicType = Either4<Bool, Float, Int, String>;
 
 typedef VirtualElementObject = {
-	var tag : String;
-	var attrs : Dynamic;
-	var children : Dynamic;
+	var tag : Dynamic;
+	var key : Null<String>;	
+	var attrs : Null<Dynamic>;
+	var children : Null<Array<VirtualElementObject>>;
+	var text : Null<String>;
 };
 
 typedef VirtualElement = Either<VirtualElementObject, Array<VirtualElementObject>>;
@@ -115,34 +107,28 @@ typedef JSONPOptions<T, T2> = {
 @:final @:native("m")
 extern class M
 {
-	@:overload(function(selector : String) : VirtualElement {})
-	@:overload(function(selector : String, attributes : Dynamic) : VirtualElement {})
-	public static function m(selector : String, attributes : Dynamic, children : Dynamic) : VirtualElement;
+	@:overload(function(selector : Either<String, Component>) : VirtualElement {})
+	@:overload(function(selector : Either<String, Component>, attributes : Dynamic) : VirtualElement {})
+	public static function m(selector : Either<String, Component>, attributes : Dynamic, children : Dynamic) : VirtualElement;
 
-	@:overload(function<T, T2, T3, T4, T5>(component : T, args : T2, extra1 : T3, extra2 : T4, extra3 : T5) : Dynamic {})
-	@:overload(function<T, T2, T3, T4>(component : T, args : T2, extra1 : T3, extra2 : T4) : Dynamic {})
-	@:overload(function<T, T2, T3>(component : T, args : T2, extra1 : T3) : Dynamic {})
-	@:overload(function<T, T2>(component : T, args : T2) : Dynamic {})
-	public static function component<T>(component : T) : Dynamic;
-
-	public static function mount<T>(element : Element, component : T) : T;
+	public static function mount(element : Element, component : Component) : Void;
 
 	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : T2 -> Void;
 
-	@:overload(function() : String {})
-	@:overload(function(element : Document, isInitialized : Bool) : Void {})
-	@:overload(function(element : Element, isInitialized : Bool) : Void {})
-	@:overload(function(path : String) : Void {})
-	@:overload(function(path : String, params : Dynamic) : Void {})
-	@:overload(function(path : String, params : Dynamic, shouldReplaceHistory : Bool) : Void {})
-	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic) : Void;
+	public static function route(rootElement : Element, defaultRoute : String, routes : {}) : Void;
+	public static inline function routePrefix(prefix : String) : Void  { return untyped __js__("m.route.prefix({0})", prefix); }
+	public static inline function routeGet() : String  { return untyped __js__("m.route.get()", prefix); }
+	public static inline function routeSet(route : String, ?data : {}, ?options : {}) : Void  { return untyped __js__("m.route.set({0}, {1}, {2})", route, data, options); }
+
+	public static var routeLink(get, null) : Function;
+	static inline function get_routeLink() : Function { return untyped __js__("m.route.link"); }
 
 	@:overload(function<T, T2>(options : JSONPOptions<T, T2>) : Promise<T> {})
 	public static function request<T, T2, T3, T4>(options : XHROptions<T, T2, T3, T4>) : Promise<T>;
 
-	public static function sync<T>(promises : Array<Promise<T>>) : Promise<T>;
-
 	public static function trust(html : String) : String;
+
+	public static function fragment(attrs : {}, children : Array<VirtualElement>) : VirtualElement;
 
 	@:overload(function(rootElement : Element, children : Dynamic) : Void {})
 	public static function render(rootElement : Element, children : Dynamic, forceRecreation : Bool) : Void;
@@ -155,11 +141,6 @@ extern class M
 
 	public static inline function buildQueryString(data : Dynamic) : String { return untyped __js__("m.route.buildQueryString({0})", data); }
 	public static inline function parseQueryString(querystring : String) : Dynamic { return untyped __js__("m.route.parseQueryString({0})", querystring); }
-
-	public static var routeLink(get, null) : Function;
-	static inline function get_routeLink() : Function { return untyped __js__("m.route.link"); }
-
-	public static inline function routePrefix(prefix : String) : Void  { return untyped __js__("m.route.prefix({0})", prefix); }
 
 	///// Haxe specific stuff /////
 

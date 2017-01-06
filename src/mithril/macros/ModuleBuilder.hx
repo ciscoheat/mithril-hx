@@ -55,7 +55,7 @@ class ModuleBuilder
 					name: "vnode"
 				});
 
-				injectCurrentModule(field.name, f);
+				injectCorrectThisReference(field.name, f);
 
 				#if (haxe_ver < 3.3)
 				if(f.ret == null) {
@@ -72,20 +72,20 @@ class ModuleBuilder
 
 	/**
 	 * The reference to 'this' is conceptually incorrect with Haxe classes when entering a component method.
-	 * Therefore it is changed if vnode.tag (first argument is vnode) is a Haxe object.
+	 * Therefore 'this' is changed if vnode.tag (first argument is vnode) is a Haxe object.
 	 * __class__ is used to detect whether that is true.
 	*/
-	private static function injectCurrentModule(name : String, f : Function) {
+	private static function injectCorrectThisReference(methodName : String, f : Function) {
 		switch(f.expr.expr) {
 			case EBlock(exprs):
 				exprs.unshift(macro
 					// Needs to be untyped to avoid clashing with macros that modify return (particularly HaxeContracts)
 					untyped __js__('if(arguments.length > 0 && arguments[0].tag.__class__ && arguments[0].tag != this) 
-						return arguments[0].tag.$name.apply(arguments[0].tag, arguments)')
+						return arguments[0].tag.$methodName.apply(arguments[0].tag, arguments)')
 				);
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
-				injectCurrentModule(name, f);
+				injectCorrectThisReference(methodName, f);
 		}
 	}	
 
