@@ -55,7 +55,9 @@ class ModuleBuilder
 					name: "vnode"
 				});
 
+				#if js
 				injectCorrectThisReference(field.name, f);
+				#end
 
 				#if (haxe_ver < 3.3)
 				if(f.ret == null) {
@@ -70,6 +72,7 @@ class ModuleBuilder
 		return fields;
 	}
 
+	#if js
 	/**
 	 * The reference to 'this' is conceptually incorrect with Haxe classes when entering a component method.
 	 * Therefore 'this' is changed if vnode.tag (first argument is vnode) is a Haxe object.
@@ -87,7 +90,8 @@ class ModuleBuilder
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
 				injectCorrectThisReference(methodName, f);
 		}
-	}	
+	}
+	#end
 
 	private static function replaceMwithFullNamespace(e : Expr) {
 		// Autocompletion for m()

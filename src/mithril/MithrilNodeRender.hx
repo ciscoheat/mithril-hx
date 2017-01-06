@@ -24,15 +24,15 @@ class MithrilNodeRender
 		this.indentMode = this.indent.length > 0;
 	}
 
-	public function render(view : ViewOutput) : String {
+	public function render(view : VirtualElement) : String {
 		return _render(view, 0).trim();
 	}
 	
-	function _render(view : ViewOutput, indentDepth : Int) : String {
+	function _render(view : VirtualElement, indentDepth : Int) : String {
 		if(view == null) return "";
 
 		if(Std.is(view, String))
-			return escape(view);
+			return escape(cast view);
 
 		if(Std.is(view, Int) || Std.is(view, Float) || Std.is(view, Bool))
 			return Std.string(view);
@@ -40,8 +40,8 @@ class MithrilNodeRender
 		if(Std.is(view, Array))
 			return cast(view, Array<Dynamic>).map(_render.bind(_, indentDepth)).join('');
 
-		// view must be a VirtualElementObject now.
-		var el : VirtualElementObject = cast view;
+		// view must be a VNode now.
+		var el : VNode<Dynamic> = cast view;
 
 		if (Reflect.hasField(el, "$trusted")) {
 			// If created on server, the value is in el.tag, otherwise it's a String.
@@ -64,7 +64,7 @@ class MithrilNodeRender
 		return '$startIndent<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>$newLine';
 	}
 
-	inline function createChildrenContent(el : VirtualElementObject, newIndentDepth : Int) : String {
+	inline function createChildrenContent(el : VNode<Dynamic>, newIndentDepth : Int) : String {
 		if(el.children == null || !Std.is(el.children, Array)) return '';
 		return _render(el.children, newIndentDepth);
 	}

@@ -3,6 +3,7 @@ package mithril;
 using Lambda;
 
 import haxe.Constraints.Function;
+import haxe.DynamicAccess;
 
 #if js
 
@@ -47,28 +48,21 @@ from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
 typedef Component = {};
 
 typedef VNode<T> = {
-	var state : T;
-	var attrs : Dynamic<String>;
+	var tag : Dynamic;
+	var state : Null<T>;
+	var key : Null<String>;
+	var attrs : Null<DynamicAccess<Dynamic>>;
+	var children : Null<Array<VNode<Dynamic>>>;
+	var text : Null<String>;
 	#if js
 	var dom : Null<Element>;
+	// domSize, events, instance
 	#else
 	var dom : Null<Dynamic>;
 	#end
-}
-
-private typedef BasicType = Either4<Bool, Float, Int, String>;
-
-typedef VirtualElementObject = {
-	var tag : Dynamic;
-	var key : Null<String>;	
-	var attrs : Null<Dynamic>;
-	var children : Null<Array<VirtualElementObject>>;
-	var text : Null<String>;
 };
 
-typedef VirtualElement = Either<VirtualElementObject, Array<VirtualElementObject>>;
-
-typedef ViewOutput = Either3<VirtualElement, BasicType, Array<BasicType>>;
+typedef VirtualElement = Either<VNode<Dynamic>, Array<VNode<Dynamic>>>;
 
 /**
  * Plenty of optional fields for this one:
@@ -103,7 +97,7 @@ typedef JSONPOptions<T, T2> = {
 
 //////////
 
-#if (js && !no_extern_mithril)
+#if ((js && !nodejs) || (js && nodejs && mithril_native))
 @:final @:native("m")
 extern class M
 {
@@ -118,7 +112,10 @@ extern class M
 	public static function route(rootElement : Element, defaultRoute : String, routes : {}) : Void;
 	public static inline function routePrefix(prefix : String) : Void  { return untyped __js__("m.route.prefix({0})", prefix); }
 	public static inline function routeGet() : String  { return untyped __js__("m.route.get()", prefix); }
-	public static inline function routeSet(route : String, ?data : {}, ?options : {}) : Void  { return untyped __js__("m.route.set({0}, {1}, {2})", route, data, options); }
+	public static inline function routeSet(route : String, ?data : {}, ?options : {}) : Void { return untyped __js__("m.route.set({0}, {1}, {2})", route, data, options); }
+
+	// Convenience method for route attributes
+	public static inline function routeAttrs(vnode : VNode<Dynamic>) : DynamicAccess<String> { return untyped __js__("{0}.attrs", vnode); }
 
 	public static var routeLink(get, null) : Function;
 	static inline function get_routeLink() : Function { return untyped __js__("m.route.link"); }
@@ -162,6 +159,8 @@ extern class M
 		// Add m.m which simplifies the API.
 		// It also prevents deferred being resolved on Node.js to avoid server rendering issues,
 		// and converts List to Array so Lambda.map can be used conveniently.
+		//
+		// if (typeof module !== 'undefined' && module.exports) m.request = function(args, extra) { return new Promise(function(res, rej) {}); };
 		untyped __js__("(function(m) {
 			if (m.m) return;
 			m.m = function() {
@@ -173,7 +172,6 @@ extern class M
 				} catch(e) {}
 				return m.apply(this, arguments);
 			}
-			if (typeof module !== 'undefined' && module.exports) m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);
 	}
 }
@@ -203,8 +201,12 @@ class M
 		
 		var cell = {
 			tag: "div",
-			attrs: { },
-			children: getVirtualChildren(args, hasAttrs)
+			attrs: null,
+			children: getVirtualChildren(args, hasAttrs),
+			text: null,
+			state: null,
+			key: null,
+			dom: null
 		}
 		
 		assignAttrs(cell.attrs, attrs, parseTagAttrs(cell, tag));
@@ -212,11 +214,15 @@ class M
 		return cell;
 	}
 	
-	public static function trust(html : String) : VirtualElementObject {
+	public static function trust(html : String) : VirtualElement {
 		return {
 			tag: html,
 			attrs: null,
 			children: null,
+			text: null,
+			state: null,
+			key: null,
+			dom: null,
 			"$trusted": true
 		}
 	}
