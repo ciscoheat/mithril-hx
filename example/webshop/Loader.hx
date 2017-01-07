@@ -18,19 +18,39 @@ enum LoadState {
  * See ProductList for an example how this class is used.
  */
 class Loader {
-    var _state = Started;
+    var _state = null;
+
+    var untilDelay : Int;
+    var untilError : Int;
+
+    var delayTimer : Timer;
+    var errorTimer : Timer;
 
     function setState(s : LoadState) {
-        if(_state == Done || _state == Error) 
+        if(s != Started && (s == _state || _state == Done || _state == Error)) 
             return;
 
+        //trace('Loader: $_state changing to $s');
         _state = s;
         M.redraw();
     }
 
     public function new(untilDelay = 1000, untilError = 5000) {
-        Timer.delay(function() setState(Delayed), untilDelay);
-        Timer.delay(function() setState(Error), untilError);
+        this.untilDelay = untilDelay;
+        this.untilError = untilError;
+    }
+
+    public function start() {
+        setState(Started);
+
+        if(delayTimer != null) delayTimer.stop();
+        if(errorTimer != null) errorTimer.stop();
+
+        delayTimer = new Timer(untilDelay);
+        delayTimer.run = function() setState(Delayed);
+
+        errorTimer = new Timer(untilError);
+        errorTimer.run = function() setState(Error);
     }
 
     // done and error have an optional parameter so they can be

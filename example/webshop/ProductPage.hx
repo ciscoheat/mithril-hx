@@ -22,7 +22,7 @@ class ProductPage implements Mithril
         loading = new Loader();
 
         Product.all().then(function(products : Array<Product>) { 
-            product = products.find(function(p) return p.id == vnode.attrs.productId);
+            product = products.find(function(p) return p.id == M.routeAttrs(vnode).get('productId'));
             loading.done();
         }, 
             loading.error

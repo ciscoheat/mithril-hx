@@ -17,22 +17,16 @@ class Menu implements Mithril
     public function new(productList, productPage) {
         this.productList = productList;
         this.productPage = productPage;
-    }
 
-    public function oncreate() {
-        trace('Nav menu oncreate');
-        //trace(this);
         Category.all().then(function(c) {
-            trace('Back from promise');
-            //trace(this);
             categories = c;
-            trace(categories);
-            M.redraw();
+            M.redraw();            
         });
     }
 
     function isActive(c : Category) {
-        return false;
+        //trace(productList.currentCategory.id); trace(c.id);
+        return productList.currentCategory.id == c.id;
         /*
         if(attrs == null) return false;
         trace(attrs);
@@ -41,7 +35,7 @@ class Menu implements Mithril
         */
     }
 
-    public function view(vnode : VNode<Menu>) { //trace(this);
+    public function view() [
         m('ul.nav.nav-sidebar', categories.map(function(c) {
             m('li', {"class": isActive(c) ? "active" : ""}, 
                 m('a', {
@@ -49,6 +43,6 @@ class Menu implements Mithril
                     oncreate: M.routeLink
                 }, c.name)
             );
-        }));
-    }
+        }))
+    ];
 }

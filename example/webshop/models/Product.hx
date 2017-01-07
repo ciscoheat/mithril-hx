@@ -11,7 +11,8 @@ class Product
     public var name : String;
     public var price : Float;
     public var stock : Int;
-    //public var category(default, null) : Category;
+    
+    public var category(default, null) : Category;
 
     public function new(data, category) {
         if(data != null) {
@@ -21,7 +22,7 @@ class Product
             this.stock = data.stock;
         }
 
-        //this.category = category;
+        this.category = category;
     }
 
     public function slug() {
