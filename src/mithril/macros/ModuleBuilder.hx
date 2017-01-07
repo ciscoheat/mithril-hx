@@ -13,12 +13,13 @@ class ModuleBuilder
 {
 	static var viewField : Function;
 
-	static var componentMethods = ['view', 'oninit', 'oncreate', 'onbeforeupdate', 'onupdate', 'onbeforeremove', 'onremove'];
+	static var componentMethods = ['view', 'render', 'oninit', 'oncreate', 'onbeforeupdate', 'onupdate', 'onbeforeremove', 'onremove'];
 
 	@macro public static function build() : Array<Field> {
 		var c : ClassType = Context.getLocalClass().get();
-		if (c.meta.has(":MithrilModuleProcessed")) return null;
-		c.meta.add(":MithrilModuleProcessed",[],c.pos);
+		
+		if (c.meta.has(":MithrilComponentProcessed")) return null;
+		c.meta.add(":MithrilComponentProcessed",[],c.pos);
 
 		var fields = Context.getBuildFields();
 
@@ -55,9 +56,8 @@ class ModuleBuilder
 					name: "vnode"
 				});
 
-				#if js
-				injectCorrectThisReference(field.name, f);
-				#end
+				if(Context.defined('js')) 
+					injectCorrectThisReference(field.name, f);
 
 				#if (haxe_ver < 3.3)
 				if(f.ret == null) {
@@ -72,18 +72,17 @@ class ModuleBuilder
 		return fields;
 	}
 
-	#if js
 	/**
 	 * The reference to 'this' is conceptually incorrect with Haxe classes when entering a component method.
 	 * Therefore 'this' is changed if vnode.tag (first argument is vnode) is a Haxe object.
-	 * __class__ is used to detect whether that is true.
+	 * __name__ is used to detect whether that is true.
 	*/
 	private static function injectCorrectThisReference(methodName : String, f : Function) {
 		switch(f.expr.expr) {
 			case EBlock(exprs):
 				exprs.unshift(macro
 					// Needs to be untyped to avoid clashing with macros that modify return (particularly HaxeContracts)
-					untyped __js__('if(arguments.length > 0 && arguments[0].tag.__class__ && arguments[0].tag != this) 
+					untyped __js__('if(arguments.length > 0 && arguments[0].tag.__name__ && arguments[0].tag != this) 
 						return arguments[0].tag.$methodName.apply(arguments[0].tag, arguments)')
 				);
 			case _:
@@ -91,7 +90,6 @@ class ModuleBuilder
 				injectCorrectThisReference(methodName, f);
 		}
 	}
-	#end
 
 	private static function replaceMwithFullNamespace(e : Expr) {
 		// Autocompletion for m()
