@@ -33,12 +33,6 @@ typedef Event = Dynamic;
 private abstract Either<T1, T2>(Dynamic)
 from T1 from T2 to T1 to T2 {}
 
-private abstract Either3<T1, T2, T3>(Dynamic)
-from T1 from T2 from T3 to T1 to T2 to T3 {}
-
-private abstract Either4<T1, T2, T3, T4>(Dynamic)
-from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
-
 ///// Interfaces /////
 
 @:autoBuild(mithril.macros.ModuleBuilder.build()) interface Mithril {}
