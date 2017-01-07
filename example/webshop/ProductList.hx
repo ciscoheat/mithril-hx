@@ -1,5 +1,6 @@
 package webshop;
 
+import haxe.DynamicAccess;
 import js.html.Element;
 import js.html.MouseEvent;
 import mithril.M;
@@ -20,11 +21,10 @@ class ProductList implements Mithril
         this.cart = cart;
     }
 
-    public function changeCategory(categorySlug : String) {
-
+    public function onmatch(params : DynamicAccess<String>, url : String) {
         // Get category based on the current route.
         function getCurrentCategory(categories : Array<Category>) {
-            return categories.find(function(c) return c.slug() == categorySlug);
+            return categories.find(function(c) return c.slug() == params.get('categoryId'));
         }
 
         loader.start();
@@ -43,7 +43,7 @@ class ProductList implements Mithril
         cart.open();
     }
 
-    public function view() {
+    public function render(vnode : VNode<ProductList>) {
         var template = switch(loader.state()) {
             case Started: m("h2.sub-header", "");
             case Delayed: m("h2.sub-header", "Loading...");

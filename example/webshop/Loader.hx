@@ -18,7 +18,7 @@ enum LoadState {
  * See ProductList for an example how this class is used.
  */
 class Loader {
-    var _state = null;
+    var _state = Started;
 
     var untilDelay : Int;
     var untilError : Int;
@@ -27,8 +27,8 @@ class Loader {
     var errorTimer : Timer;
 
     function setState(s : LoadState) {
-        if(s != Started && (s == _state || _state == Done || _state == Error)) 
-            return;
+        if(s == _state) return;
+        if(s != Started && (_state == Done || _state == Error)) return;
 
         //trace('Loader: $_state changing to $s');
         _state = s;

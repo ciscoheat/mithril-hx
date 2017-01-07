@@ -30,12 +30,16 @@ class Webshop implements Mithril
 
         menu = new Menu(productList, productPage);
 
+        /*
+        {
+            onmatch: function(params, url) productList.changeCategory(params.categoryId),
+            render: function(vnode) return m(productList)
+        }
+        */
+
         routes = {
             "/": this,
-            "/category/:categoryId": {
-                onmatch: function(params, url) productList.changeCategory(params.categoryId),
-                render: function(vnode) return m(productList)
-            },
+            "/category/:categoryId": productList,
             "/product/:productId": productPage,
             "/checkout": new Checkout(cart)
         };
