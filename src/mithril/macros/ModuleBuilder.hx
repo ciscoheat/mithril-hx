@@ -13,7 +13,10 @@ class ModuleBuilder
 {
 	static var viewField : Function;
 
-	static var componentMethods = ['view', 'render', 'oninit', 'oncreate', 'onbeforeupdate', 'onupdate', 'onbeforeremove', 'onremove'];
+	// For javascript:
+	// RouteResolver methods onmatch and render have a correct 'this' reference.
+	// Component hasn't, so methods in this array will be injected with a correct 'this'.
+	static var componentMethods = ['view', 'oninit', 'oncreate', 'onbeforeupdate', 'onupdate', 'onbeforeremove', 'onremove'];
 
 	@macro public static function build() : Array<Field> {
 		var c : ClassType = Context.getLocalClass().get();
@@ -82,8 +85,7 @@ class ModuleBuilder
 			case EBlock(exprs):
 				exprs.unshift(macro
 					// Needs to be untyped to avoid clashing with macros that modify return (particularly HaxeContracts)
-					untyped __js__('if(arguments.length > 0 && arguments[0].tag.__name__ && arguments[0].tag != this) 
-						return arguments[0].tag.$methodName.apply(arguments[0].tag, arguments)')
+					untyped __js__('if(arguments.length > 0 && arguments[0].tag.__name__ && arguments[0].tag != this) return arguments[0].tag.$methodName.apply(arguments[0].tag, arguments)')
 				);
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
