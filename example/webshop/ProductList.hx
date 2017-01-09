@@ -44,7 +44,7 @@ class ProductList implements Mithril implements HaxeContracts
             loader.error();
             return;
         }
-        
+
         menu.setActive(currentCategory.id);
 
         // Load new products
@@ -105,6 +105,7 @@ class ProductList implements Mithril implements HaxeContracts
     }
 
     @invariants function invariants() {
+        invariant(products != null);
         invariant(menu != null);
         invariant(categories != null);
         invariant(cart != null);

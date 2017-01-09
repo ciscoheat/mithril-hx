@@ -1,5 +1,6 @@
 package webshop;
 
+import haxecontracts.*;
 import js.Browser;
 #if (haxe_ver >= 3.2)
 import js.html.DOMElement in Element;
@@ -12,12 +13,10 @@ import mithril.M;
 import webshop.models.*;
 import haxe.Serializer;
 import haxe.Unserializer;
+
 using Lambda;
 
-/**
- * Left-side menu, listing the categories in the webshop.
- */
-class ShoppingCart implements Mithril
+class ShoppingCart implements Mithril implements HaxeContracts
 {
     var isOpen : Bool;
     var cartParent : Element;
@@ -26,6 +25,7 @@ class ShoppingCart implements Mithril
     var content : haxe.ds.ObjectMap<Product, Int> = new haxe.ds.ObjectMap<Product, Int>();
 
     public function new() {
+        this.isOpen = false;
         unserialize();
     }
 
@@ -37,8 +37,7 @@ class ShoppingCart implements Mithril
         for (p in products())
             output.set(p.id, content.get(p));
 
-        js.Browser.getLocalStorage()
-        .setItem("cart", haxe.Serializer.run(output));
+        Browser.getLocalStorage().setItem("cart", haxe.Serializer.run(output));
     }
 
     public function unserialize() {
@@ -50,7 +49,7 @@ class ShoppingCart implements Mithril
             
             Product.all().then(function(products : Array<Product>) {
                 products = products.filter(function(p) return cartData.exists(p.id));
-                for(p in products) this.set(p, cartData.get(p.id));
+                for(p in products) content.set(p, cartData.get(p.id));
                 M.redraw();
             });
         } catch(e : Dynamic) {}
@@ -78,6 +77,9 @@ class ShoppingCart implements Mithril
     }
 
     public function open() {
+        requires(cartParent != null);
+        requires(dropDownMenu != null);
+
         var html = Browser.document.documentElement;
 
         isOpen = true;
@@ -110,23 +112,30 @@ class ShoppingCart implements Mithril
 		m('li', {
 			"class": isOpen ? "dropdown open" : "dropdown",
 			oncreate: function(vnode : VNode<ShoppingCart>) {
+                // Setting cartParent
 				cartParent = vnode.dom.parentElement;
 				// Need to prevent dropdown from closing automatically:
 				vnode.dom.addEventListener("hide.bs.dropdown", function() return false);
 			}
 		}, [
 			m('a.dropdown-toggle', {
-				href: "#",
+				href: "",
 				role: "button", 
 				"aria-expanded": false,
-				onclick: open
+				onclick: function(e) {
+                    e.preventDefault();
+                    open();
+                }
 			}, [
 				cast "Shopping cart ",
 				m('span.caret', null)
 			]),
 			m('ul.dropdown-menu', {
 				role: "menu",
-				config: function(el, isInit) if(!isInit) dropDownMenu = el
+				oncreate: function(vnode) {
+                    // Setting dropDownMenu
+                    dropDownMenu = vnode.dom;
+                }
 			}, items())
 		]),
 		m('li', content.empty() 
@@ -161,5 +170,9 @@ class ShoppingCart implements Mithril
         ]);
 
         return products.array();        
+    }
+
+    @invariants function invariants() {
+        invariant(content != null);
     }
 }
