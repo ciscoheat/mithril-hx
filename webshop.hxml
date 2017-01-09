@@ -1,5 +1,7 @@
 -D mithril-sugartags
 -cp example
 -lib mithril
+-lib HaxeContracts
+-lib slambda
 -js bin/webshop/webshop.js
 -main webshop.Webshop

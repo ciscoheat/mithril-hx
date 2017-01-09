@@ -1,41 +1,51 @@
 package webshop;
 
+import haxecontracts.*;
 import js.html.Element;
 import js.html.MouseEvent;
 import mithril.M;
 import webshop.models.*;
+
 using Lambda;
 using StringTools;
 
-class ProductPage implements Mithril
+class ProductPage implements Mithril implements HaxeContracts
 {
-    var product : Product;
-    var loading : Loader;
+    var loader : Loader;
     var cart : ShoppingCart;
+    var menu : Menu;
 
-    public function new(cart) {
-        this.product = new Product(null, null);
+    var product : Null<Product>;
+
+    public function new(menu, cart) {
         this.cart = cart;
+        this.loader = new Loader();
+        this.menu = menu;
     }
 
-    public function oninit(vnode : VNode<ProductPage>) {
-        loading = new Loader();
+    public function onmatch(params : haxe.DynamicAccess<String>) {
+        loader.start();
 
         Product.all().then(function(products : Array<Product>) { 
-            product = products.find(function(p) return p.id == M.routeAttrs(vnode).get('productId'));
-            loading.done();
+            menu.setActive(null);
+            product = products.find(function(p) return p.id == params.get('key'));
+            if(product != null) {
+                menu.setActive(product.category.id);
+                loader.done();
+            } 
+            else loader.error();
         }, 
-            loading.error
+            loader.error
         );
     }
 
-    function addToCart(p : Product, e : MouseEvent) {
+    function addToCart(p : Product) {
         cart.add(p);
         cart.open();
     }
 
-    public function view() {
-        var template = switch loading.state() {
+    public function render() {
+        var template = switch loader.state() {
             case Started: m('div.row', "");
             case Delayed: m('div.row', m('div.col-xs-12', m('h1', "Loading...")));
             case Error: m('div.row', m('div.col-xs-12', m('h1', {style: {color: "red"}}, "Loading error, please reload page.")));
@@ -63,6 +73,12 @@ class ProductPage implements Mithril
                 m('div.col-xs-12.col-sm-12.col-md-5.col-lg-6', lorem.map(function(l) m('p', l)))
             ])
         ];
+    }
+
+    @invariants function invariants() {
+        invariant(cart != null);
+        invariant(loader != null);
+        invariant(menu != null);
     }
 
     static var lorem = 

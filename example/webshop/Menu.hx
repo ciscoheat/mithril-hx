@@ -1,43 +1,32 @@
 package webshop;
 
+import haxecontracts.*;
 import mithril.M;
 import webshop.models.Category;
 import webshop.models.*;
-using Lambda;
+
+using StringTools;
+using Slambda;
 
 /**
  * Left-side menu, listing the categories in the webshop.
  */
-class Menu implements Mithril
+class Menu implements Mithril implements HaxeContracts
 {
-    var categories : Array<Category> = [];
-    var productList : ProductList;
-    var productPage : ProductPage;
+    var categories : Array<Category>;
+    var active : Null<Category>;
 
-    public function new(productList, productPage) {
-        this.productList = productList;
-        this.productPage = productPage;
-
-        Category.all().then(function(c) {
-            categories = c;
-            M.redraw();            
-        });
+    public function new(categories) {
+        this.categories = categories;
     }
 
-    function isActive(c : Category) {
-        //trace(productList.currentCategory.id); trace(c.id);
-        return productList.currentCategory.id == c.id;
-        /*
-        if(attrs == null) return false;
-        trace(attrs);
-        if(c.slug() == attrs.categoryId) return true;
-        return c.products.exists(function(p) return p.id == attrs.productId);
-        */
+    public function setActive(categoryId : Null<String>) {
+        this.active = categories.find(function(c) return c.id == categoryId);
     }
 
     public function view() [
         m('ul.nav.nav-sidebar', categories.map(function(c) {
-            m('li', {"class": isActive(c) ? "active" : ""}, 
+            m('li', {"class": (active != null && active == c ? "active" : "")}, 
                 m('a', {
                     href: '/category/${c.slug()}',
                     oncreate: M.routeLink
@@ -45,4 +34,9 @@ class Menu implements Mithril
             );
         }))
     ];
+
+    @invariants function invariants() {
+        invariant(categories != null);
+        invariant(active == null || categories.exists.fn(_ == active));
+    }
 }

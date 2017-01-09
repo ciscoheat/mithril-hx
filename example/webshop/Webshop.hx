@@ -5,7 +5,7 @@ import js.Browser;
 #end
 import mithril.M;
 import webshop.models.*;
-using Lambda;
+using Slambda;
 using StringTools;
 
 /**
@@ -15,32 +15,26 @@ class Webshop implements Mithril
 {
 	#if js
     var cart : ShoppingCart;
-    var menu : Menu;
-    var search : Search;
-    var checkout : Checkout;
     var routes : Dynamic;
+    var menu : Menu;
 
     // Create menu and routes.
-    public function new() {
-        search = new Search();
+    public function new(categories : Array<Category>) {
         cart = new ShoppingCart();
+        menu = new Menu(categories);
         
-        var productList = new ProductList(cart);
-        var productPage = new ProductPage(cart);
-
-        menu = new Menu(productList, productPage);
-
         /*
         {
-            onmatch: function(params, url) productList.changeCategory(params.categoryId),
+            onmatch: function(params : haxe.DynamicAccess<String>, url : String) 
+                productList.changeCategory(params.get('categoryId')),
             render: function(vnode) return m(productList)
         }
         */
 
         routes = {
             "/": this,
-            "/category/:categoryId": productList,
-            "/product/:productId": productPage,
+            "/category/:key": new ProductList(menu, cart, categories),
+            "/product/:key": new ProductPage(menu, cart),
             "/checkout": new Checkout(cart)
         };
     }
@@ -53,7 +47,7 @@ class Webshop implements Mithril
         // Define modules that should not change if the main content changes
         M.mount(element("navigation"), menu);
         M.mount(element("shopping-cart"), cart);
-        M.mount(element("search"), search);
+        M.mount(element("search"), new Search());
 
         // An "inline module" just to create the home link.
         M.mount(element("home-link"), {
@@ -68,7 +62,9 @@ class Webshop implements Mithril
 
     // Program entry point
     static function main() {
-        new Webshop().start();
+        Category.all().then(function(categories) {
+            new Webshop(categories).start();
+        });
     }
 
 	#else
@@ -76,8 +72,7 @@ class Webshop implements Mithril
 	#end
 
     // Welcome text for the default route
-    public function view() { if(this.todo == null) trace('OBJECT SCHIZOPHRENIA');
-        return [
+    public function view() [
         m('H1', "Welcome!"),
         m('p', "Select a category on the left to start shopping."),
         m('p', "Built in Haxe & Mithril. Source code: ", 
@@ -96,19 +91,15 @@ class Webshop implements Mithril
                 m("span[style='margin-left:5px']", (done ? t.substring(2) : t))
             ]);
         }))
-    ];}
+    ];
 
-    ///////////////////////////
-
-    function todo() {
-        return [
-            "Checkout page",
-            "Thank you page",
-            "x Make cart not change size when open and items are deleted",
-            "Enable use of arrow keys when navigating search results",
-            "URL slugs for products",
-            "Fix css for navbar and cart for low-res devices",
-            "Administration section..."
-        ];
-    }
+    function todo() return [
+        "Checkout page",
+        "Thank you page",
+        "x Make cart not change size when open and items are deleted",
+        "Enable use of arrow keys when navigating search results",
+        "URL slugs for products",
+        "Fix css for navbar and cart for low-res devices",
+        "Administration section..."
+    ];
 }

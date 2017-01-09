@@ -38,6 +38,15 @@ class Product
         });
     }
 
+    public static function inCategory(category : Category) : Promise<Array<Product>> {
+        return new Promise<Array<Product>>(function(resolve, reject) {
+            Category.all().then(function(categories : Array<Category>) {
+                var products = categories.find(function(c) return c.id == category.id).products;
+                resolve(products);
+            });
+        });
+    }
+
     public static function search(partialName : String) : Promise<Array<Product>> {
         return all().then(function(products : Array<Product>)
             return products.filter(function(p) 
