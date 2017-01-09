@@ -85,7 +85,7 @@ class ModuleBuilder
 			case EBlock(exprs):
 				exprs.unshift(macro
 					// Needs to be untyped to avoid clashing with macros that modify return (particularly HaxeContracts)
-					untyped __js__('if(arguments.length > 0 && arguments[0].tag.__name__ && arguments[0].tag != this) return arguments[0].tag.$methodName.apply(arguments[0].tag, arguments)')
+					untyped __js__('if(arguments.length > 0 && arguments[0].tag != this) return arguments[0].tag.$methodName.apply(arguments[0].tag, arguments)')
 				);
 			case _:
 				f.expr = {expr: EBlock([f.expr]), pos: f.expr.pos};
