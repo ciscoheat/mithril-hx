@@ -42,7 +42,7 @@ class DashboardModule implements Mithril
 		);
 	}
 
-	public function onupdate(vnode : VNode<DashboardModule>) {
+	public function onupdate(vnode : Vnode<DashboardModule>) {
 		currentApp = M.routeAttrs(vnode).get('app');
 	}
 

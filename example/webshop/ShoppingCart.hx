@@ -31,7 +31,7 @@ class ShoppingCart implements Mithril implements HaxeContracts
 
     ///// Saving and restoring the cart to localStorage /////
 
-    public function serialize() {
+    function serialize() {
         var output = new Map<String, Int>();
 
         for (p in products())
@@ -40,7 +40,7 @@ class ShoppingCart implements Mithril implements HaxeContracts
         Browser.getLocalStorage().setItem("cart", haxe.Serializer.run(output));
     }
 
-    public function unserialize() {
+    function unserialize() {
         var data = Browser.getLocalStorage().getItem("cart");
         if(data == null) return;
 
@@ -111,7 +111,7 @@ class ShoppingCart implements Mithril implements HaxeContracts
     public function view() [
 		m('li', {
 			"class": isOpen ? "dropdown open" : "dropdown",
-			oncreate: function(vnode : VNode<ShoppingCart>) {
+			oncreate: function(vnode) {
                 // Setting cartParent
 				cartParent = vnode.dom.parentElement;
 				// Need to prevent dropdown from closing automatically:

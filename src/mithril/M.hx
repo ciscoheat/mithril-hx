@@ -41,22 +41,20 @@ from T1 from T2 to T1 to T2 {}
 
 typedef Component = {};
 
-typedef VNode<T> = {
-	var tag : Dynamic;
+typedef Vnode<T> = {
 	var state : Null<T>;
+	var tag : Dynamic;
 	var key : Null<String>;
 	var attrs : Null<DynamicAccess<Dynamic>>;
-	var children : Null<Array<VNode<Dynamic>>>;
-	var text : Null<String>;
+	var children : Null<Array<Vnode<Dynamic>>>;	
+	var text : Null<Dynamic>;
 	#if js
 	var dom : Null<Element>;
-	// domSize, events, instance
-	#else
-	var dom : Null<Dynamic>;
+	var domSize : Null<Int>;
 	#end
 };
 
-typedef VirtualElement = Either<VNode<Dynamic>, Array<VNode<Dynamic>>>;
+typedef VirtualElement = Either<Vnode<Dynamic>, Array<Vnode<Dynamic>>>;
 
 /**
  * Plenty of optional fields for this one:
@@ -109,7 +107,7 @@ extern class M
 	public static inline function routeSet(route : String, ?data : {}, ?options : {}) : Void { return untyped __js__("m.route.set({0}, {1}, {2})", route, data, options); }
 
 	// Convenience method for route attributes
-	public static inline function routeAttrs(vnode : VNode<Dynamic>) : DynamicAccess<String> { return untyped __js__("{0}.attrs", vnode); }
+	public static inline function routeAttrs(vnode : Vnode<Dynamic>) : DynamicAccess<String> { return untyped __js__("{0}.attrs", vnode); }
 
 	public static var routeLink(get, null) : Function;
 	static inline function get_routeLink() : Function { return untyped __js__("m.route.link"); }
@@ -183,6 +181,8 @@ class M
 	
 	///// Rendering /////
 	
+	static var selectorParser = ~/(?:(^|#|\.)([^#\.\[\]]+))|(\[(.+?)(?:\s*=\s*("|'|)((?:\\["'\]]|.)*?)\5)?\])/g;
+	
 	public static function m(tag : String, ?attrs : Dynamic, ?children : Dynamic) : VirtualElement {
 
 		var args = if(attrs == null) [] else if(children == null) [attrs] else [attrs, children];
@@ -194,13 +194,12 @@ class M
 		attrs = hasAttrs ? attrs : { };
 		
 		var cell = {
+			state: null,
 			tag: "div",
+			key: null,
 			attrs: null,
 			children: getVirtualChildren(args, hasAttrs),
-			text: null,
-			state: null,
-			key: null,
-			dom: null
+			text: null
 		}
 		
 		assignAttrs(cell.attrs, attrs, parseTagAttrs(cell, tag));
@@ -210,13 +209,12 @@ class M
 	
 	public static function trust(html : String) : VirtualElement {
 		return {
+			state: null,
 			tag: html,
+			key: null,
 			attrs: null,
 			children: null,
 			text: null,
-			state: null,
-			key: null,
-			dom: null,
 			"$trusted": true
 		}
 	}

@@ -34,7 +34,7 @@ class ModuleBuilder
 				viewField = if(field.name == "view") f else null;
 
 				replaceMwithFullNamespace(f.expr);
-				returnLastMExpr(f);
+				returnLastMExpr(f);				
 				
 				if (!componentMethods.has(field.name)) continue;
 
@@ -46,19 +46,15 @@ class ModuleBuilder
 				});
 
 				// Add a vnode argument to parameterless component methods
-				// since it's used to 
-				if(f.args.length == 0) f.args.push({
-					value: null,
-					type: TPath({
+				if (f.args.length > 0 && f.args[0].type == null) {
+					f.args[0].type = TPath({
 						name: 'M',
 						pack: ['mithril'],
 						params: [TPType(Context.toComplexType(Context.getLocalType()))],
-						sub: 'VNode'
-					}),
-					opt: true,
-					name: "vnode"
-				});
-
+						sub: 'Vnode'
+					});
+				}
+				
 				if(Context.defined('js')) 
 					injectCorrectThisReference(field.name, f);
 
@@ -120,9 +116,17 @@ class ModuleBuilder
 		}
 
 		switch(e.expr) {
-			case EFunction(_, f): returnLastMExpr(f);
+			case EObjectDecl(fields): for (field in fields) if (componentMethods.has(field.field)) switch field.expr.expr {
+				case EFunction(_, f):
+					if (f.args.length > 0 && f.args[0].type == null) {
+						f.args[0].type = macro : mithril.M.Vnode<Dynamic>;
+					}
+				case _:
+			}
+			case EFunction(_, f) if(f.expr != null): 
+				returnLastMExpr(f);
 			case _:
-		}
+		}		
 	}
 
 	/**

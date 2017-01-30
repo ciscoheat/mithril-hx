@@ -5,6 +5,9 @@ import js.html.DOMElement in Element;
 #else
 import js.html.Element;
 #end
+import haxe.Constraints.Function;
+import haxe.DynamicAccess;
+import js.Browser;
 import js.html.Event;
 import js.html.InputElement;
 import js.html.KeyboardEvent;
@@ -16,6 +19,7 @@ using StringTools;
 class Search implements Mithril
 {
     var results : Array<Product> = [];
+	var clickHandler : Function;
 
     public function new() {}
 
@@ -48,17 +52,20 @@ class Search implements Mithril
             m('UL.dropdown-menu.dropdown-menu-right', {
                 role: "menu",
                 style: {display: results.length > 0 ? "block" : "none"},
-                config: function(el, isInit) if(!isInit) {
-                    js.Browser.document.documentElement.addEventListener("click", 
-                        documentClickEvent.bind(el.parentElement));
-                }
+                oncreate: function(vnode) {					
+					clickHandler = documentClickEvent.bind(vnode.dom.parentElement);
+                    Browser.document.documentElement.addEventListener("click", clickHandler);
+                },
+				onremove: function(vnode) {
+					Browser.document.documentElement.removeEventListener("click", clickHandler);
+				}
             }, results.map(function(p)
                 m('li', {role: "presentation"},
                     m('a', {
                         role: "menuitem",
                         tabindex: -1,
                         href: '/product/${p.id}',
-                        config: M.route
+                        oncreate: M.routeLink
                     }, p.name)
                 )
             ))
