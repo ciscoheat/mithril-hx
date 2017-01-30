@@ -1,7 +1,9 @@
 -D mithril-sugartags
+-lib slambda
 -lib buddy
 -cp src 
 -cp example
 -neko bin/serverrendering-tests.n
 -main ServerRenderingTests
 -debug
+#-cmd neko bin/serverrendering-tests.n

@@ -8,7 +8,7 @@ import mithril.MithrilNodeRender;
 using StringTools;
 using buddy.Should;
 
-class ServerRenderingTests implements Buddy<[ServerRenderingTests]> extends BuddySuite
+@colorize class ServerRenderingTests extends buddy.SingleSuite
 {
 	public function new() {
 		var render = new MithrilNodeRender().render;
@@ -29,7 +29,7 @@ class ServerRenderingTests implements Buddy<[ServerRenderingTests]> extends Budd
 				render(view).should.be("<h2>true</h2>");
 				
 				view = m("div", false);
-				render(view).should.be("<div>false</div>");
+				render(view).should.be("<div></div>");
 			});
 			
 			it("should render css styles properly", {
@@ -62,8 +62,8 @@ class ServerRenderingTests implements Buddy<[ServerRenderingTests]> extends Budd
 				view = m("span#layout", "ok");
 				render(view).should.be('<span id="layout">ok</span>');
 				
-				//view = m("input", {readOnly: true});
-				//render(view).should.be("<input readonly>");
+				view = m("input", {readonly: true});
+				render(view).should.be("<input readonly>");
 
 				// Attribute position could vary between platforms
 				view = m("a#google.external[href='http://google.com']", "Google"); 
@@ -128,15 +128,6 @@ class ServerRenderingTests implements Buddy<[ServerRenderingTests]> extends Budd
 				
 				view = m('p', M.trust('<trusted&>'));
 				render(view).should.be("<p><trusted&></p>");
-			});
-			
-			it("should use the same structure as original mithril", {
-				// Thanks to https://www.npmjs.com/package/mithril-objectify
-				var virtualObject : VirtualElementObject = cast m(".fooga.wooga.booga");
-				Reflect.fields(virtualObject.attrs).length.should.be(1);
-				virtualObject.attrs.className.should.be("fooga wooga booga");
-				virtualObject.children.length.should.be(0);
-				virtualObject.tag.should.be("div");
 			});
 			
 			///// Messy tests ////////////////////////////////////////////////////////////////////////			

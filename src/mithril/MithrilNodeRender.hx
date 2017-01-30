@@ -1,6 +1,5 @@
 package mithril;
 
-import haxe.Constraints.Function;
 import mithril.M;
 
 using StringTools;
@@ -17,7 +16,7 @@ class MithrilNodeRender
 	var indent : String;
 	var newLine : String;
 	var indentMode : Bool;
-						   
+
 	public function new(?indent : String, ?newLine : String) {
 		this.indent = indent == null ? "" : indent;
 		this.newLine = newLine == null ? (this.indent.length > 0 ? "\n" : "") : newLine;
@@ -40,14 +39,14 @@ class MithrilNodeRender
 		if(Std.is(view, Array))
 			return cast(view, Array<Dynamic>).map(_render.bind(_, indentDepth)).join('');
 
-		// view must be a VNode now.
-		var el : VNode<Dynamic> = cast view;
+		// view must be a Vnode now.
+		var el : Vnode<Dynamic> = cast view;
 
-		if (Reflect.hasField(el, "$trusted")) {
-			// If created on server, the value is in el.tag, otherwise it's a String.
-			return Std.is(el, String) ? (cast el) : el.tag;
+		// Test for trusted html
+		if (el.tag == "<") {
+			return cast el.state;
 		}
-
+		
 		var children = createChildrenContent(el, indentDepth + 1);
 		
 		var currentIndent = indentMode ? "".lpad(this.indent, indentDepth * this.indent.length) : "";
@@ -64,14 +63,14 @@ class MithrilNodeRender
 		return '$startIndent<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>$newLine';
 	}
 
-	inline function createChildrenContent(el : VNode<Dynamic>, newIndentDepth : Int) : String {
-		if(el.children == null || !Std.is(el.children, Array)) return '';
-		return _render(el.children, newIndentDepth);
+	inline function createChildrenContent(el : Vnode<Dynamic>, newIndentDepth : Int) : String {
+		return if(el.children == null || !Std.is(el.children, Array)) el.text;
+		else _render(el.children, newIndentDepth);
 	}
 
 	function createAttrString(attrs : Dynamic) {
-		if(attrs == null) return '';
-
+		if (attrs == null) return '';
+		
 		return Reflect.fields(attrs).map(function(name) {
 			var value = Reflect.field(attrs, name);
 			if (value == null) return ' ' + (name == 'className' ? 'class' : name);

@@ -1,6 +1,7 @@
 package mithril;
 
 using Lambda;
+using StringTools;
 
 import haxe.Constraints.Function;
 import haxe.DynamicAccess;
@@ -181,41 +182,145 @@ class M
 	
 	///// Rendering /////
 	
-	static var selectorParser = ~/(?:(^|#|\.)([^#\.\[\]]+))|(\[(.+?)(?:\s*=\s*("|'|)((?:\\["'\]]|.)*?)\5)?\])/g;
+	static var selectorCache = new Map<String, DynamicAccess<Dynamic> -> Dynamic -> Vnode<Dynamic>>();
 	
-	public static function m(tag : String, ?attrs : Dynamic, ?children : Dynamic) : VirtualElement {
+	static function vnode(tag : Dynamic, key, attrs0, children : Dynamic, text, dom) : Dynamic {
+		return { 
+			tag: tag, key: key, attrs: attrs0, children: children, text: text, 
+			dom: dom, domSize: null, 
+			state: {}, events: null, instance: null, skip: false			
+		}
+	}
 
-		var args = if(attrs == null) [] else if(children == null) [attrs] else [attrs, children];
-		
-		// Simplify?
-		var hasAttrs = attrs != null && !Std.is(attrs, String) && !Std.is(attrs, Array) && Reflect.isObject(attrs) &&
-			!(Reflect.hasField(attrs, "tag") || Reflect.hasField(attrs, "view") || Reflect.hasField(attrs, "subtree"));
-		
-		attrs = hasAttrs ? attrs : { };
-		
-		var cell = {
-			state: null,
-			tag: "div",
-			key: null,
-			attrs: null,
-			children: getVirtualChildren(args, hasAttrs),
-			text: null
+	static function vnodeNormalize(node : Dynamic) : DynamicAccess<Dynamic> {
+		return if (Std.is(node, Array)) vnode("[", null, null, vnodeNormalizeChildren(node), null, null)
+		else if (node != null && !Reflect.isObject(node)) vnode("#", null, null, node == false ? "" : node, null, null)
+		else node;
+	}
+	
+	static function vnodeNormalizeChildren(children : Array<DynamicAccess<Dynamic>>) {
+		return [for (c in children) vnodeNormalize(c)];
+		//for (i in 0...children.length) children[i] = vnodeNormalize(children[i]);
+		//return children;		
+	}
+	
+	public static function m(selector : String, ?attrs : Dynamic, ?children : Dynamic) : Vnode<Dynamic> {
+		if (selector == null || !Std.is(selector, String) && Reflect.hasField(selector, "view")) {
+			throw "The selector must be either a string or a component.";
 		}
 		
-		assignAttrs(cell.attrs, attrs, parseTagAttrs(cell, tag));
+		if (Std.is(selector, String) && !selectorCache.exists(selector)) {
+			var tag : String, classes : Array<String> = [];
+			var attributes : DynamicAccess<Dynamic> = {}, tempSelector = selector;
+			
+			while (selectorParser.match(tempSelector)) {
+				var matched = selectorParser.matched;
+				var type = matched(1), value = matched(2);
+				if (type == "" && value != "") tag = value;
+				else if (type == "#") attributes.set('id', value);
+				else if (type == ".") classes.push(value);
+				else if (matched(3).charAt(0) == "[") {
+					var attrValue = matched(6);
+					if (attrValue != null) {
+						attrValue = ~/\\(["'])/g.replace(attrValue, "$1");
+						attrValue = ~/\\\\/g.replace(attrValue, "\\");
+					}
+						
+					if (matched(4) == "class") 
+						classes.push(attrValue);
+					else 
+						attributes.set(matched(4), attrValue == null ? true : attrValue);
+				}
+				tempSelector = selectorParser.matchedRight();
+			}
+			
+			if (classes.length > 0) attributes.set('className', classes.join(" "));
+			
+			selectorCache[selector] = function(attrs : DynamicAccess<Dynamic>, children) {
+				var hasAttrs = false, childList : Array<Vnode<Dynamic>> = null, text : String = null;
+				
+				var className = if (attrs.exists("className") && attrs.get("className") != null && cast(attrs.get("className"), String).length > 0)
+					attrs.get("className")
+				else if (attrs.exists("class") && attrs.get("class") != null && cast(attrs.get("class"), String).length > 0)
+					attrs.get("class")
+				else
+					null;
+				
+				for (key in attributes.keys()) attrs.set(key, attributes.get(key));
+				
+				if (className != null) {
+					if (attrs.get("class") != null) {
+						attrs.remove("class");
+						attrs.set("className", className);
+					}
+					if (attributes.get("className") != null) {
+						attrs.set("className", attributes.get("className") + " " + className);
+					}
+				}
+
+				for (key in attrs.keys()) if (key != "key") {
+					hasAttrs = true;
+					break;
+				}
+				
+				var childArray : Array<Vnode<Dynamic>> = Std.is(children, Array) ? cast children : null;
+								
+				if (childArray != null && childArray.length == 1 && childArray[0] != null && childArray[0].tag == "#") {
+					text = Std.string(childArray[0].children);
+				}
+				else 
+					childList = children;
+				
+				return vnode(tag == null ? "div" : tag, attrs.get("key"), hasAttrs ? attrs : null, childList, text, null);
+			}			
+		}
+
+		var arguments : Array<Dynamic> = if(attrs == null) [null] else if(children == null) [null, attrs] else [null, attrs, children];
+
+		var attrs = { };
+		var childrenIndex = if(
+			(arguments.length >= 2 && arguments[1] == null) || 
+			!Std.is(arguments[1], String) &&
+			Reflect.isObject(arguments[1]) && 
+			!Reflect.hasField(arguments[1], "tag") && 
+			!Std.is(arguments[1], Array)
+		) {
+			attrs = arguments[1];
+			2;
+		}
+		else 1;
 		
-		return cell;
+		var newChildren = if (arguments.length == childrenIndex + 1) {
+			Std.is(arguments[childrenIndex], Array) ? arguments[childrenIndex] : [arguments[childrenIndex]];
+		}
+		else {
+			[for (i in childrenIndex...arguments.length) arguments[i]];
+		}
+		
+		//trace(arguments); trace(attrs); trace(newChildren);
+		
+		return if (Std.is(selector, String))
+			selectorCache[selector](attrs, vnodeNormalizeChildren(newChildren))
+		else {
+			vnode(
+				selector, 
+				Reflect.hasField(attrs, "key") ? Reflect.field(attrs, "key") : null, 
+				attrs, 
+				vnodeNormalizeChildren(newChildren), 
+				null, 
+				null
+			);
+		}
 	}
 	
 	public static function trust(html : String) : VirtualElement {
 		return {
-			state: null,
-			tag: html,
+			state: html,
+			tag: "<",
 			key: null,
 			attrs: null,
 			children: null,
-			text: null,
-			"$trusted": true
+			text: null
 		}
 	}
 	
@@ -273,5 +378,7 @@ class M
 		
 		return classes;
 	}
+	
+	static var selectorParser : EReg = new EReg("(?:(^|#|\\.)([^#\\.\\[\\]]+))|(\\[(.+?)(?:\\s*=\\s*(\"|'|)((?:\\\\[\"'\\]]|.)*?)\\5)?\\])", "g");
 }
 #end

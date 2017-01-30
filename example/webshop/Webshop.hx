@@ -73,7 +73,7 @@ class Webshop implements Mithril
 
     // Welcome text for the default route
     public function view() [
-        m('H1', "Welcome!"),
+        m('h1', "Welcome!"),
         m('p', "Select a category on the left to start shopping."),
         m('p', "Built in Haxe & Mithril. Source code: ", 
             m('a', 
