@@ -182,28 +182,6 @@ class M
 	
 	///// Rendering /////
 	
-	static var selectorCache = new Map<String, DynamicAccess<Dynamic> -> Dynamic -> Vnode<Dynamic>>();
-	
-	static function vnode(tag : Dynamic, key, attrs0, children : Dynamic, text, dom) : Dynamic {
-		return { 
-			tag: tag, key: key, attrs: attrs0, children: children, text: text, 
-			dom: dom, domSize: null, 
-			state: {}, events: null, instance: null, skip: false			
-		}
-	}
-
-	static function vnodeNormalize(node : Dynamic) : DynamicAccess<Dynamic> {
-		return if (Std.is(node, Array)) vnode("[", null, null, vnodeNormalizeChildren(node), null, null)
-		else if (node != null && !Reflect.isObject(node)) vnode("#", null, null, node == false ? "" : node, null, null)
-		else node;
-	}
-	
-	static function vnodeNormalizeChildren(children : Array<DynamicAccess<Dynamic>>) {
-		return [for (c in children) vnodeNormalize(c)];
-		//for (i in 0...children.length) children[i] = vnodeNormalize(children[i]);
-		//return children;		
-	}
-	
 	public static function m(selector : String, ?attrs : Dynamic, ?children : Dynamic) : Vnode<Dynamic> {
 		if (selector == null || !Std.is(selector, String) && Reflect.hasField(selector, "view")) {
 			throw "The selector must be either a string or a component.";
@@ -234,7 +212,8 @@ class M
 				tempSelector = selectorParser.matchedRight();
 			}
 			
-			if (classes.length > 0) attributes.set('className', classes.join(" "));
+			if (classes.length > 0) 
+				attributes.set('className', classes.join(" "));
 			
 			selectorCache[selector] = function(attrs : DynamicAccess<Dynamic>, children) {
 				var hasAttrs = false, childList : Array<Vnode<Dynamic>> = null, text : String = null;
@@ -324,61 +303,26 @@ class M
 		}
 	}
 	
-	static function getVirtualChildren(args : Array<Dynamic>, hasAttrs : Bool) : Dynamic {
-		var children = hasAttrs ? args.slice(1) : args;
-		return children.length == 1 && Std.is(children[0], Array) ? children[0]	: children;
+	static var selectorCache = new Map<String, DynamicAccess<Dynamic> -> Dynamic -> Vnode<Dynamic>>();
+	
+	static function vnode(tag : Dynamic, key, attrs0, children : Dynamic, text, dom) : Dynamic {
+		return { 
+			tag: tag, key: key, attrs: attrs0, children: children, text: text, 
+			dom: dom, domSize: null, 
+			state: {}, events: null, instance: null, skip: false			
+		}
 	}
 
-	static function assignAttrs(target : Dynamic, attrs : Dynamic, classes : Array<String>) : Void {
-		var classAttr = Reflect.hasField(attrs, "class") ? "class" : "className";
-
-		for (attrName in Reflect.fields(attrs)) {
-			if (Reflect.hasField(attrs, attrName)) {
-				var currentAttribute : String = cast Reflect.field(attrs, attrName);
-				if (attrName == classAttr && currentAttribute != null && currentAttribute.length > 0) {
-					classes.push(currentAttribute);
-					// create key in correct iteration order
-					Reflect.setField(target, attrName, "");
-				} else {
-					Reflect.setField(target, attrName, currentAttribute);
-				}
-			}
-		}
-
-		if (classes.length > 0) Reflect.setField(target, classAttr, classes.join(" "));		
+	static function vnodeNormalize(node : Dynamic) : DynamicAccess<Dynamic> {
+		return if (Std.is(node, Array)) vnode("[", null, null, vnodeNormalizeChildren(node), null, null)
+		else if (node != null && !Reflect.isObject(node)) vnode("#", null, null, node == false ? "" : node, null, null)
+		else node;
 	}
 	
-	static function parseTagAttrs(cell : Dynamic, tag : String) : Array<String> {
-		var classes = [];
-		//trace("===== " + tag);
-		var parser = ~/(?:(^|#|\.)([^#\.\[\]]+))|(\[.+?\])/g;
-
-		while(parser.match(tag)) {		
-			var match1 = parser.matched(1);
-			var match2 = try parser.matched(2) catch (e : Dynamic) null;
-			var match3 = try parser.matched(3) catch (e : Dynamic) null;
-			
-			//trace(match1); trace(match2); trace(match3);
-			
-			if (match1 == "" && match2 != null)
-				cell.tag = match2;
-			else if (match1 == "#")
-				cell.attrs.id = match2;
-			else if (match1 == ".")
-				classes.push(match2);
-			else if (match3.charAt(0) == "[") {
-				var pair = ~/\[(.+?)(?:=("|'|)(.*?)\2)?\]/;
-				pair.match(match3);
-				var pair3 = try pair.matched(3) catch (e : Dynamic) "";
-				Reflect.setField(cell.attrs, pair.matched(1), pair3);
-			}
-			
-			tag = parser.matchedRight();
-		}
+	static function vnodeNormalizeChildren(children : Array<DynamicAccess<Dynamic>>) {
+		return [for (c in children) vnodeNormalize(c)];
+	}	
 		
-		return classes;
-	}
-	
 	static var selectorParser : EReg = new EReg("(?:(^|#|\\.)([^#\\.\\[\\]]+))|(\\[(.+?)(?:\\s*=\\s*(\"|'|)((?:\\\\[\"'\\]]|.)*?)\\5)?\\])", "g");
 }
 #end
