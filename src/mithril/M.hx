@@ -40,7 +40,9 @@ from T1 from T2 to T1 to T2 {}
 
 ///// Typedefs /////
 
-typedef Component = {};
+typedef Component = {
+	var view : Function;
+};
 
 typedef Vnode<T> = {
 	var state : Null<T>;
@@ -51,41 +53,43 @@ typedef Vnode<T> = {
 	var text : Null<Dynamic>;
 	#if js
 	var dom : Null<Element>;
-	var domSize : Null<Int>;
+	var domSize : Int;
+	#else
+	var dom : Null<Dynamic>;
+	var domSize : Int;
 	#end
 };
 
-typedef VirtualElement = Either<Vnode<Dynamic>, Array<Vnode<Dynamic>>>;
+typedef Vnodes = Either<Vnode<Dynamic>, Array<Vnode<Dynamic>>>;
 
 /**
- * Plenty of optional fields for this one:
- * http://lhorie.github.io/mithril/mithril.request.html#signature
+ * Plenty of optional fields for this one.
+ * @see http://mithril.js.org/request.html
  */
-typedef XHROptions<T, T2, T3, T4> = {
-	var method : String;
-	var url : String;
+typedef XHROptions<T, T2, T3> = {
+	@:optional var url : String;
+	@:optional var method : String;
+	@:optional var data : Dynamic;
+	@:optional var async : Bool;
 	@:optional var user : String;
 	@:optional var password : String;
-	@:optional var data : Dynamic;
+	@:optional var withCredentials : Bool;
+	@:optional var config : XMLHttpRequest -> XMLHttpRequest;
+	@:optional var headers : DynamicAccess<String>;
+	@:optional var type : T -> Dynamic;
+	@:optional var serialize : T3 -> String;
+	@:optional var deserialize : String -> T3;
+	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3> -> String;
+	@:optional var useBody : Bool;
 	@:optional var background : Bool;
-	@:optional var initialValue : T;
-	@:optional var unwrapSuccess : Dynamic -> T;
-	@:optional var unwrapError : Dynamic -> T2;
-	@:optional var serialize : T3 -> T4;
-	@:optional var deserialize : T4 -> T3;
-	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> T4;
-	@:optional var config : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> Null<XMLHttpRequest>;
 };
 
 typedef JSONPOptions<T, T2> = {
-	var dataType : String;
-	var url : String;
-	@:optional var callbackKey : String;
+	@:optional var url : String;
 	@:optional var data : Dynamic;
-	@:optional var background : Bool;
-	@:optional var initialValue : T;
-	@:optional var unwrapSuccess : Dynamic -> T;
-	@:optional var unwrapError : Dynamic -> T2;
+	@:optional var type : T -> Dynamic;
+	@:optional var callbackName : String;
+	@:optional var callbackKey : String;
 };
 
 //////////
@@ -94,44 +98,57 @@ typedef JSONPOptions<T, T2> = {
 @:final @:native("m")
 extern class M
 {
-	@:overload(function(selector : Either<String, Component>) : VirtualElement {})
-	@:overload(function(selector : Either<String, Component>, attributes : Dynamic) : VirtualElement {})
-	public static function m(selector : Either<String, Component>, attributes : Dynamic, children : Dynamic) : VirtualElement;
+	@:overload(function<T>(selector : Either<String, Component>) : Vnode<T> {})
+	@:overload(function<T>(selector : Either<String, Component>, attributes : Dynamic) : Vnode<T> {})
+	public static function m<T>(selector : Either<String, Component>, attributes : Dynamic, children : Dynamic) : Vnode<T>;
 
-	public static function mount(element : Element, component : Component) : Void;
+	public static function render(rootElement : Element, children : Vnodes) : Void;
+	
+	public static function mount(element : Element, component : Null<Component>) : Void;
 
-	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : T2 -> Void;
-
-	public static function route(rootElement : Element, defaultRoute : String, routes : {}) : Void;
+	public static function route(rootElement : Element, defaultRoute : String, routes : { } ) : Void;
+	
+	///// Special route accessors /////
+	
+	public static inline function routeSet(route : String, ?data : { }, ?options : {
+		?replace : Bool,
+		?state : { },
+		?title : String
+	}) : Void { 
+		return untyped __js__("m.route.set({0}, {1}, {2})", route, data, options); 		
+	}
+	public static inline function routeGet() : String  { return untyped __js__("m.route.get()"); }
 	public static inline function routePrefix(prefix : String) : Void  { return untyped __js__("m.route.prefix({0})", prefix); }
-	public static inline function routeGet() : String  { return untyped __js__("m.route.get()", prefix); }
-	public static inline function routeSet(route : String, ?data : {}, ?options : {}) : Void { return untyped __js__("m.route.set({0}, {1}, {2})", route, data, options); }
 
 	// Convenience method for route attributes
 	public static inline function routeAttrs(vnode : Vnode<Dynamic>) : DynamicAccess<String> { return untyped __js__("{0}.attrs", vnode); }
 
 	public static var routeLink(get, null) : Function;
 	static inline function get_routeLink() : Function { return untyped __js__("m.route.link"); }
+	
+	///////////////////////////////////
+	
+	@:overload(function<T, T2, T3>(url : String) : Promise<T> {})
+	@:overload(function<T, T2, T3>(options : XHROptions<T, T2, T3>) : Promise<T> {})
+	public static function request<T, T2, T3>(url : String, options : XHROptions<T, T2, T3>) : Promise<T>;
 
+	@:overload(function<T>(url : String) : Promise<T> {})
 	@:overload(function<T, T2>(options : JSONPOptions<T, T2>) : Promise<T> {})
-	public static function request<T, T2, T3, T4>(options : XHROptions<T, T2, T3, T4>) : Promise<T>;
+	public static function jsonp<T, T2>(url : String, options : JSONPOptions<T, T2>) : Promise<T>;
 
-	public static function trust(html : String) : String;
-
-	public static function fragment(attrs : {}, children : Array<VirtualElement>) : VirtualElement;
-
-	@:overload(function(rootElement : Element, children : Dynamic) : Void {})
-	public static function render(rootElement : Element, children : Dynamic, forceRecreation : Bool) : Void;
+	public static function parseQueryString(querystring : String) : DynamicAccess<String>;
+	public static function buildQueryString(data : {}) : String;
+	
+	public static function withAttr<T, T2 : Event>(attrName : String, callback : T -> Void) : T2 -> Void;
+	
+	public static function trust(html : String) : Vnode<Dynamic>;
+	
+	public static function fragment(attrs : {}, children : Array<Vnodes>) : Vnode<Dynamic>;
 
 	public static function redraw() : Void;
-
-	public static function deps(window : Dynamic) : Dynamic;
-
-	///// Properties that uses function properties /////
-
-	public static inline function buildQueryString(data : Dynamic) : String { return untyped __js__("m.route.buildQueryString({0})", data); }
-	public static inline function parseQueryString(querystring : String) : Dynamic { return untyped __js__("m.route.parseQueryString({0})", querystring); }
-
+	
+	public static function version() : String;
+	
 	///// Haxe specific stuff /////
 
 	static function __init__() : Void {
@@ -170,6 +187,7 @@ extern class M
 }
 #else
 
+@:final
 class M 
 {
 	///// Stubs /////
@@ -179,6 +197,8 @@ class M
 	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : T2 -> Void {
 		return function(e) {}
 	}
+	
+	public static var routeLink(default, null) : Function = null;
 	
 	///// Rendering /////
 	
@@ -284,22 +304,21 @@ class M
 			vnode(
 				selector, 
 				Reflect.hasField(attrs, "key") ? Reflect.field(attrs, "key") : null, 
-				attrs, 
-				vnodeNormalizeChildren(newChildren), 
-				null, 
-				null
+				attrs, vnodeNormalizeChildren(newChildren), null, null
 			);
 		}
 	}
 	
-	public static function trust(html : String) : VirtualElement {
+	public static function trust(html : String) : Vnode<Dynamic> {
 		return {
 			state: html,
 			tag: "<",
 			key: null,
 			attrs: null,
 			children: null,
-			text: null
+			text: null,
+			dom: null,
+			domSize: 0
 		}
 	}
 	
@@ -308,7 +327,7 @@ class M
 	static function vnode(tag : Dynamic, key, attrs0, children : Dynamic, text, dom) : Dynamic {
 		return { 
 			tag: tag, key: key, attrs: attrs0, children: children, text: text, 
-			dom: dom, domSize: null, 
+			dom: dom, domSize: 0,
 			state: {}, events: null, instance: null, skip: false			
 		}
 	}

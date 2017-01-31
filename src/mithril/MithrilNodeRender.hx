@@ -23,11 +23,11 @@ class MithrilNodeRender
 		this.indentMode = this.indent.length > 0;
 	}
 
-	public function render(view : VirtualElement) : String {
+	public function render(view : Vnodes) : String {
 		return _render(view, 0).trim();
 	}
 	
-	function _render(view : VirtualElement, indentDepth : Int) : String {
+	function _render(view : Vnodes, indentDepth : Int) : String {
 		if(view == null) return "";
 
 		if(Std.is(view, String))

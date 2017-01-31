@@ -12,7 +12,7 @@ import js.html.InputElement;
 import js.html.Storage;
 import js.Lib;
 import mithril.M;
-import mithril.M.VirtualElement;
+import mithril.M.Vnodes;
 
 class ChainModel extends IntMap<Bool>
 {

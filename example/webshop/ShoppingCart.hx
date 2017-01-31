@@ -144,7 +144,7 @@ class ShoppingCart implements Mithril implements HaxeContracts
         )
 	];
 
-    function items() : Array<VirtualElement> {
+    function items() : Array<Vnodes> {
         if(content.empty()) return [m('li', m('a', "Empty"))];
 
         var total = 0.0;

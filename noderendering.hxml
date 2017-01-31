@@ -1,11 +1,11 @@
--D nodejs
 -D isomorphic
+-D server
+-D source-map-content
 -cp src 
 -cp example
 -lib hxnodejs
 -js bin/noderendering.js
 -main NodeRendering
 -debug
--D source-map-content
 # Changing route mode in the demo with -D isomorphic.
 -cmd haxe -D isomorphic mithril.hxml

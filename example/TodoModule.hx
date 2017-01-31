@@ -1,7 +1,8 @@
 import haxe.Timer;
 import mithril.M;
+import mithril.M.m;
 
-#if (js && !nodejs)
+#if !server
 import haxe.Serializer;
 import haxe.Unserializer;
 #end
@@ -18,10 +19,6 @@ typedef KeyboardEvent = Dynamic;
 typedef InputElement = Dynamic;
 #end
 
-/**
-* Cannot use @prop and M.prop(), doesn't work well with
-* Haxe serialization.
-*/
 class Todo
 {
 	public var description : String;
@@ -35,12 +32,12 @@ class Todo
 
 class TodoList
 {
-	#if (js && !nodejs)
+	#if !server
 	static var storage = Browser.window.localStorage;
 	#end
 
 	public static function load() : TodoList {
-		#if (sys || nodejs)
+		#if server
 		return new TodoList();
 		#else
 		var list = storage.getItem("todo-app-list");
@@ -72,7 +69,7 @@ class TodoList
 	}
 
 	public function save() {
-		#if (js && !nodejs)
+		#if !server
 		var ser = new Serializer();
 		ser.serialize(list);
 		storage.setItem("todo-app-list", ser.toString());
@@ -117,8 +114,6 @@ class TodoModule implements Mithril
 	}
 
 	private function todo_add(delay = 0) {
-		// M.startComputation is used automatically in a real call to 
-		// m.request, but here it's simulated.
 		todoAdding = true;
 		// First redraw to display the loading text:
 		M.redraw();
@@ -143,10 +138,4 @@ class TodoModule implements Mithril
 		task.done = checked;
 		todo.save();
 	}
-
-	#if js
-	static function main() {
-		M.mount(Browser.document.body, new TodoModule());
-	}
-	#end
 }

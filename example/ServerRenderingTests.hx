@@ -12,7 +12,7 @@ using buddy.Should;
 {
 	public function new() {
 		var render = new MithrilNodeRender().render;
-		var view : VirtualElement;
+		var view : Vnodes;
 		
 		describe("MithrilNodeRender", {
 			it("should render basic types to html", {
