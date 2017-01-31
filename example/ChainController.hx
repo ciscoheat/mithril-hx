@@ -36,6 +36,16 @@ class ChainModel extends IntMap<Bool>
 		super();
 	}
 
+	public function isChecked(index) {
+		return get(index) == true;
+	}
+
+	public function toggle(index : Int) {
+		if (dateAt(index).getTime() > today().getTime()) return;
+		set(index, get(index) == null ? true : !get(index));
+		save();
+	}	
+	
 	public function clear() {
 		for(key in keys()) this.remove(key);
 		resetDate();
@@ -77,41 +87,6 @@ class ChainModel extends IntMap<Bool>
 	}
 }
 
-class ChainController implements Mithril
-{
-	var list : ChainModel;
-	public var view : ChainView;
-
-	public function new() {
-		this.list = ChainModel.load();
-		this.view = new ChainView(list);
-	}
-
-	public function controller() {
-		// Nothing to do, only used for demonstrating Controllers.		
-	}
-
-	public function clear() {
-		list.clear();
-	}
-
-	public function isChecked(index) {
-		return list.get(index) == true;
-	}
-
-	public function check(index : Int, status : Bool) {
-		if (list.dateAt(index).getTime() <= list.today().getTime()) {
-			list.set(index, status);
-			list.save();
-		}
-	}
-
-	public static function main() {
-		var controller = new ChainController();
-		M.mount(Browser.document.body, { controller: controller.controller, view: controller.view.view });
-	}
-}
-
 class ChainView implements Mithril
 {
 	var model : ChainModel;
@@ -120,34 +95,27 @@ class ChainView implements Mithril
 		this.model = model;
 	}
 
-	public function view(?ctrl : ChainController) : VirtualElement {
+	public function view() {
 		m("table", seven(function(y) {
 			m("tr", seven(function(x) {
 				var index = indexAt(x, y);
 				m("td", highlights(index), [
-					m("input[type=checkbox]", checks(ctrl, index))
+					m("input[type=checkbox]", checks(index))
 				]);
 			}));
 		}));
 	}
 
-	private function seven(subject)	{
-		var output = [];
+	private function seven(view) {
 		var i = -1;
-		while (i++ < 6) output.push(subject(i));
-		return output;
+		return [while (i++ < 6) view(i)];
 	}
 
-	public function checks(ctrl : ChainController, index : Int) {
-		var attribs : Dynamic = {
-			onclick: function(e : Event) {
-				var checkBox = cast(e.target, InputElement);
-				ctrl.check(index, checkBox.checked);
-			},
+	public function checks(index : Int) {
+		return {
+			onclick: model.toggle.bind(index),
+			checked: model.isChecked(index)
 		};
-
-		if(ctrl.isChecked(index)) attribs.checked = "checked";
-		return attribs;
 	}
 
 	public function highlights(index) {
