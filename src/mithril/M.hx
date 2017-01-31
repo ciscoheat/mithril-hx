@@ -26,6 +26,7 @@ import js.html.Element;
 // Mock js classes for server rendering
 typedef XMLHttpRequest = Dynamic;
 typedef Event = Dynamic;
+typedef Promise<T> = Dynamic;
 
 #end
 
@@ -43,6 +44,11 @@ from T1 from T2 to T1 to T2 {}
 typedef Component = {
 	var view : Function;
 };
+
+typedef RouteResolver<T : Component> = {
+	@:optional function onmatch(args : DynamicAccess<String>, requestedPath : String) : Either<T, Promise<T>>;
+	@:optional function render(vnode : Null<Vnode<T>>) : Vnodes;
+}
 
 typedef Vnode<T> = {
 	var state : Null<T>;
@@ -106,7 +112,7 @@ extern class M
 	
 	public static function mount(element : Element, component : Null<Component>) : Void;
 
-	public static function route(rootElement : Element, defaultRoute : String, routes : { } ) : Void;
+	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<Either<Component, RouteResolver<Dynamic>>>) : Void;
 	
 	///// Special route accessors /////
 	
@@ -119,15 +125,14 @@ extern class M
 	}
 	public static inline function routeGet() : String  { return untyped __js__("m.route.get()"); }
 	public static inline function routePrefix(prefix : String) : Void  { return untyped __js__("m.route.prefix({0})", prefix); }
-
+	public static inline function routeLink(vnode : Vnode<Dynamic>) : Event -> Void { return untyped __js__("m.route.link({0})", vnode); }
+	
 	// Convenience method for route attributes
 	public static inline function routeAttrs(vnode : Vnode<Dynamic>) : DynamicAccess<String> { return untyped __js__("{0}.attrs", vnode); }
-
-	public static var routeLink(get, null) : Function;
-	static inline function get_routeLink() : Function { return untyped __js__("m.route.link"); }
 	
 	///////////////////////////////////
 	
+	#if !nodejs
 	@:overload(function<T, T2, T3>(url : String) : Promise<T> {})
 	@:overload(function<T, T2, T3>(options : XHROptions<T, T2, T3>) : Promise<T> {})
 	public static function request<T, T2, T3>(url : String, options : XHROptions<T, T2, T3>) : Promise<T>;
@@ -135,6 +140,7 @@ extern class M
 	@:overload(function<T>(url : String) : Promise<T> {})
 	@:overload(function<T, T2>(options : JSONPOptions<T, T2>) : Promise<T> {})
 	public static function jsonp<T, T2>(url : String, options : JSONPOptions<T, T2>) : Promise<T>;
+	#end
 
 	public static function parseQueryString(querystring : String) : DynamicAccess<String>;
 	public static function buildQueryString(data : {}) : String;
@@ -186,6 +192,8 @@ extern class M
 	}
 }
 #else
+
+///// Cross-platform implementation of Mithril. /////
 
 @:final
 class M 

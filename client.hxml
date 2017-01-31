@@ -1,7 +1,9 @@
 -D source-map-content
+
 -cp src
 -cp example
--js bin/app.js
+
 -main DashboardModule
+-js bin/client.js
+
 -debug
-#-cmd start bin/index.html

@@ -1,16 +1,19 @@
 package  ;
 
+#if js
 #if !nodejs
 import haxe.Serializer;
 import haxe.Unserializer;
 #end
-import haxe.ds.IntMap;
-import haxe.Json;
 import js.Browser;
 import js.html.Event;
 import js.html.InputElement;
 import js.html.Storage;
 import js.Lib;
+#end
+
+import haxe.ds.IntMap;
+import haxe.Json;
 import mithril.M;
 import mithril.M.Vnodes;
 

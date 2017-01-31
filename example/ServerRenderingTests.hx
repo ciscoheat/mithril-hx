@@ -1,4 +1,3 @@
-package ;
 
 import buddy.*;
 import mithril.M;
@@ -8,7 +7,7 @@ import mithril.MithrilNodeRender;
 using StringTools;
 using buddy.Should;
 
-@colorize class ServerRenderingTests extends buddy.SingleSuite
+class ServerRenderingTests extends buddy.SingleSuite
 {
 	public function new() {
 		var render = new MithrilNodeRender().render;

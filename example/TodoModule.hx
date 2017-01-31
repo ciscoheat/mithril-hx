@@ -119,7 +119,6 @@ class TodoModule implements Mithril
 		M.redraw();
 		// Wait for request to finish:
 		Timer.delay(function() { 
-			trace('Todo delay $delay done');
 			todo.add(todo.description);
 			// Request completed, set appropriate state:
 			todo.description = "";

@@ -1,0 +1,27 @@
+# Server-side compilation
+
+# Compilation defines
+# can be used as preprocessor directives
+-D isomorphic
+-D server
+-D source-map-content
+
+# Code paths for source files
+-cp example
+-cp src 
+
+# Libraries from haxelib
+-lib hxnodejs
+
+# Entrypoint and compilation output
+-main NodeRendering
+-js bin/server.js
+
+-debug
+
+# Compile the client-side code. Added 
+# -D isomorphic to change route mode 
+# on the client.
+--next
+-D isomorphic
+client.hxml

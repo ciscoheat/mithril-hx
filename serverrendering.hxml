@@ -1,5 +1,6 @@
+-D server
 -cp src 
 -cp example
 -neko bin/serverrendering.n
--main ServerRendering
+-main NodeRendering
 -cmd neko bin/serverrendering.n
