@@ -196,7 +196,9 @@ As a bonus, a Neko version of Example 1 will also be compiled. Test it with
 
 `neko server.n`
 
-The `MithrilNodeRender` is tested with [travix](https://github.com/back2dos/travix/) and should work on all targets.
+The `MithrilNodeRender` is tested with [travix](https://github.com/back2dos/travix/) and should work on all targets. 
+
+Finally, if you're using Node.js, you can install and use Mithril from npm instead of the Haxe port. To do that, define `-D mithril-native`.
 
 # Feedback please!
 
