@@ -117,6 +117,8 @@ class TodoComponent implements Mithril
 	}
 
 	private function todo_add(delay = 0) {
+		// For testing purposes
+		#if !server
 		todoAdding = true;
 		// First redraw to display the loading text:
 		M.redraw();
@@ -128,6 +130,7 @@ class TodoComponent implements Mithril
 			todoAdding = false;
 			M.redraw();
 		}, delay);
+		#end
 	}
 
 	private function todo_setDescription(e : KeyboardEvent) {

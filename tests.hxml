@@ -1,0 +1,10 @@
+-D server
+-D buddy-colors
+
+-lib slambda
+-lib buddy
+
+-cp src 
+-cp example
+
+-main ServerRenderingTests

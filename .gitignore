@@ -24,3 +24,8 @@
 /bin/neko
 /bin/node
 /bin/python
+/.vagrant
+/bin/cs
+/bin/cpp
+/bin/swf
+/bin/php

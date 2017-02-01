@@ -214,7 +214,7 @@ class M
 		//trace("=== " + selector);
 		
 		if (Std.is(selector, String) && !selectorCache.exists(selector)) {
-			var tag : String, classes : Array<String> = [];
+			var tag : String = null, classes : Array<String> = [];
 			var attributes : DynamicAccess<Dynamic> = {}, tempSelector = selector;
 			
 			while (selectorParser.match(tempSelector)) {
@@ -255,7 +255,15 @@ class M
 				
 				if (className != null) {
 					if (attrs.get("class") != null) {
+						#if python
+						// Cannot delete "class" field on python
+						var newAttrs: DynamicAccess<Dynamic> = {};
+						for (key in attrs.keys()) if (key != 'class') 
+							newAttrs.set(key, attrs.get(key));
+						attrs = newAttrs;
+						#else
 						attrs.remove("class");
+						#end
 						attrs.set("className", className);
 					}
 					if (attributes.get("className") != null) {
@@ -313,8 +321,11 @@ class M
 		
 		//trace(arguments); trace(attrs);
 		
-		return if (Std.is(selector, String))
-			selectorCache[selector](attrs, vnodeNormalizeChildren(newChildren))
+		return if (Std.is(selector, String)) {
+			// php cannot call the selector directly
+			var cacheFunc = selectorCache[selector];
+			cacheFunc(attrs, vnodeNormalizeChildren(newChildren));
+		}
 		else {
 			vnode(
 				selector, 
