@@ -1,12 +1,9 @@
 package webshop;
 
 import haxecontracts.*;
+import haxe.ds.ObjectMap;
 import js.Browser;
-#if (haxe_ver >= 3.2)
 import js.html.DOMElement in Element;
-#else
-import js.html.Element;
-#end
 import js.html.Event;
 import haxe.Timer;
 import mithril.M;
@@ -22,40 +19,12 @@ class ShoppingCart implements Mithril implements HaxeContracts
     var cartParent : Element;
     var dropDownMenu : Element;
 
-    var content : haxe.ds.ObjectMap<Product, Int> = new haxe.ds.ObjectMap<Product, Int>();
+    var content : ObjectMap<Product, Int> = new ObjectMap<Product, Int>();
 
     public function new() {
         this.isOpen = false;
         unserialize();
     }
-
-    ///// Saving and restoring the cart to localStorage /////
-
-    function serialize() {
-        var output = new Map<String, Int>();
-
-        for (p in products())
-            output.set(p.id, content.get(p));
-
-        Browser.getLocalStorage().setItem("cart", haxe.Serializer.run(output));
-    }
-
-    function unserialize() {
-        var data = Browser.getLocalStorage().getItem("cart");
-        if(data == null) return;
-
-        try {
-            var cartData : Map<String, Int> = cast Unserializer.run(data);
-            
-            Product.all().then(function(products : Array<Product>) {
-                products = products.filter(function(p) return cartData.exists(p.id));
-                for(p in products) content.set(p, cartData.get(p.id));
-                M.redraw();
-            });
-        } catch(e : Dynamic) {}
-    }
-
-    //////////////////////////////////////////////////////////
 
     function products() {
         return {iterator: content.keys};
@@ -79,10 +48,10 @@ class ShoppingCart implements Mithril implements HaxeContracts
     public function open() {
         requires(cartParent != null);
         requires(dropDownMenu != null);
+		
+        isOpen = true;
 
         var html = Browser.document.documentElement;
-
-        isOpen = true;
 
         // A little tweak to keep the menu size when removing items.
         // Set the width to auto and after a short delay its calculated width.
@@ -112,7 +81,6 @@ class ShoppingCart implements Mithril implements HaxeContracts
 		m('li', {
 			"class": isOpen ? "dropdown open" : "dropdown",
 			oncreate: function(vnode) {
-                // Setting cartParent
 				cartParent = vnode.dom.parentElement;
 				// Need to prevent dropdown from closing automatically:
 				vnode.dom.addEventListener("hide.bs.dropdown", function() return false);
@@ -133,7 +101,6 @@ class ShoppingCart implements Mithril implements HaxeContracts
 			m('ul.dropdown-menu', {
 				role: "menu",
 				oncreate: function(vnode) {
-                    // Setting dropDownMenu
                     dropDownMenu = vnode.dom;
                 }
 			}, items())
@@ -171,7 +138,32 @@ class ShoppingCart implements Mithril implements HaxeContracts
 
         return products.array();        
     }
+	
+    ///// Saving and restoring the cart to localStorage /////
 
+    function serialize() {
+        var output = [for (p in products()) p.id => content.get(p)];
+
+        Browser.getLocalStorage().setItem("cart", haxe.Serializer.run(output));
+    }
+
+    function unserialize() {
+        var data = Browser.getLocalStorage().getItem("cart");
+        if(data == null) return;
+
+        try {
+            var cartData : Map<String, Int> = cast Unserializer.run(data);
+            
+            Product.all().then(function(products : Array<Product>) {
+                products = products.filter(function(p) return cartData.exists(p.id));
+                for(p in products) content.set(p, cartData.get(p.id));
+                M.redraw();
+            });
+        } catch(e : Dynamic) {}
+    }
+
+    //////////////////////////////////////////////////////////
+	
     @invariants function invariants() {
         invariant(content != null);
     }

@@ -14,3 +14,9 @@
 /bin/*.js
 /bin/*.map
 /bin/*.n
+/bin/obj
+/bin/src
+/bin/Server.jar
+/bin/cmd
+/bin/hxjava_build.txt
+/bin/manifest

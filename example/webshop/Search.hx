@@ -1,10 +1,6 @@
 package webshop;
 
-#if (haxe_ver >= 3.2)
 import js.html.DOMElement in Element;
-#else
-import js.html.Element;
-#end
 import haxe.Constraints.Function;
 import haxe.DynamicAccess;
 import js.Browser;

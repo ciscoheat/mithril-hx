@@ -1,10 +1,9 @@
 package webshop;
 
-#if js
 import js.Browser;
-#end
 import mithril.M;
 import webshop.models.*;
+
 using Slambda;
 using StringTools;
 
@@ -13,35 +12,29 @@ using StringTools;
  */
 class Webshop implements Mithril
 {
-	#if js
-    var cart : ShoppingCart;
-    var routes : Dynamic;
-    var menu : Menu;
-
-    // Create menu and routes.
+	//
+	// Program entry point
+	//
+    static function main() {
+        Category.all().then(function(categories) {
+            new Webshop(categories);
+        });
+    }
+	
     public function new(categories : Array<Category>) {
-        cart = new ShoppingCart();
-        menu = new Menu(categories);
+        var cart = new ShoppingCart();
+        var menu = new Menu(categories);
         
-        /*
-        {
-            onmatch: function(params : haxe.DynamicAccess<String>, url : String) 
-                productList.changeCategory(params.get('categoryId')),
-            render: function(vnode) return m(productList)
-        }
-        */
-
-        routes = {
+        var routes = {
             "/": this,
             "/category/:key": new ProductList(menu, cart, categories),
             "/product/:key": new ProductPage(menu, cart),
             "/checkout": new Checkout(cart)
         };
-    }
+		
+		var element = Browser.document.getElementById;
 
-    // Call to start the whole site.
-    public function start() {
-        // Define routes for the main page content
+        // Routes for the main page content
         M.route(element("content"), "/", routes);
 
         // Define modules that should not change if the main content changes
@@ -55,21 +48,6 @@ class Webshop implements Mithril
                 m("a.navbar-brand[href='/']", {oncreate: M.routeLink}, "Mithril/Haxe Webshop")
         });
     }
-
-    private inline function element(id : String) {
-        return Browser.document.getElementById(id);
-    }
-
-    // Program entry point
-    static function main() {
-        Category.all().then(function(categories) {
-            new Webshop(categories).start();
-        });
-    }
-
-	#else
-	public function new() {}
-	#end
 
     // Welcome text for the default route
     public function view() [
