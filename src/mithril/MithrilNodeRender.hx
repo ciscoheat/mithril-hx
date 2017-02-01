@@ -41,7 +41,7 @@ class MithrilNodeRender
 
 		// view must be a Vnode now.
 		var el : Vnode<Dynamic> = cast view;
-
+		
 		// Test for trusted html
 		if (el.tag == "<") {
 			return cast el.state;
@@ -72,19 +72,23 @@ class MithrilNodeRender
 		if (attrs == null) return '';
 		
 		return Reflect.fields(attrs).map(function(name) {
-			var value = Reflect.field(attrs, name);
+			// Needed a typehint to Dynamic for java to treat most values as not strings.
+			var value : Dynamic = Reflect.field(attrs, name);
 			if (value == null) return ' ' + (name == 'className' ? 'class' : name);
+			
+			//trace(value); trace(Type.typeof(value));
 			
 			if(Reflect.isFunction(value)) return '';
 			if(Std.is(value, Bool)) return cast(value, Bool) ? ' ' + name : '';
 
 			if(name == 'style') {
-				var styles = value;
-				if(Std.is(styles, String)) return ' style="' + escape(styles) + '"';
-
+				var styles : Dynamic = value;
+				if (Std.is(styles, String)) return ' style="' + escape(styles) + '"';
+				
 				return ' style="' + Reflect.fields(styles).map(function(property) {
-					return camelToDash(property).toLowerCase() + ':' + 
-						   escape(Reflect.field(styles, property));
+					// Same here for java as above
+					var value : Dynamic = Reflect.field(styles, property);
+					return camelToDash(property).toLowerCase() + ':' + escape(value);
 				}).join(';') + '"';
 			}
 			return ' ' + (name == 'className' ? 'class' : name) + '="' + escape(value) + '"';

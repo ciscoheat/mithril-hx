@@ -7,27 +7,18 @@ import haxe.Constraints.Function;
 import haxe.DynamicAccess;
 
 #if js
-
 import js.Browser;
 import js.Promise;
 import js.Error;
 import js.html.Document;
 import js.html.Event;
 import js.html.XMLHttpRequest;
-
-#if (haxe_ver >= 3.2)
 import js.html.DOMElement in Element;
 #else
-import js.html.Element;
-#end
-
-#else
-
-// Mock js classes for server rendering
+// Mock some js classes for server rendering
 typedef XMLHttpRequest = Dynamic;
 typedef Event = Dynamic;
 typedef Promise<T> = Dynamic;
-
 #end
 
 /////////////////////////////////////////////////////////////
@@ -65,11 +56,10 @@ typedef Vnode<T> = {
 	var text : Null<Dynamic>;
 	#if js
 	var dom : Null<Element>;
-	var domSize : Int;
 	#else
 	var dom : Null<Dynamic>;
-	var domSize : Int;
 	#end
+	var domSize : Null<Int>;
 };
 
 typedef Vnodes = Either<Vnode<Dynamic>, Array<Vnode<Dynamic>>>;
@@ -221,6 +211,8 @@ class M
 			throw "The selector must be either a string or a component.";
 		}
 		
+		//trace("=== " + selector);
+		
 		if (Std.is(selector, String) && !selectorCache.exists(selector)) {
 			var tag : String, classes : Array<String> = [];
 			var attributes : DynamicAccess<Dynamic> = {}, tempSelector = selector;
@@ -277,8 +269,12 @@ class M
 				}
 				
 				var childArray : Array<Vnode<Dynamic>> = Std.is(children, Array) ? cast children : null;
-								
-				if (childArray != null && childArray.length == 1 && childArray[0] != null && childArray[0].tag == "#") {
+				
+				//trace("selectorCache[" + selector + "] childArray:"); trace(childArray);
+				
+				if (childArray != null && childArray.length == 1 && 
+					childArray[0] != null && Reflect.hasField(childArray[0], "tag") && childArray[0].tag == "#"
+				) {
 					text = Std.string(childArray[0].children);
 				}
 				else 
@@ -310,7 +306,7 @@ class M
 			[for (i in childrenIndex...arguments.length) arguments[i]];
 		}
 		
-		//trace(arguments); trace(attrs); trace(newChildren);
+		//trace(arguments); trace(attrs);
 		
 		return if (Std.is(selector, String))
 			selectorCache[selector](attrs, vnodeNormalizeChildren(newChildren))
