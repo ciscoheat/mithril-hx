@@ -4,7 +4,7 @@
   <output>
     <movie outputType="CustomBuild" />
     <movie input="" />
-    <movie path="server.hxml" />
+    <movie path="server-node.hxml" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
@@ -23,7 +23,7 @@
     <option directives="isomorphic&#xA;server&#xA;source-map-content" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
-    <option mainClass="NodeRendering" />
+    <option mainClass="Server" />
     <option enabledebug="False" />
     <option additional="-debug " />
   </build>
@@ -37,6 +37,7 @@
     <compile path="src\TodoModul.hx" />
     <compile path="src\TodoModule.hx" />
     <compile path="example\DashboardModule.hx" />
+    <compile path="example\Server.hx" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>

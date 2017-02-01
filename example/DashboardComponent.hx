@@ -1,6 +1,6 @@
 
 import mithril.M;
-import ChainModel;
+import ChainComponent;
 
 @:enum abstract CurrentApp(String) from String {
 	var None = "";
@@ -8,10 +8,10 @@ import ChainModel;
 	var Chain = "chain";
 }
 
-class DashboardModule implements Mithril
+class DashboardComponent implements Mithril
 {
-	var todo : TodoModule;
-	var chainView : ChainView;
+	var todo : TodoComponent;
+	var chainView : ChainComponent;
 	var chainModel : ChainModel;
 
 	var ip : String = "";
@@ -20,9 +20,9 @@ class DashboardModule implements Mithril
 	///////////////////////////////////////////////////////////////////////////
 	
 	public function new() {
-		todo = new TodoModule();
+		todo = new TodoComponent();
 		chainModel = new ChainModel();
-		chainView = new ChainView(chainModel);
+		chainView = new ChainComponent(chainModel);
 		
 		#if !server
 		M.request("https://jsonip.com/").then(
@@ -68,7 +68,7 @@ class DashboardModule implements Mithril
 	
 	#if !server
 	public static function main() {
-		var dashboard = new DashboardModule();
+		var dashboard = new DashboardComponent();
 		var htmlBody = js.Browser.document.body;
 		
 		#if isomorphic

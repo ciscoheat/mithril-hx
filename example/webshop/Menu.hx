@@ -24,7 +24,7 @@ class Menu implements Mithril implements HaxeContracts
         this.active = categories.find(function(c) return c.id == categoryId);
     }
 
-    public function view() [
+    public function view(vnode) [
         m('ul.nav.nav-sidebar', categories.map(function(c) {
             m('li', {"class": (active != null && active == c ? "active" : "")}, 
                 m('a', {

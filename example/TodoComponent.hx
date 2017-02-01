@@ -19,6 +19,7 @@ typedef KeyboardEvent = Dynamic;
 typedef InputElement = Dynamic;
 #end
 
+// Model
 class Todo
 {
 	public var description : String;
@@ -30,6 +31,7 @@ class Todo
 	}
 }
 
+// Model
 class TodoList
 {
 	#if !server
@@ -77,7 +79,8 @@ class TodoList
 	}
 }
 
-class TodoModule implements Mithril
+// Controller/View
+class TodoComponent implements Mithril
 {
 	public var todo : TodoList;
 

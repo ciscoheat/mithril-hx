@@ -1,0 +1,10 @@
+# Targeting neko in this build.
+# Using the same Server class as in server-node.hxml
+
+-D server
+
+-cp src 
+-cp example
+
+-neko bin/server.n
+-main Server

@@ -3,7 +3,7 @@
 -cp src
 -cp example
 
--main DashboardModule
+-main DashboardComponent
 -js bin/client.js
 
 -debug

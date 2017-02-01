@@ -41,9 +41,15 @@ from T1 from T2 to T1 to T2 {}
 
 ///// Typedefs /////
 
-typedef Component = {
-	var view : Function;
+private typedef Component1 = {
+	function view() : Vnodes;
 };
+
+private typedef Component2 = {
+	function view(vnode : Vnode<Dynamic>) : Vnodes;
+};
+
+typedef Component = Either<Component1, Component2>;
 
 typedef RouteResolver<T : Component> = {
 	@:optional function onmatch(args : DynamicAccess<String>, requestedPath : String) : Either<T, Promise<T>>;
@@ -104,9 +110,9 @@ typedef JSONPOptions<T, T2> = {
 @:final @:native("m")
 extern class M
 {
-	@:overload(function<T>(selector : Either<String, Component>) : Vnode<T> {})
-	@:overload(function<T>(selector : Either<String, Component>, attributes : Dynamic) : Vnode<T> {})
-	public static function m<T>(selector : Either<String, Component>, attributes : Dynamic, children : Dynamic) : Vnode<T>;
+	@:overload(function(selector : Either<String, Component>) : Vnodes {})
+	@:overload(function(selector : Either<String, Component>, attributes : Dynamic) : Vnodes {})
+	public static function m(selector : Either<String, Component>, attributes : Dynamic, children : Dynamic) : Vnodes;
 
 	public static function render(rootElement : Element, children : Vnodes) : Void;
 	
@@ -318,6 +324,8 @@ class M
 	}
 	
 	public static function trust(html : String) : Vnode<Dynamic> {
+		// Implementation differs from native Mithril, html is stored in state instead
+		// because of static platform types.
 		return {
 			state: html,
 			tag: "<",

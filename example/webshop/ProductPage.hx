@@ -23,7 +23,7 @@ class ProductPage implements Mithril implements HaxeContracts
         this.menu = menu;
     }
 
-    public function onmatch(params : haxe.DynamicAccess<String>) {
+    public function onmatch(params : haxe.DynamicAccess<String>, url : String) {
         loader.start();
 
         Product.all().then(function(products : Array<Product>) { 
@@ -37,6 +37,8 @@ class ProductPage implements Mithril implements HaxeContracts
         }, 
             loader.error
         );
+		
+		return null;
     }
 
     function addToCart(p : Product) {
@@ -44,7 +46,7 @@ class ProductPage implements Mithril implements HaxeContracts
         cart.open();
     }
 
-    public function render() {
+    public function render(vnode) {
         var template = switch loader.state() {
             case Started: m('div.row', "");
             case Delayed: m('div.row', m('div.col-xs-12', m('h1', "Loading...")));

@@ -14,7 +14,7 @@
 -lib hxnodejs
 
 # Entrypoint and compilation output
--main NodeRendering
+-main Server
 -js bin/server.js
 
 -debug
@@ -25,3 +25,8 @@
 --next
 -D isomorphic
 client.hxml
+
+# Also compile the server for Neko,
+# to demonstrate cross-platform capabilities
+--next
+server-neko.hxml

@@ -90,7 +90,7 @@ class ChainModel extends IntMap<Bool>
 	}
 }
 
-class ChainView implements Mithril
+class ChainComponent implements Mithril
 {
 	var model : ChainModel;
 

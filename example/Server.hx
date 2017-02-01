@@ -1,3 +1,5 @@
+#if server
+
 #if nodejs
 import js.Lib;
 import js.Node;
@@ -12,14 +14,13 @@ import js.node.Url.UrlData;
 import js.node.Fs;
 #end
 
-import haxe.Constraints;
 import mithril.M;
 import mithril.M.m;
 import mithril.MithrilNodeRender;
 
 using StringTools;
 
-class NodeRendering
+class Server
 {
 	//
 	// Entrypoint for the server application
@@ -32,7 +33,7 @@ class NodeRendering
 	}	
 
 	static function displayTodo() {
-		var todoList = new TodoModule();
+		var todoList = new TodoComponent();
 
 		todoList.todo.add("First one");
 		todoList.todo.add("Second <one>");
@@ -45,7 +46,7 @@ class NodeRendering
 	// A simple Express server, matching the routes in DashboardModule.
 	static function startServer() {
 		#if nodejs
-		var dashboard = new DashboardModule();
+		var dashboard = new DashboardComponent();
 		var renderer = new MithrilNodeRender();		
 		
 		var express : Dynamic = Lib.require('express');
@@ -85,3 +86,4 @@ class NodeRendering
 		#end
 	}
 }
+#end

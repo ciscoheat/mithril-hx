@@ -11,3 +11,6 @@
 /bin/htmlrendering.n
 /bin/serverrendering-tests.n
 /bin/serverrendering.n
+/bin/*.js
+/bin/*.map
+/bin/*.n

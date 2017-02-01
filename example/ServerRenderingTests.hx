@@ -132,7 +132,7 @@ class ServerRenderingTests extends buddy.SingleSuite
 			///// Messy tests ////////////////////////////////////////////////////////////////////////			
 			
 			it("should stub most m.methods", {
-				var todoList = new TodoModule();
+				var todoList = new TodoComponent();
 		
 				todoList.todo.add("First one");
 				todoList.todo.add("Second <one>");
