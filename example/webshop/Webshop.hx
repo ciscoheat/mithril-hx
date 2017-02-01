@@ -1,11 +1,26 @@
 package webshop;
 
+#if js
 import js.Browser;
+#end
 import mithril.M;
 import webshop.models.*;
 
 using Slambda;
 using StringTools;
+
+/*
+  - haxelib run travix interp
+  - haxelib run travix neko
+  - haxelib run travix python
+  - haxelib run travix node
+  - haxelib run travix flash
+  - haxelib run travix java
+  - haxelib run travix cpp
+  - haxelib run travix cs
+  - haxelib run travix php
+  - haxelib run travix lua
+*/
 
 /**
  * A simple webshop to demonstrate the power of Mithril.
@@ -14,7 +29,8 @@ class Webshop implements Mithril
 {
 	//
 	// Program entry point
-	//
+	// With a preprocessor directive to support testing. Please ignore it.
+	#if !buddy
     static function main() {
         Category.all().then(function(categories) {
             new Webshop(categories);
@@ -48,6 +64,9 @@ class Webshop implements Mithril
                 m("a.navbar-brand[href='/']", {oncreate: M.routeLink}, "Mithril/Haxe Webshop")
         });
     }
+	#else
+	public function new() {}
+	#end
 
     // Welcome text for the default route
     public function view() [

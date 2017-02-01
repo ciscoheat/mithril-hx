@@ -36,7 +36,10 @@ class ServerRenderingTests extends buddy.SingleSuite
 					m('h1', "Hello world"),
 					m('.test', {style: {color: 'red', backgroundColor: 'blue'}}, "Server-side Mithril")
 				];
-				render(view).should.be('<h1>Hello world</h1><div class="test" style="color:red;background-color:blue">Server-side Mithril</div>');
+				render(view).should.startWith('<h1>Hello world</h1><div ');
+				render(view).should.contain('class="test"');
+				render(view).should.match(~/\bstyle="(color:red|;|background-color:blue){3}"/);
+				render(view).should.endWith('>Server-side Mithril</div>');
 			});
 			
 			it("should render tags with attributes properly", {
@@ -66,7 +69,11 @@ class ServerRenderingTests extends buddy.SingleSuite
 
 				// Attribute position could vary between platforms
 				view = m("a#google.external[href='http://google.com']", "Google"); 
-				render(view).should.be('<a href="http://google.com" class="external" id="google">Google</a>');
+				render(view).should.contain('href="http://google.com"');
+				render(view).should.contain('class="external"');
+				render(view).should.contain('id="google"');
+				render(view).should.startWith('<a ');
+				render(view).should.endWith('>Google</a>');
 			});
 			
 			it("should render combinations of static and dynamic attributes properly", {
@@ -85,7 +92,10 @@ class ServerRenderingTests extends buddy.SingleSuite
 				render(view).should.be('<hr>');
 				
 				view = m("meta[name=keywords][content='A test']");
-				render(view).should.be('<meta name="keywords" content="A test">');
+				render(view).should.startWith('<meta ');
+				render(view).should.endWith('>');
+				render(view).should.contain('name="keywords"');
+				render(view).should.contain('content="A test"');
 			});
 			
 			it("should render nested virtual elements properly", {
@@ -138,10 +148,18 @@ class ServerRenderingTests extends buddy.SingleSuite
 				todoList.todo.add("Second <one>");
 		
 				todoList.todo.list[0].done = true;
+				
+				var renderedList : String = render(todoList.view());
 		
-				render(todoList.view()).should.be('<div><input value=""><button>Add</button><span style="display:none"> Adding...</span><table><tr><td><input type="checkbox" checked="checked"></td><td style="text-decoration:line-through">First one</td></tr><tr><td><input type="checkbox"></td><td style="text-decoration:none">Second &lt;one&gt;</td></tr></table></div>');
+				renderedList.should.startWith('<div><input value=""><button>Add</button><span style="display:none"> Adding...</span><table><tr><td><input ');
+			
+				renderedList.should.contain('checked="checked"');
+				renderedList.should.contain('type="checkbox"');
+			
+				renderedList.should.endWith('></td><td style="text-decoration:line-through">First one</td></tr><tr><td><input type="checkbox"></td><td style="text-decoration:none">Second &lt;one&gt;</td></tr></table></div>');
 			});
 			
+			#if (!nodejs && !java)
 			it("should render complex compositions with indentation properly", {
 				var render = new MithrilNodeRender("  ").render;
 				var webshop = new webshop.Webshop();
@@ -184,6 +202,7 @@ class ServerRenderingTests extends buddy.SingleSuite
 </ul>
 '.trim());
 			});
+			#end
 		});		
 	}
 }

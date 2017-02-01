@@ -273,12 +273,17 @@ class M
 				//trace("selectorCache[" + selector + "] childArray:"); trace(childArray);
 				
 				if (childArray != null && childArray.length == 1 && 
-					childArray[0] != null && Reflect.hasField(childArray[0], "tag") && childArray[0].tag == "#"
+					childArray[0] != null && Reflect.hasField(childArray[0], "tag") && Reflect.field(childArray[0], "tag") == "#"
 				) {
-					text = Std.string(childArray[0].children);
+					//trace("setting text: "); trace(childArray);
+					text = Std.string(Reflect.field(childArray[0], "children"));
 				}
-				else 
+				else {
+					//trace("assigning childList: "); trace(children);
 					childList = children;
+				}
+					
+				//trace("return vnode =====");
 				
 				return vnode(tag == null ? "div" : tag, attrs.get("key"), hasAttrs ? attrs : null, childList, text, null);
 			}			

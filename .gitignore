@@ -20,3 +20,7 @@
 /bin/cmd
 /bin/hxjava_build.txt
 /bin/manifest
+/bin/java
+/bin/neko
+/bin/node
+/bin/python

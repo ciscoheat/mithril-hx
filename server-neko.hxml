@@ -6,5 +6,6 @@
 -cp src 
 -cp example
 
--neko bin/server.n
 -main Server
+
+-neko bin/server.n
