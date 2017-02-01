@@ -1,0 +1,17 @@
+{
+  "name": "mithril",
+  "license": "MIT",
+  "tags": [
+    "mvc"
+  ],
+  "classPath": "src",
+  "contributors": [
+    "ciscoheat"
+  ],
+  "releasenote": "initial release",
+  "version": "0.0.0",
+  "dependencies": {
+    "slambda": "",
+    "buddy": ""
+  }
+}

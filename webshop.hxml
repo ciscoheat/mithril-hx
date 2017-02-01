@@ -1,5 +1,12 @@
--D mithril-sugartags
+-D source-map-content
+
 -cp example
+
 -lib mithril
--js bin/webshop/webshop.js
+-lib HaxeContracts
+-lib slambda
+
 -main webshop.Webshop
+-js bin/webshop/webshop.js
+
+-debug

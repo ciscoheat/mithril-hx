@@ -1,1 +1,0 @@
-nekotools server -d bin

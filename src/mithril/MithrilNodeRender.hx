@@ -1,6 +1,5 @@
 package mithril;
 
-import haxe.Constraints.Function;
 import mithril.M;
 
 using StringTools;
@@ -17,22 +16,22 @@ class MithrilNodeRender
 	var indent : String;
 	var newLine : String;
 	var indentMode : Bool;
-						   
+
 	public function new(?indent : String, ?newLine : String) {
 		this.indent = indent == null ? "" : indent;
 		this.newLine = newLine == null ? (this.indent.length > 0 ? "\n" : "") : newLine;
 		this.indentMode = this.indent.length > 0;
 	}
 
-	public function render(view : ViewOutput) : String {
+	public function render(view : Vnodes) : String {
 		return _render(view, 0).trim();
 	}
 	
-	function _render(view : ViewOutput, indentDepth : Int) : String {
+	function _render(view : Dynamic, indentDepth : Int) : String {
 		if(view == null) return "";
 
 		if(Std.is(view, String))
-			return escape(view);
+			return escape(cast view);
 
 		if(Std.is(view, Int) || Std.is(view, Float) || Std.is(view, Bool))
 			return Std.string(view);
@@ -40,14 +39,14 @@ class MithrilNodeRender
 		if(Std.is(view, Array))
 			return cast(view, Array<Dynamic>).map(_render.bind(_, indentDepth)).join('');
 
-		// view must be a VirtualElementObject now.
-		var el : VirtualElementObject = cast view;
-
-		if (Reflect.hasField(el, "$trusted")) {
-			// If created on server, the value is in el.tag, otherwise it's a String.
-			return Std.is(el, String) ? (cast el) : el.tag;
+		// view must be a Vnode now.
+		var el : Vnode<Dynamic> = cast view;
+		
+		// Test for trusted html
+		if (el.tag == "<") {
+			return cast el.state;
 		}
-
+		
 		var children = createChildrenContent(el, indentDepth + 1);
 		
 		var currentIndent = indentMode ? "".lpad(this.indent, indentDepth * this.indent.length) : "";
@@ -64,28 +63,32 @@ class MithrilNodeRender
 		return '$startIndent<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>$newLine';
 	}
 
-	inline function createChildrenContent(el : VirtualElementObject, newIndentDepth : Int) : String {
-		if(el.children == null || !Std.is(el.children, Array)) return '';
-		return _render(el.children, newIndentDepth);
+	inline function createChildrenContent(el : Vnode<Dynamic>, newIndentDepth : Int) : String {
+		return if(el.children == null || !Std.is(el.children, Array)) el.text;
+		else _render(el.children, newIndentDepth);
 	}
 
 	function createAttrString(attrs : Dynamic) {
-		if(attrs == null) return '';
-
+		if (attrs == null) return '';
+		
 		return Reflect.fields(attrs).map(function(name) {
-			var value = Reflect.field(attrs, name);
+			// Needed a typehint to Dynamic for java to treat most values as not strings.
+			var value : Dynamic = Reflect.field(attrs, name);
 			if (value == null) return ' ' + (name == 'className' ? 'class' : name);
+			
+			//trace(value); trace(Type.typeof(value));
 			
 			if(Reflect.isFunction(value)) return '';
 			if(Std.is(value, Bool)) return cast(value, Bool) ? ' ' + name : '';
 
 			if(name == 'style') {
-				var styles = value;
-				if(Std.is(styles, String)) return ' style="' + escape(styles) + '"';
-
+				var styles : Dynamic = value;
+				if (Std.is(styles, String)) return ' style="' + escape(styles) + '"';
+				
 				return ' style="' + Reflect.fields(styles).map(function(property) {
-					return camelToDash(property).toLowerCase() + ':' + 
-						   escape(Reflect.field(styles, property));
+					// Same here for java as above
+					var value : Dynamic = Reflect.field(styles, property);
+					return camelToDash(property).toLowerCase() + ':' + escape(value);
 				}).join(';') + '"';
 			}
 			return ' ' + (name == 'className' ? 'class' : name) + '="' + escape(value) + '"';

@@ -1,24 +1,24 @@
 package mithril;
 
 using Lambda;
+using StringTools;
+
+import haxe.Constraints.Function;
+import haxe.DynamicAccess;
 
 #if js
 import js.Browser;
-import js.html.Document;
-
-#if (haxe_ver >= 3.2)
-import js.html.DOMElement in Element;
-#else
-import js.html.Element;
-#end
-
+import js.Promise;
 import js.Error;
+import js.html.Document;
 import js.html.Event;
 import js.html.XMLHttpRequest;
+import js.html.DOMElement in Element;
 #else
-// Mock js classes for server rendering
+// Mock some js classes for server rendering
 typedef XMLHttpRequest = Dynamic;
 typedef Event = Dynamic;
+typedef Promise<T> = Dynamic;
 #end
 
 /////////////////////////////////////////////////////////////
@@ -26,189 +26,131 @@ typedef Event = Dynamic;
 private abstract Either<T1, T2>(Dynamic)
 from T1 from T2 to T1 to T2 {}
 
-private abstract Either3<T1, T2, T3>(Dynamic)
-from T1 from T2 from T3 to T1 to T2 to T3 {}
-
-private abstract Either4<T1, T2, T3, T4>(Dynamic)
-from T1 from T2 from T3 from T4 to T1 to T2 to T3 to T4 {}
-
 ///// Interfaces /////
 
-@:autoBuild(mithril.macros.ModuleBuilder.build(0)) interface Model {}
-
-@:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface View {
-	function view() : ViewOutput;
-}
-
-@:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Controller<T> {
-	function controller() : T;
-}
-
-/**
- * Haxe-style Component
- */
-@:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Component {
-	function controller() : Dynamic;
-	function view() : ViewOutput;
-}
-
-/**
- * The loosely-typed path
- */
-@:autoBuild(mithril.macros.ModuleBuilder.build(2)) interface Mithril {}
-
-///// Deprecated interfaces /////
-
-@:deprecated('ControllerView<T> is deprecated: Use Mitril instead')
-@:autoBuild(mithril.macros.ModuleBuilder.build(1)) interface ControllerView<T> {
-	function view(?ctrl : T) : ViewOutput;
-}
-
-@:deprecated('Module<T> interface is deprecated: Use Component or Mithril instead') 
-@:autoBuild(mithril.macros.ModuleBuilder.build(3)) interface Module<T> {
-	function controller() : T;
-	function view(?ctrl : T) : ViewOutput;
-}
-
-@:deprecated('MithrilModule<T> is deprecated and can be removed.')
-typedef MithrilModule<T> = {
-	function controller() : T;
-	function view(?ctrl : T) : ViewOutput;
-}
+@:autoBuild(mithril.macros.ModuleBuilder.build()) interface Mithril {}
 
 ///// Typedefs /////
 
-typedef BasicType = Either4<Bool, Float, Int, String>;
-
-typedef VirtualElementObject = {
-	var tag : String;
-	var attrs : Dynamic;
-	var children : Dynamic;
+private typedef Component1 = {
+	function view() : Vnodes;
 };
 
-typedef VirtualElement = Either<VirtualElementObject, Array<VirtualElementObject>>;
+private typedef Component2 = {
+	function view(vnode : Vnode<Dynamic>) : Vnodes;
+};
 
-typedef ViewOutput = Either3<VirtualElement, BasicType, Array<BasicType>>;
+typedef Component = Either<Component1, Component2>;
 
-typedef GetterSetter<T> = ?T -> T;
-typedef EventHandler<T : Event> = T -> Void;
-
-typedef Promise<T, T2> = {
-	// Haxe limitation: Cannot expose the GetterSetter directly. then() is required to get value.
-	function then<T3, T4>(?success : T -> T3, ?error : T2 -> T4) : Promise<T3, T4>;
+typedef RouteResolver<T : Component> = {
+	@:optional function onmatch(args : DynamicAccess<String>, requestedPath : String) : Either<T, Promise<T>>;
+	@:optional function render(vnode : Null<Vnode<T>>) : Vnodes;
 }
 
-typedef Deferred<T, T2> = {
-	var promise : Promise<T, T2>;
-	function resolve(value : T) : Void;
-	function reject(value : T2) : Void;
-}
+typedef Vnode<T> = {
+	var state : Null<T>;
+	var tag : Dynamic;
+	var key : Null<String>;
+	var attrs : Null<DynamicAccess<Dynamic>>;
+	var children : Null<Array<Vnode<Dynamic>>>;	
+	var text : Null<Dynamic>;
+	#if js
+	var dom : Null<Element>;
+	#else
+	var dom : Null<Dynamic>;
+	#end
+	var domSize : Null<Int>;
+};
+
+typedef Vnodes = Either<Vnode<Dynamic>, Array<Vnode<Dynamic>>>;
 
 /**
- * Plenty of optional fields for this one:
- * http://lhorie.github.io/mithril/mithril.request.html#signature
+ * Plenty of optional fields for this one.
+ * @see http://mithril.js.org/request.html
  */
-typedef XHROptions<T, T2, T3, T4> = {
-	var method : String;
-	var url : String;
+typedef XHROptions<T, T2, T3> = {
+	@:optional var url : String;
+	@:optional var method : String;
+	@:optional var data : Dynamic;
+	@:optional var async : Bool;
 	@:optional var user : String;
 	@:optional var password : String;
-	@:optional var data : Dynamic;
+	@:optional var withCredentials : Bool;
+	@:optional var config : XMLHttpRequest -> XMLHttpRequest;
+	@:optional var headers : DynamicAccess<String>;
+	@:optional var type : T -> Dynamic;
+	@:optional var serialize : T3 -> String;
+	@:optional var deserialize : String -> T3;
+	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3> -> String;
+	@:optional var useBody : Bool;
 	@:optional var background : Bool;
-	@:optional var initialValue : T;
-	@:optional var unwrapSuccess : Dynamic -> T;
-	@:optional var unwrapError : Dynamic -> T2;
-	@:optional var serialize : T3 -> T4;
-	@:optional var deserialize : T4 -> T3;
-	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> T4;
-	@:optional var config : XMLHttpRequest -> XHROptions<T, T2, T3, T4> -> Null<XMLHttpRequest>;
 };
 
 typedef JSONPOptions<T, T2> = {
-	var dataType : String;
-	var url : String;
-	@:optional var callbackKey : String;
+	@:optional var url : String;
 	@:optional var data : Dynamic;
-	@:optional var background : Bool;
-	@:optional var initialValue : T;
-	@:optional var unwrapSuccess : Dynamic -> T;
-	@:optional var unwrapError : Dynamic -> T2;
+	@:optional var type : T -> Dynamic;
+	@:optional var callbackName : String;
+	@:optional var callbackKey : String;
 };
 
 //////////
 
-#if (js && !no_extern_mithril)
+#if ((js && !nodejs) || (js && nodejs && mithril_native))
 @:final @:native("m")
 extern class M
 {
-	@:overload(function(selector : String) : VirtualElement {})
-	@:overload(function(selector : String, attributes : Dynamic) : VirtualElement {})
-	public static function m(selector : String, attributes : Dynamic, children : Dynamic) : VirtualElement;
+	@:overload(function(selector : Either<String, Component>) : Vnodes {})
+	@:overload(function(selector : Either<String, Component>, attributes : Dynamic) : Vnodes {})
+	public static function m(selector : Either<String, Component>, attributes : Dynamic, children : Dynamic) : Vnodes;
 
-	@:overload(function<T, T2, T3, T4, T5>(component : T, args : T2, extra1 : T3, extra2 : T4, extra3 : T5) : Dynamic {})
-	@:overload(function<T, T2, T3, T4>(component : T, args : T2, extra1 : T3, extra2 : T4) : Dynamic {})
-	@:overload(function<T, T2, T3>(component : T, args : T2, extra1 : T3) : Dynamic {})
-	@:overload(function<T, T2>(component : T, args : T2) : Dynamic {})
-	public static function component<T>(component : T) : Dynamic;
+	public static function render(rootElement : Element, children : Vnodes) : Void;
+	
+	public static function mount(element : Element, component : Null<Component>) : Void;
 
-	public static function mount<T>(element : Element, component : T) : T;
+	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<Either<Component, RouteResolver<Dynamic>>>) : Void;
+	
+	///// Special route accessors /////
+	
+	public static inline function routeSet(route : String, ?data : { }, ?options : {
+		?replace : Bool,
+		?state : { },
+		?title : String
+	}) : Void { 
+		return untyped __js__("m.route.set({0}, {1}, {2})", route, data, options); 		
+	}
+	public static inline function routeGet() : String  { return untyped __js__("m.route.get()"); }
+	public static inline function routePrefix(prefix : String) : Void  { return untyped __js__("m.route.prefix({0})", prefix); }
+	public static inline function routeLink(vnode : Vnode<Dynamic>) : Event -> Void { return untyped __js__("m.route.link({0})", vnode); }
+	
+	// Convenience method for route attributes
+	public static inline function routeAttrs(vnode : Vnode<Dynamic>) : DynamicAccess<String> { return untyped __js__("{0}.attrs", vnode); }
+	
+	///////////////////////////////////
+	
+	#if !nodejs
+	@:overload(function<T, T2, T3>(url : String) : Promise<T> {})
+	@:overload(function<T, T2, T3>(options : XHROptions<T, T2, T3>) : Promise<T> {})
+	public static function request<T, T2, T3>(url : String, options : XHROptions<T, T2, T3>) : Promise<T>;
 
-	@:deprecated("M.module is deprecated: Use M.mount instead") 
-	public static function module<T>(element : Element, module : T) : T;
+	@:overload(function<T>(url : String) : Promise<T> {})
+	@:overload(function<T, T2>(options : JSONPOptions<T, T2>) : Promise<T> {})
+	public static function jsonp<T, T2>(url : String, options : JSONPOptions<T, T2>) : Promise<T>;
+	#end
 
-	public static function prop<T>(?initialValue : T) : GetterSetter<T>;
+	public static function parseQueryString(querystring : String) : DynamicAccess<String>;
+	public static function buildQueryString(data : {}) : String;
+	
+	public static function withAttr<T, T2 : Event>(attrName : String, callback : T -> Void) : T2 -> Void;
+	
+	public static function trust(html : String) : Vnode<Dynamic>;
+	
+	public static function fragment(attrs : {}, children : Array<Vnodes>) : Vnode<Dynamic>;
 
-	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : EventHandler<T2>;
-
-	@:overload(function() : String {})
-	@:overload(function(element : Document, isInitialized : Bool) : Void {})
-	@:overload(function(element : Element, isInitialized : Bool) : Void {})
-	@:overload(function(path : String) : Void {})
-	@:overload(function(path : String, params : Dynamic) : Void {})
-	@:overload(function(path : String, params : Dynamic, shouldReplaceHistory : Bool) : Void {})
-	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic) : Void;
-
-	@:overload(function<T, T2>(options : JSONPOptions<T, T2>) : Promise<T, T2> {})
-	public static function request<T, T2, T3, T4>(options : XHROptions<T, T2, T3, T4>) : Promise<T, T2>;
-
-	public static function deferred<T, T2>() : Deferred<T, T2>;
-
-	public static function sync<T, T2>(promises : Array<Promise<T, T2>>) : Promise<T, T2>;
-
-	public static function trust(html : String) : String;
-
-	@:overload(function(rootElement : Element, children : Dynamic) : Void {})
-	public static function render(rootElement : Element, children : Dynamic, forceRecreation : Bool) : Void;
-
-	public static function redraw(?forceSync : Bool) : Void;
-
-	public static function startComputation() : Void;
-
-	public static function endComputation() : Void;
-
-	public static function deps(window : Dynamic) : Dynamic;
-
-	///// Properties that uses function properties /////
-
-	public static inline function buildQueryString(data : Dynamic) : String { return untyped __js__("m.route.buildQueryString({0})", data); }
-	public static inline function parseQueryString(querystring : String) : Dynamic { return untyped __js__("m.route.parseQueryString({0})", querystring); }
-
-	public static var routeParam(get, set) : String -> String;
-	static inline function get_routeParam() : String -> String { return untyped __js__("m.route.param"); }
-	static inline function set_routeParam(f : String -> String) : String -> String { return untyped __js__("m.route.param = ") (f); }
-
-	public static var redrawStrategy(get, set) : GetterSetter<String>;
-	static inline function get_redrawStrategy() : GetterSetter<String> { return untyped __js__("m.redraw.strategy"); }
-	static inline function set_redrawStrategy(s : GetterSetter<String>) : GetterSetter<String> { return untyped __js__("m.redraw.strategy = ") (s); }
-
-	public static var routeMode(get, set) : String;
-	static inline function get_routeMode() : String { return untyped __js__("m.route.mode"); }
-	static inline function set_routeMode(s : String) : String { return untyped __js__("m.route.mode = ") (s); }
-
-	public static var deferredOnerror(get, set) : Dynamic -> Void;
-	static inline function get_deferredOnerror() : Dynamic -> Void { return untyped __js__("m.deferred.onerror"); }
-	static inline function set_deferredOnerror(f : Dynamic -> Void) : Dynamic -> Void { return untyped __js__("m.deferred.onerror = ") (f); }
-
+	public static function redraw() : Void;
+	
+	public static function version() : String;
+	
 	///// Haxe specific stuff /////
 
 	static function __init__() : Void {
@@ -226,157 +168,208 @@ extern class M
 	}
 
 	@:noCompletion public static inline function _patch(__varName : Dynamic) : Void {
-		// Some extra properties that simplifies the API.
-		// Also makes a stack-based access to the current component
-		// because m.mount and m.component makes a "new component.controller()" call which
-		// removes the actual component from the scope.
+		// Add m.m which simplifies the API.
 		// It also prevents deferred being resolved on Node.js to avoid server rendering issues,
 		// and converts List to Array so Lambda.map can be used conveniently.
+		//
+		// if (typeof module !== 'undefined' && module.exports) m.request = function(args, extra) { return new Promise(function(res, rej) {}); };
 		untyped __js__("(function(m) {
-			if (m.__haxecomponents) return;
+			if (m.m) return;
 			m.m = function() {
 				try { 
 					for(var i=0; i < arguments.length; ++i) if(arguments[i] instanceof List) {
-						var l = arguments[i].h; arguments[i] = [];
-						while(l != null) { arguments[i].push(l[0]); l = l[1]; }
+						var list = arguments[i].h; arguments[i] = [];
+						while(list != null) { arguments[i].push(l[0]); list = l[1]; }
 					}
 				} catch(e) {}
 				return m.apply(this, arguments);
 			}
-			m.__mount   = m.mount;
-			m.__component = m.component;
-			m.__haxecomponents = [];
-			m.mount = function(root, component) { if(component.controller) m.__haxecomponents.push(component); return m.__mount(root, component); }
-			m.component = function(component) { if(component.controller) m.__haxecomponents.push(component); return m.__component(component); }
-			if (typeof module !== 'undefined' && module.exports) m.request = function(xhrOptions) { return m.deferred().promise; };
 		})")(__varName);
 	}
-
-	// Stores the current component so it can be used in component.controller 
-	// calls. See above (injected automatically in macros.ModuleBuilder).
-	@:noCompletion public static var __haxecomponents : Dynamic;
 }
 #else
 
-/*
-typedef Promise<T, T2> = {
-	// Haxe limitation: Cannot expose the GetterSetter directly. then() is required to get value.
-	function then<T3, T4>(?success : T -> T3, ?error : T2 -> T4) : Promise<T3, T4>;
-}
+///// Cross-platform implementation of Mithril. /////
 
-typedef Deferred<T, T2> = {
-	var promise : Promise<T, T2>;
-	function resolve(value : T) : Void;
-	function reject(value : T2) : Void;
-}
-
-typedef EventHandler<T : Event> = T -> Void;
-
-typedef GetterSetter<T> = ?T -> T;
-*/ 
-
+@:final
 class M 
 {
 	///// Stubs /////
 	
 	public static function redraw(?forceSync : Bool) {}
-	public static function startComputation() {}
-	public static function endComputation() {}	
-	public static function deferred<T, T2>() : Deferred<T, T2> return {
-		promise: { then: function(?success, ?error) return null },
-		resolve: function(v) {},
-		reject: function(v) {}
-	}	
-	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : EventHandler<T2> {
+
+	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : T2 -> Void {
 		return function(e) {}
 	}
 	
+	public static var routeLink(default, null) : Function = null;
+	
 	///// Rendering /////
 	
-	public static function m(tag : String, ?attrs : Dynamic, ?children : Dynamic) : VirtualElement {
-		// tag could be a Mithril object in original Mithril, but keeping it simple for now.
-		
-		var args = if(attrs == null) [] else if(children == null) [attrs] else [attrs, children];
-		
-		// Simplify?
-		var hasAttrs = attrs != null && !Std.is(attrs, String) && !Std.is(attrs, Array) && Reflect.isObject(attrs) &&
-			!(Reflect.hasField(attrs, "tag") || Reflect.hasField(attrs, "view") || Reflect.hasField(attrs, "subtree"));
-		
-		attrs = hasAttrs ? attrs : { };
-		
-		var cell = {
-			tag: "div",
-			attrs: { },
-			children: getVirtualChildren(args, hasAttrs)
+	public static function m(selector : String, ?attrs : Dynamic, ?children : Dynamic) : Vnode<Dynamic> {
+		if (selector == null || !Std.is(selector, String) && Reflect.hasField(selector, "view")) {
+			throw "The selector must be either a string or a component.";
 		}
 		
-		assignAttrs(cell.attrs, attrs, parseTagAttrs(cell, tag));
+		//trace("=== " + selector);
 		
-		return cell;
+		if (Std.is(selector, String) && !selectorCache.exists(selector)) {
+			var tag : String = null, classes : Array<String> = [];
+			var attributes : DynamicAccess<Dynamic> = {}, tempSelector = selector;
+			
+			while (selectorParser.match(tempSelector)) {
+				var matched = selectorParser.matched;
+				var type = matched(1), value = matched(2);
+				if (type == "" && value != "") tag = value;
+				else if (type == "#") attributes.set('id', value);
+				else if (type == ".") classes.push(value);
+				else if (matched(3).charAt(0) == "[") {
+					var attrValue = matched(6);
+					if (attrValue != null) {
+						attrValue = ~/\\(["'])/g.replace(attrValue, "$1");
+						attrValue = ~/\\\\/g.replace(attrValue, "\\");
+					}
+						
+					if (matched(4) == "class") 
+						classes.push(attrValue);
+					else 
+						attributes.set(matched(4), attrValue == null ? true : attrValue);
+				}
+				tempSelector = selectorParser.matchedRight();
+			}
+			
+			if (classes.length > 0) 
+				attributes.set('className', classes.join(" "));
+			
+			selectorCache[selector] = function(attrs : DynamicAccess<Dynamic>, children) {
+				var hasAttrs = false, childList : Array<Vnode<Dynamic>> = null, text : String = null;
+				
+				var className = if (attrs.exists("className") && attrs.get("className") != null && cast(attrs.get("className"), String).length > 0)
+					attrs.get("className")
+				else if (attrs.exists("class") && attrs.get("class") != null && cast(attrs.get("class"), String).length > 0)
+					attrs.get("class")
+				else
+					null;
+				
+				for (key in attributes.keys()) attrs.set(key, attributes.get(key));
+				
+				if (className != null) {
+					if (attrs.get("class") != null) {
+						#if python
+						// Cannot delete "class" field on python
+						var newAttrs: DynamicAccess<Dynamic> = {};
+						for (key in attrs.keys()) if (key != 'class') 
+							newAttrs.set(key, attrs.get(key));
+						attrs = newAttrs;
+						#else
+						attrs.remove("class");
+						#end
+						attrs.set("className", className);
+					}
+					if (attributes.get("className") != null) {
+						attrs.set("className", attributes.get("className") + " " + className);
+					}
+				}
+
+				for (key in attrs.keys()) if (key != "key") {
+					hasAttrs = true;
+					break;
+				}
+				
+				var childArray : Array<Vnode<Dynamic>> = Std.is(children, Array) ? cast children : null;
+				
+				//trace("selectorCache[" + selector + "] childArray:"); trace(childArray);
+				
+				if (childArray != null && childArray.length == 1 && 
+					childArray[0] != null && Reflect.hasField(childArray[0], "tag") && Reflect.field(childArray[0], "tag") == "#"
+				) {
+					//trace("setting text: "); trace(childArray);
+					text = Std.string(Reflect.field(childArray[0], "children"));
+				}
+				else {
+					//trace("assigning childList: "); trace(children);
+					childList = children;
+				}
+					
+				//trace("return vnode =====");
+				
+				return vnode(tag == null ? "div" : tag, attrs.get("key"), hasAttrs ? attrs : null, childList, text, null);
+			}			
+		}
+
+		var arguments : Array<Dynamic> = if(attrs == null) [null] else if(children == null) [null, attrs] else [null, attrs, children];
+
+		var attrs = { };
+		var childrenIndex = if(
+			(arguments.length >= 2 && arguments[1] == null) || 
+			!Std.is(arguments[1], String) &&
+			Reflect.isObject(arguments[1]) && 
+			!Reflect.hasField(arguments[1], "tag") && 
+			!Std.is(arguments[1], Array)
+		) {
+			attrs = arguments[1];
+			2;
+		}
+		else 1;
+		
+		var newChildren = if (arguments.length == childrenIndex + 1) {
+			Std.is(arguments[childrenIndex], Array) ? arguments[childrenIndex] : [arguments[childrenIndex]];
+		}
+		else {
+			[for (i in childrenIndex...arguments.length) arguments[i]];
+		}
+		
+		//trace(arguments); trace(attrs);
+		
+		return if (Std.is(selector, String)) {
+			// php cannot call the selector directly
+			var cacheFunc = selectorCache[selector];
+			cacheFunc(attrs, vnodeNormalizeChildren(newChildren));
+		}
+		else {
+			vnode(
+				selector, 
+				Reflect.hasField(attrs, "key") ? Reflect.field(attrs, "key") : null, 
+				attrs, vnodeNormalizeChildren(newChildren), null, null
+			);
+		}
 	}
 	
-	public static function trust(html : String) : VirtualElementObject {
+	public static function trust(html : String) : Vnode<Dynamic> {
+		// Implementation differs from native Mithril, html is stored in state instead
+		// because of static platform types.
 		return {
-			tag: html,
+			state: html,
+			tag: "<",
+			key: null,
 			attrs: null,
 			children: null,
-			"$trusted": true
+			text: null,
+			dom: null,
+			domSize: 0
 		}
 	}
 	
-	static function getVirtualChildren(args : Array<Dynamic>, hasAttrs : Bool) : Dynamic {
-		var children = hasAttrs ? args.slice(1) : args;
-		return children.length == 1 && Std.is(children[0], Array) ? children[0]	: children;
+	static var selectorCache = new Map<String, DynamicAccess<Dynamic> -> Dynamic -> Vnode<Dynamic>>();
+	
+	static function vnode(tag : Dynamic, key, attrs0, children : Dynamic, text, dom) : Dynamic {
+		return { 
+			tag: tag, key: key, attrs: attrs0, children: children, text: text, 
+			dom: dom, domSize: 0,
+			state: {}, events: null, instance: null, skip: false			
+		}
 	}
 
-	static function assignAttrs(target : Dynamic, attrs : Dynamic, classes : Array<String>) : Void {
-		var classAttr = Reflect.hasField(attrs, "class") ? "class" : "className";
-
-		for (attrName in Reflect.fields(attrs)) {
-			if (Reflect.hasField(attrs, attrName)) {
-				var currentAttribute : String = cast Reflect.field(attrs, attrName);
-				if (attrName == classAttr && currentAttribute != null && currentAttribute.length > 0) {
-					classes.push(currentAttribute);
-					// create key in correct iteration order
-					Reflect.setField(target, attrName, "");
-				} else {
-					Reflect.setField(target, attrName, currentAttribute);
-				}
-			}
-		}
-
-		if (classes.length > 0) Reflect.setField(target, classAttr, classes.join(" "));		
+	static function vnodeNormalize(node : Dynamic) : DynamicAccess<Dynamic> {
+		return if (Std.is(node, Array)) vnode("[", null, null, vnodeNormalizeChildren(node), null, null)
+		else if (node != null && !Reflect.isObject(node)) vnode("#", null, null, node == false ? "" : node, null, null)
+		else node;
 	}
 	
-	static function parseTagAttrs(cell : Dynamic, tag : String) : Array<String> {
-		var classes = [];
-		//trace("===== " + tag);
-		var parser = ~/(?:(^|#|\.)([^#\.\[\]]+))|(\[.+?\])/g;
-
-		while(parser.match(tag)) {		
-			var match1 = parser.matched(1);
-			var match2 = try parser.matched(2) catch (e : Dynamic) null;
-			var match3 = try parser.matched(3) catch (e : Dynamic) null;
-			
-			//trace(match1); trace(match2); trace(match3);
-			
-			if (match1 == "" && match2 != null)
-				cell.tag = match2;
-			else if (match1 == "#")
-				cell.attrs.id = match2;
-			else if (match1 == ".")
-				classes.push(match2);
-			else if (match3.charAt(0) == "[") {
-				var pair = ~/\[(.+?)(?:=("|'|)(.*?)\2)?\]/;
-				pair.match(match3);
-				var pair3 = try pair.matched(3) catch (e : Dynamic) "";
-				Reflect.setField(cell.attrs, pair.matched(1), pair3);
-			}
-			
-			tag = parser.matchedRight();
-		}
+	static function vnodeNormalizeChildren(children : Array<DynamicAccess<Dynamic>>) {
+		return [for (c in children) vnodeNormalize(c)];
+	}	
 		
-		return classes;
-	}
+	static var selectorParser : EReg = new EReg("(?:(^|#|\\.)([^#\\.\\[\\]]+))|(\\[(.+?)(?:\\s*=\\s*(\"|'|)((?:\\\\[\"'\\]]|.)*?)\\5)?\\])", "g");
 }
 #end

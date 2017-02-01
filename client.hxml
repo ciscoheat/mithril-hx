@@ -1,0 +1,11 @@
+# Client-side functionality
+
+-D source-map-content
+
+-cp src
+-cp example
+
+-main DashboardComponent
+-js bin/client.js
+
+-debug

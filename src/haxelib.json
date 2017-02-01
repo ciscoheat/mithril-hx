@@ -1,10 +1,10 @@
 {
   "name": "mithril",
-  "description": "Haxe externs for Mithril, A javascript MVC framework.",
+  "description": "Haxe externs for Mithril, a javascript MVC framework.",
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Added define for using Haxe ported code on js serverside",
-  "version": "0.30.0",
+  "releasenote": "Now supports Mithril 1.0!",
+  "version": "1.0.0",
   "contributors": ["ciscoheat"]
 }

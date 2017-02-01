@@ -2,9 +2,9 @@
 <project version="2">
   <!-- Output SWF options -->
   <output>
-    <movie outputType="Application" />
+    <movie outputType="CustomBuild" />
     <movie input="" />
-    <movie path="serverrendering-tests.hxml" />
+    <movie path="webshop.hxml" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
@@ -15,7 +15,6 @@
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
-    <class path="src" />
     <class path="example" />
   </classpaths>
   <!-- Build options -->
@@ -23,13 +22,15 @@
     <option directives="mithril-sugartags" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
-    <option mainClass="ServerRenderingTests" />
+    <option mainClass="webshop.Webshop" />
     <option enabledebug="False" />
-    <option additional="-debug " />
+    <option additional="" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
-    <library name="buddy" />
+    <library name="mithril" />
+    <library name="HaxeContracts" />
+    <library name="slambda" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
@@ -37,6 +38,7 @@
     <compile path="src\TodoModul.hx" />
     <compile path="src\TodoModule.hx" />
     <compile path="example\DashboardModule.hx" />
+    <compile path="example\Server.hx" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
@@ -49,8 +51,8 @@
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
-    <option testMovie="Custom" />
-    <option testMovieCommand="fdrun.bat" />
+    <option testMovie="OpenDocument" />
+    <option testMovieCommand="" />
   </options>
   <!-- Plugin storage -->
   <storage />

@@ -5,96 +5,86 @@ import js.Browser;
 #end
 import mithril.M;
 import webshop.models.*;
-using Lambda;
+
+using Slambda;
 using StringTools;
 
 /**
  * A simple webshop to demonstrate the power of Mithril.
  */
-class Webshop implements View
+class Webshop implements Mithril
 {
-	#if js
-    var cart : ShoppingCart;
-    var menu : Menu;
-    var search : Search;
-    var checkout : Checkout;
-    var routes : Dynamic;
-
-    // Create menu and routes.
-    public function new() {
-        menu = new Menu();
-        cart = new ShoppingCart();
-        search = new Search();
-
-        routes = {
+	//
+	// Program entry point
+	// With a preprocessor directive to support testing. Please ignore it.
+	//
+	#if !buddy
+    static function main() {
+        Category.all().then(function(categories) {
+            new Webshop(categories);
+        });
+    }
+	
+    public function new(categories : Array<Category>) {
+        var cart = new ShoppingCart();
+        var menu = new Menu(categories);
+        
+        var routes = {
             "/": this,
-            "/category/:categoryId": new ProductList(cart),
-            "/product/:productId": new ProductPage(cart),
+            "/category/:key": new ProductList(menu, cart, categories),
+            "/product/:key": new ProductPage(menu, cart),
             "/checkout": new Checkout(cart)
         };
-    }
+		
+		var element = Browser.document.getElementById;
 
-    // Call to start the whole site.
-    public function start() {
-        // Define routes for the main page content
+        // Routes for the main page content
         M.route(element("content"), "/", routes);
 
         // Define modules that should not change if the main content changes
         M.mount(element("navigation"), menu);
         M.mount(element("shopping-cart"), cart);
-        M.mount(element("search"), search);
+        M.mount(element("search"), new Search());
 
         // An "inline module" just to create the home link.
         M.mount(element("home-link"), {
             view: function() 
-                m("a.navbar-brand[href='/']", {config: M.route}, "Mithril/Haxe Webshop")
+                m("a.navbar-brand[href='/']", {oncreate: M.routeLink}, "Mithril/Haxe Webshop")
         });
     }
-
-    private inline function element(id : String) {
-        return Browser.document.getElementById(id);
-    }
-
-    // Program entry point
-    static function main() {
-        new Webshop().start();
-    }
-
 	#else
 	public function new() {}
 	#end
 
     // Welcome text for the default route
     public function view() [
-        H1("Welcome!"),
-        P("Select a category on the left to start shopping."),
-        P("Built in Haxe & Mithril. Source code: ", 
-            A[href="https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop"][target="_blank"](
+        m('h1', "Welcome!"),
+        m('p', "Select a category on the left to start shopping."),
+        m('p', "Built in Haxe & Mithril. Source code: ", 
+            m('a', 
+                {href: "https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop", target: "_blank"}, 
                 "https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop"
-        )),
-        H2("Todo"),
-        UL.list-group(todo().map(function(t) {
+            )
+        ),
+        m('h2', "Todo"),
+        m('ul.list-group', todo().map(function(t) {
             var done = t.toLowerCase().startsWith("x ");
-            LI.list-group-item({ 
+            m('li.list-group-item', { 
                 style: { textDecoration: done ? "line-through" : "none" }
             }, [
-                INPUT[type=checkbox]({ checked: done ? "checked" : "" }), 
-                SPAN[style='margin-left:5px'](done ? t.substring(2) : t)
+                m('input[type=checkbox]', { checked: done ? "checked" : "" }),
+                m("span[style='margin-left:5px']", (done ? t.substring(2) : t))
             ]);
         }))
     ];
 
-    ///////////////////////////
-
-    function todo() {
-        return [
-            "Checkout page",
-            "Thank you page",
-            "x Make cart not change size when open and items are deleted",
-            "Enable use of arrow keys when navigating search results",
-            "URL slugs for products",
-            "Fix css for navbar and cart for low-res devices",
-            "Administration section..."
-        ];
-    }
+    function todo() return [
+        "Checkout page",
+        "Thank you page",
+        "x Make cart not change size when open and items are deleted",
+        "Enable use of arrow keys when navigating search results",
+        "URL slugs for products",
+        "Fix css for navbar and cart for low-res devices",
+        "Administration section..."
+    ];
 }

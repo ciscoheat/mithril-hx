@@ -1,7 +1,8 @@
 import haxe.Timer;
 import mithril.M;
+import mithril.M.m;
 
-#if (js && !nodejs)
+#if !server
 import haxe.Serializer;
 import haxe.Unserializer;
 #end
@@ -18,11 +19,8 @@ typedef KeyboardEvent = Dynamic;
 typedef InputElement = Dynamic;
 #end
 
-/**
-* Cannot use @prop and M.prop(), doesn't work well with
-* Haxe serialization.
-*/
-class Todo implements Model
+// Model
+class Todo
 {
 	public var description : String;
 	public var done : Bool;
@@ -33,14 +31,15 @@ class Todo implements Model
 	}
 }
 
-class TodoList implements Model
+// Model
+class TodoList
 {
-	#if (js && !nodejs)
+	#if !server
 	static var storage = Browser.window.localStorage;
 	#end
 
 	public static function load() : TodoList {
-		#if (sys || nodejs)
+		#if server
 		return new TodoList();
 		#else
 		var list = storage.getItem("todo-app-list");
@@ -72,7 +71,7 @@ class TodoList implements Model
 	}
 
 	public function save() {
-		#if (js && !nodejs)
+		#if !server
 		var ser = new Serializer();
 		ser.serialize(list);
 		storage.setItem("todo-app-list", ser.toString());
@@ -80,7 +79,8 @@ class TodoList implements Model
 	}
 }
 
-class TodoModule implements View
+// Controller/View
+class TodoComponent implements Mithril
 {
 	public var todo : TodoList;
 
@@ -91,9 +91,7 @@ class TodoModule implements View
 	}
 
 	public function clear() {
-		M.startComputation();
 		todo.clear();
-		M.endComputation();
 	}
 
 	public function view() {
@@ -119,23 +117,20 @@ class TodoModule implements View
 	}
 
 	private function todo_add(delay = 0) {
-		// M.startComputation is used automatically in a real call to 
-		// m.request, but here it's simulated.
+		// For testing purposes
+		#if !server
 		todoAdding = true;
 		// First redraw to display the loading text:
 		M.redraw();
 		// Wait for request to finish:
-		M.startComputation();
-		deferMs(delay)
-		.then(function(ok) { todo.add(todo.description); return ok; }, function(error) return error)
-		.then(function(_) {
+		Timer.delay(function() { 
+			todo.add(todo.description);
 			// Request completed, set appropriate state:
 			todo.description = "";
 			todoAdding = false;
-			// End computation which will trigger a redraw unless more
-			// computations are queued.
-			M.endComputation();
-		});
+			M.redraw();
+		}, delay);
+		#end
 	}
 
 	private function todo_setDescription(e : KeyboardEvent) {
@@ -148,18 +143,4 @@ class TodoModule implements View
 		task.done = checked;
 		todo.save();
 	}
-
-	private function deferMs(delay : Int) : Promise<Bool, Bool> {
-		var d = M.deferred();
-		#if js
-		Timer.delay(d.resolve.bind(true), delay);
-		#end
-		return d.promise;
-	}
-
-	#if js
-	static function main() {
-		M.mount(Browser.document.body, new TodoModule());
-	}
-	#end
 }

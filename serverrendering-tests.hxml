@@ -1,7 +1,0 @@
--D mithril-sugartags
--lib buddy
--cp src 
--cp example
--neko bin/serverrendering-tests.n
--main ServerRenderingTests
--debug

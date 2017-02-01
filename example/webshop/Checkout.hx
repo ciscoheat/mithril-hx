@@ -12,7 +12,7 @@ private typedef FormField = {
     @:optional var width : Int;     // Default: 5 (bootstrap columns)
 }
 
-class Checkout implements View
+class Checkout implements Mithril
 {
     var cart : ShoppingCart;
     var checkoutForm : Array<FormField>;
@@ -30,13 +30,13 @@ class Checkout implements View
         ];
     }
 
-    public function view() [
-        H1("Checkout"),
-        FORM.form-horizontal[role=form]( 
+    public function view() return [
+        m('h1', "Checkout"),
+        m('form.form-horizontal[role=form]',  
             checkoutForm.map(formFields).concat([
-                DIV.form-group(
-                    DIV.col-sm-offset-1.col-sm-5(
-                        BUTTON.btn.btn-success("Submit order")
+                m('div.form-group', 
+                    m('div.col-sm-offset-1.col-sm-5', 
+                        m('button.btn.btn-success', "Submit order")
                     )
                 )
             ])
@@ -45,10 +45,10 @@ class Checkout implements View
 
     function formFields(f : FormField) {
         var required = f.required != false;
-        DIV.form-group([
-            LABEL.col-sm-1.control-label({"for": f.id}, f.label + (required ? "*" : "")),
-            DIV({"class": "col-sm-" + (f.width == null ? 5 : f.width)}, 
-                INPUT({
+        m('div.form-group', [
+            m('label.col-sm-1.control-label', {"for": f.id}, f.label + (required ? "*" : "")),
+            m('div', {"class": "col-sm-" + (f.width == null ? 5 : f.width)}, 
+                m('input', {
                     "class": "form-control", 
                     required: required,
                     type: f.type == null ? "text" : f.type,
