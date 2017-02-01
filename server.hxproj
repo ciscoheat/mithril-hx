@@ -4,7 +4,7 @@
   <output>
     <movie outputType="CustomBuild" />
     <movie input="" />
-    <movie path="server-node.hxml" />
+    <movie path="server.hxml" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />

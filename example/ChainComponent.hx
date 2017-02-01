@@ -23,20 +23,9 @@ class ChainModel extends IntMap<Bool>
 	static var storage = Browser.window.localStorage;
 	#end
 
-	public static function load() : ChainModel {
-		#if nodejs
-		return new ChainModel();
-		#else
-		var list = storage.getItem("chain-app-list");
-		if(list == "" || list == null) return new ChainModel();
-
-		var ser = new Unserializer(list);
-		return cast ser.unserialize();
-		#end
-	}
-
 	public function new() {
 		super();
+		load();
 	}
 
 	public function isChecked(index) {
@@ -53,6 +42,17 @@ class ChainModel extends IntMap<Bool>
 		for(key in keys()) this.remove(key);
 		resetDate();
 		save();
+	}
+
+	public function load() : Void {
+		#if !nodejs
+		for (key in keys()) this.remove(key);
+		
+		try {
+			var loaded : ChainModel = cast Unserializer.run(storage.getItem("chain-app-list"));
+			for (key in loaded.keys()) this.set(key, loaded.get(key));
+		} catch (e : Dynamic) {}
+		#end
 	}
 
 	public function save() : Void {
