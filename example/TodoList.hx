@@ -4,7 +4,9 @@ import haxe.Unserializer;
 
 using Lambda;
 
-// Allow TodoList to change properties ("friend")
+// Allow TodoList to change properties ("friend").
+// This allows Todo objects to be used in views, but nobody can change
+// them except the TodoList they belong to.
 @:allow(TodoList)
 class Todo
 {
