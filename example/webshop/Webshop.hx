@@ -16,7 +16,7 @@ class Webshop implements Mithril
 {
 	//
 	// Program entry point
-	// With a preprocessor directive to support testing. Please ignore it.
+	// With a preprocessor directive to support testing. Please disregard the else part.
 	//
 	#if !buddy
     static function main() {
@@ -28,7 +28,10 @@ class Webshop implements Mithril
     public function new(categories : Array<Category>) {
         var cart = new ShoppingCart();
         var menu = new Menu(categories);
+		
+		var element = Browser.document.getElementById;
         
+		// Note the key parameters in the routes: http://mithril.js.org/route.html#key-parameter
         var routes = {
             "/": this,
             "/category/:key": new ProductList(menu, cart, categories),
@@ -36,8 +39,6 @@ class Webshop implements Mithril
             "/checkout": new Checkout(cart)
         };
 		
-		var element = Browser.document.getElementById;
-
         // Routes for the main page content
         M.route(element("content"), "/", routes);
 
@@ -56,7 +57,6 @@ class Webshop implements Mithril
 	public function new() {}
 	#end
 
-    // Welcome text for the default route
     public function view() [
         m('h1', "Welcome!"),
         m('p', "Select a category on the left to start shopping."),

@@ -20,7 +20,7 @@ class DashboardComponent implements Mithril
 	///////////////////////////////////////////////////////////////////////////
 	
 	public function new() {
-		todo = new TodoComponent();
+		todo = new TodoComponent(TodoList.load());
 		chainModel = new ChainModel();
 		chainView = new ChainComponent(chainModel);
 		
@@ -33,11 +33,12 @@ class DashboardComponent implements Mithril
 	}
 	
 	public function changeApp(app : CurrentApp) {
+		if (app == null) app = None;
 		currentApp = app;
 		M.redraw();
 	}
 
-	public function render(vnode) return [
+	public function render(?vnode : Vnode<DashboardComponent>) return [
 		m("h1", "Welcome!"),
 		m("p", "Choose your app:"),
 		m("div", {style: {width: "300px"}}, [
@@ -65,8 +66,11 @@ class DashboardComponent implements Mithril
 		changeApp(params.get('app'));
 		return null;
 	}
-	
+		
 	#if !server
+	//
+	// Client entry point
+	//
 	public static function main() {
 		var dashboard = new DashboardComponent();
 		var htmlBody = js.Browser.document.body;

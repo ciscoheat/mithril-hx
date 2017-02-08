@@ -10,10 +10,6 @@ Standard procedure: `haxelib install mithril` and then `-lib mithril` in your .h
 
 Mithril has a great introduction on its website and an astounding amount of documentation, so I'll only highlight what you need to get started with the Haxe version here.
 
-## Use M, not m!
-
-The biggest difference! `import mithril.M` then use `M` instead of `m` for the whole API. The only exception is when using the `m()` method for creating views.
-
 ## Implement the Mithril interface
 
 Because Javascript is so dynamic and Haxe is strongly typed, the balance between flexibility and compiler safety can be difficult. When using Mithril, you will create [components](http://mithril.js.org/components.html) that will be used together with the Mithril API. For these objects you should implement the `Mithril` interface. Here's an example of a Mithril component:
@@ -36,12 +32,22 @@ class TodoComponent implements Mithril
             m("h1", "To do"),
             m("table", todos.map(function(todo) {
                 m("tr", [
-                    m("td", m("input[type=checkbox]", { checked: todo.done })),
+                    m("td", m("input[type=checkbox]", { checked: function(e) todo.done = e.target. })),
                     m("td", todo.description)
                 ]);
             }))
         ]);
     }
+	
+	// Program entry point
+	static function main() {
+		var todos = [
+			new Todo("Learn Haxe"),
+			new Todo("??"),
+			new Todo("Profit!")
+		];
+		M.mount(js.Browser.document.body, new TodoComponent(todos));
+	}		
 }
 
 class Todo
@@ -54,6 +60,11 @@ class Todo
     }
 }
 ```
+
+## A few API differences
+
+- Use M, not m! `import mithril.M;`, then use `M` instead of `m` for the whole API. As you see above, the only exception is when using `m()`, you can use that without prefixing with `M`.
+- The `route` methods are available by a simple translation: `M.route.link` for example, becomes `M.routeLink`.
 
 ## "this" is slightly different
 

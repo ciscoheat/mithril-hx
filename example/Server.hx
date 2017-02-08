@@ -33,12 +33,14 @@ class Server
 	}	
 
 	static function displayTodo() {
-		var todoList = new TodoComponent();
-
-		todoList.todo.add("First one");
-		todoList.todo.add("Second <one>");
-
-		todoList.todo.list[0].done = true;
+		var todos = new TodoList();
+		
+		// Add some test data
+		todos.add("First one");
+		todos.add("Second <one>");
+		todos.setStatus(todos.iterator().next(), true);
+		
+		var todoList = new TodoComponent(todos);
 
 		Sys.println(new MithrilNodeRender().render(todoList.view()));
 	}
@@ -73,7 +75,7 @@ class Server
 		
 		app.get('/dashboard/:app?', function(req, res, next) {
 			dashboard.changeApp(req.params.app);
-			renderMithril(dashboard.render(null), res, next);
+			renderMithril(dashboard.render(), res, next);
 		});
 		
 		///////////////////////////////////////////////////////////////////////

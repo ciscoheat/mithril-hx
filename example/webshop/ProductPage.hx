@@ -23,9 +23,11 @@ class ProductPage implements Mithril implements HaxeContracts
         this.menu = menu;
     }
 
+	// Matching routes from Webshop.hx
     public function onmatch(params : haxe.DynamicAccess<String>, url : String) {
         loader.start();
 
+		// Load the product asynchronously
         Product.all().then(function(products : Array<Product>) { 
             menu.setActive(null);
             product = products.find(function(p) return p.id == params.get('key'));
@@ -46,6 +48,7 @@ class ProductPage implements Mithril implements HaxeContracts
         cart.open();
     }
 
+	// Since ProductPage is a RouteResolver, a "vnode" argument is required.
     public function render(vnode) {
         var template = switch loader.state() {
             case Started: m('div.row', "");
@@ -59,6 +62,7 @@ class ProductPage implements Mithril implements HaxeContracts
             "Add to Cart"
         );
 
+		// Important null check, in case the product couldn't be loaded.
 		return if (template != null) template else [
             m('div.row', m('div.col-xs-12', m('h1', product.name))),
             m('div.row', [
@@ -81,7 +85,10 @@ class ProductPage implements Mithril implements HaxeContracts
         invariant(cart != null);
         invariant(loader != null);
         invariant(menu != null);
+		invariant(product != null || loader.state() != Done, "Product cannot be null when the loader is done");
     }
+	
+	///////////////////////////////////////////////////////////////////////////
 
     static var lorem = 
     "Cupcake ipsum dolor sit amet pudding. Tiramisu marshmallow cotton candy fruitcake gummies candy gummi bears. Powder pastry oat cake oat cake dragée soufflé apple pie. Chocolate bar bear claw cupcake I love dragée toffee oat cake marshmallow bonbon. Fruitcake marshmallow I love pudding I love jelly beans carrot cake biscuit. Lollipop brownie tart apple pie cotton candy sugar plum candy. Topping lollipop wafer cotton candy fruitcake toffee.
