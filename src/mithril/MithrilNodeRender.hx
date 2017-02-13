@@ -76,7 +76,8 @@ class MithrilNodeRender
 			var value : Dynamic = Reflect.field(attrs, name);
 			if (value == null) return ' ' + (name == 'className' ? 'class' : name);
 			
-			//trace(value); trace(Type.typeof(value));
+			//trace("------"); trace(name); trace(value); 
+			//trace(Type.typeof(value));
 			
 			if(Reflect.isFunction(value)) return '';
 			if(Std.is(value, Bool)) return cast(value, Bool) ? ' ' + name : '';

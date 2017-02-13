@@ -72,7 +72,7 @@ class Webshop implements Mithril
             m('li.list-group-item', { 
                 style: { textDecoration: done ? "line-through" : "none" }
             }, [
-                m('input[type=checkbox]', { checked: done ? "checked" : "" }),
+                m('input[type=checkbox]', { checked: done }),
                 m("span[style='margin-left:5px']", (done ? t.substring(2) : t))
             ]);
         }))

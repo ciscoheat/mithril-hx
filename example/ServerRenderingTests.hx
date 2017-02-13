@@ -157,7 +157,7 @@ class ServerRenderingTests extends buddy.SingleSuite
 		
 				renderedList.should.startWith('<div><input value=""><button>Add</button><span style="display:none"> Adding...</span><table><tr><td><input ');
 			
-				renderedList.should.contain('checked="checked"');
+				renderedList.should.contain('checked');
 				renderedList.should.contain('type="checkbox"');
 			
 				renderedList.should.endWith('></td><td style="text-decoration:line-through">First one</td></tr><tr><td><input type="checkbox"></td><td style="text-decoration:none">Second &lt;one&gt;</td></tr></table></div>');
@@ -178,31 +178,31 @@ class ServerRenderingTests extends buddy.SingleSuite
 <h2>Todo</h2>
 <ul class="list-group">
   <li class="list-group-item" style="text-decoration:none">
-    <input type="checkbox" checked="">
+    <input type="checkbox">
     <span style="margin-left:5px">Checkout page</span>
   </li>
   <li class="list-group-item" style="text-decoration:none">
-    <input type="checkbox" checked="">
+    <input type="checkbox">
     <span style="margin-left:5px">Thank you page</span>
   </li>
   <li class="list-group-item" style="text-decoration:line-through">
-    <input type="checkbox" checked="checked">
+    <input type="checkbox" checked>
     <span style="margin-left:5px">Make cart not change size when open and items are deleted</span>
   </li>
   <li class="list-group-item" style="text-decoration:none">
-    <input type="checkbox" checked="">
+    <input type="checkbox">
     <span style="margin-left:5px">Enable use of arrow keys when navigating search results</span>
   </li>
   <li class="list-group-item" style="text-decoration:none">
-    <input type="checkbox" checked="">
+    <input type="checkbox">
     <span style="margin-left:5px">URL slugs for products</span>
   </li>
   <li class="list-group-item" style="text-decoration:none">
-    <input type="checkbox" checked="">
+    <input type="checkbox">
     <span style="margin-left:5px">Fix css for navbar and cart for low-res devices</span>
   </li>
   <li class="list-group-item" style="text-decoration:none">
-    <input type="checkbox" checked="">
+    <input type="checkbox">
     <span style="margin-left:5px">Administration section...</span>
   </li>
 </ul>

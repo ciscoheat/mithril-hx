@@ -20,7 +20,7 @@ typedef InputElement = Dynamic;
 class TodoComponent implements Mithril
 {
 	var todos : TodoList;
-	var inputBox : String;
+	var inputBox : String = "";
 	var waitingForServer : Bool;
 
 	public function new(todos : TodoList) {
