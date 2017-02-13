@@ -169,9 +169,11 @@ class ServerRenderingTests extends buddy.SingleSuite
 			it("should render complex compositions with indentation properly", {
 				var render = new MithrilNodeRender("  ").render;
 				var webshop = new webshop.Webshop();
-				//File.saveContent("e:\\temp\\test.html", render(webshop.view()));
-				render(webshop.view()).replace("\n", "\r\n").should.be('
-<h1>Welcome!</h1>
+
+				var output = render(webshop.view());
+				output = ~/[\r\n]/g.replace(output, "");
+
+				var test = '<h1>Welcome!</h1>
 <p>Select a category on the left to start shopping.</p>
 <p>Built in Haxe &amp; Mithril. Source code: <a href="https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop" target="_blank">https://github.com/ciscoheat/mithril-hx/tree/master/example/webshop</a>
 </p>
@@ -205,10 +207,12 @@ class ServerRenderingTests extends buddy.SingleSuite
     <input type="checkbox">
     <span style="margin-left:5px">Administration section...</span>
   </li>
-</ul>
-'.trim());
+</ul>';
+				test = ~/[\r\n]/g.replace(test, "");
+
+				output.should.be(test);
 			});
 			#end
-		});		
+		});
 	}
 }
