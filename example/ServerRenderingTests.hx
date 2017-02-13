@@ -148,7 +148,7 @@ class ServerRenderingTests extends buddy.SingleSuite
 				todoList.add("Second <one>");
 		
 				for(todo in todoList) {
-					todo.done = true;
+					todoList.setStatus(todo, true);
 					break;
 				}
 				
