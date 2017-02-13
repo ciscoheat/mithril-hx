@@ -142,17 +142,18 @@ class ServerRenderingTests extends buddy.SingleSuite
 			///// Messy tests ////////////////////////////////////////////////////////////////////////			
 			
 			it("should stub most m.methods", {
-				var todoList = new TodoComponent();
+				var todoList = new TodoList();
 		
-				todoList.todos.add("First one");
-				todoList.todos.add("Second <one>");
+				todoList.add("First one");
+				todoList.add("Second <one>");
 		
 				for(todo in todoList) {
 					todo.done = true;
 					break;
 				}
 				
-				var renderedList : String = render(todoList.view());
+				var component = new TodoComponent(todoList);
+				var renderedList : String = render(component.view());
 		
 				renderedList.should.startWith('<div><input value=""><button>Add</button><span style="display:none"> Adding...</span><table><tr><td><input ');
 			
