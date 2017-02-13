@@ -165,13 +165,14 @@ class ServerRenderingTests extends buddy.SingleSuite
 			
 			// Attributes come in a different order on many targets,
 			// can't be bothered to make this fully testable.
-			#if (!nodejs && !java && !php && !python && !cpp && !cs)
+			#if (!nodejs && !java && !php && !python && !cpp && !cs && !flash)
 			it("should render complex compositions with indentation properly", {
 				var render = new MithrilNodeRender("  ").render;
 				var webshop = new webshop.Webshop();
 
 				var output = render(webshop.view());
 				output = ~/[\r\n]/g.replace(output, "");
+				output = ~/\s+/g.replace(output, " ");
 
 				var test = '<h1>Welcome!</h1>
 <p>Select a category on the left to start shopping.</p>
@@ -209,6 +210,7 @@ class ServerRenderingTests extends buddy.SingleSuite
   </li>
 </ul>';
 				test = ~/[\r\n]/g.replace(test, "");
+				test = ~/\s+/g.replace(test, " ");
 
 				output.should.be(test);
 			});
