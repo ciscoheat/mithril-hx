@@ -144,10 +144,13 @@ class ServerRenderingTests extends buddy.SingleSuite
 			it("should stub most m.methods", {
 				var todoList = new TodoComponent();
 		
-				todoList.todo.add("First one");
-				todoList.todo.add("Second <one>");
+				todoList.todos.add("First one");
+				todoList.todos.add("Second <one>");
 		
-				todoList.todo.list[0].done = true;
+				for(todo in todoList) {
+					todo.done = true;
+					break;
+				}
 				
 				var renderedList : String = render(todoList.view());
 		
