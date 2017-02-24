@@ -6,7 +6,6 @@ import js.Browser;
 import mithril.M;
 import webshop.models.*;
 
-using Slambda;
 using StringTools;
 
 /**
@@ -42,12 +41,12 @@ class Webshop implements Mithril
         // Routes for the main page content
         M.route(element("content"), "/", routes);
 
-        // Define modules that should not change if the main content changes
+        // Define components that should not change if the main content changes
         M.mount(element("navigation"), menu);
         M.mount(element("shopping-cart"), cart);
         M.mount(element("search"), new Search());
 
-        // An "inline module" just to create the home link.
+        // An "inline component" just to create the home link.
         M.mount(element("home-link"), {
             view: function() 
                 m("a.navbar-brand[href='/']", {oncreate: M.routeLink}, "Mithril/Haxe Webshop")

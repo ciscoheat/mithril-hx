@@ -2,20 +2,10 @@
 
 #if nodejs
 import js.Lib;
-import js.Node;
-import js.Browser;
-import js.html.DOMElement in Element;
-import js.html.Document;
-import js.node.Process;
-import js.node.Http;
-import js.node.Url;
-import js.node.http.ServerResponse;
-import js.node.Url.UrlData;
 import js.node.Fs;
 #end
 
 import mithril.M;
-import mithril.M.m;
 import mithril.MithrilNodeRender;
 
 using StringTools;
