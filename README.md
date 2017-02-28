@@ -32,7 +32,10 @@ class TodoComponent implements Mithril
             m("h1", "To do"),
             m("table", todos.map(function(todo) {
                 m("tr", [
-                    m("td", m("input[type=checkbox]", { checked: function(e) todo.done = e.target. })),
+                    m("td", m("input[type=checkbox]", { 
+						onclick: function(e) todo.done = e.target.checked,
+						checked: todo.done
+					})),
                     m("td", todo.description)
                 ]);
             }))
