@@ -33,24 +33,25 @@ class TodoComponent implements Mithril
             m("table", todos.map(function(todo) {
                 m("tr", [
                     m("td", m("input[type=checkbox]", { 
-						onclick: function(e) todo.done = e.target.checked,
-						checked: todo.done
-					})),
+                        onclick: function(e) todo.done = e.target.checked,
+                        checked: todo.done
+                    })),
                     m("td", todo.description)
                 ]);
             }))
         ]);
     }
-	
-	// Program entry point
-	static function main() {
-		var todos = [
-			new Todo("Learn Haxe"),
-			new Todo("??"),
-			new Todo("Profit!")
-		];
-		M.mount(js.Browser.document.body, new TodoComponent(todos));
-	}		
+    
+    // Program entry point
+    static function main() {
+        var todos = [
+            new Todo("Learn Haxe"),
+            new Todo("??"),
+            new Todo("Profit!")
+        ];
+        
+        M.mount(js.Browser.document.body, new TodoComponent(todos));
+    }       
 }
 
 class Todo
