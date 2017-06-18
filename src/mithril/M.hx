@@ -81,7 +81,7 @@ typedef XHROptions<T, T2, T3> = {
 	@:optional var type : T -> Dynamic;
 	@:optional var serialize : T3 -> String;
 	@:optional var deserialize : String -> T3;
-	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3> -> String;
+	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3> -> Dynamic;
 	@:optional var useBody : Bool;
 	@:optional var background : Bool;
 };
