@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Now supports Mithril 1.0!",
-  "version": "1.0.0",
+  "releasenote": "Changed xhr request extract function return type from `String` to `Dynamic` to reflect actual Mithril.js",
+  "version": "1.0.1",
   "contributors": ["ciscoheat"]
 }
