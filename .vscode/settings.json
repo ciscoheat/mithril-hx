@@ -10,5 +10,6 @@
         ["client.hxml"],
         ["server.hxml"],
         ["tests.hxml"]
-    ]
+    ],
+    "vsicons.presets.angular": false
 }
