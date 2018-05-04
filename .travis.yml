@@ -8,7 +8,7 @@ os:
   - osx
   
 haxe:
-  - "3.2.1"
+  - "3.4.7"
   - development
   
 matrix:
@@ -20,7 +20,6 @@ install:
   - haxelib run travix install
 
 script:
-  - haxelib run travix interp
   - haxelib run travix neko
   - haxelib run travix python
   - haxelib run travix node

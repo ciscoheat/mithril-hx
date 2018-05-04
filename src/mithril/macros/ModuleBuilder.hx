@@ -7,7 +7,6 @@ import haxe.macro.Type;
 
 using haxe.macro.ExprTools;
 using Lambda;
-using StringTools;
 
 class ModuleBuilder
 {

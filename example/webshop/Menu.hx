@@ -3,9 +3,7 @@ package webshop;
 import haxecontracts.*;
 import mithril.M;
 import webshop.models.Category;
-import webshop.models.*;
 
-using StringTools;
 using Slambda;
 
 /**
@@ -36,7 +34,7 @@ class Menu implements Mithril implements HaxeContracts
     ];
 
     @invariants function invariants() {
-        invariant(categories != null);
-        invariant(active == null || categories.exists.fn(_ == active));
+        Contract.invariant(categories != null);
+        Contract.invariant(active == null || categories.exists.fn(_ == active));
     }
 }

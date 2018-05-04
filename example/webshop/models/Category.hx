@@ -1,7 +1,6 @@
 package webshop.models;
 
 import js.Promise;
-import mithril.M;
 using StringTools;
 
 class Category

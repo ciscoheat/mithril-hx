@@ -1,6 +1,5 @@
 package webshop.models;
 
-import mithril.M;
 import js.Promise;
 using Lambda;
 using StringTools;
