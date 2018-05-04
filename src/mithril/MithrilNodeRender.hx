@@ -37,7 +37,7 @@ class MithrilNodeRender
 			return Std.string(view);
 
 		if(Std.is(view, Array))
-			return cast(view, Array<Dynamic>).map(_render.bind(_, indentDepth)).join('');
+			return [for(v in cast(view, Array<Dynamic>)) _render(v, indentDepth)].join('');
 
 		// view must be a Vnode now.
 		var el : Vnode<Dynamic> = cast view;
