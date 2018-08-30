@@ -1,8 +1,6 @@
 package webshop;
 
 import haxecontracts.*;
-import js.html.Element;
-import js.html.MouseEvent;
 import mithril.M;
 import webshop.models.*;
 
@@ -48,8 +46,7 @@ class ProductPage implements Mithril implements HaxeContracts
         cart.open();
     }
 
-	// Since ProductPage is a RouteResolver, a "vnode" argument is required.
-    public function render(vnode) {
+    public function render() {
         var template = switch loader.state() {
             case Started: m('div.row', "");
             case Delayed: m('div.row', m('div.col-xs-12', m('h1', "Loading...")));
@@ -82,10 +79,10 @@ class ProductPage implements Mithril implements HaxeContracts
     }
 
     @invariants function invariants() {
-        invariant(cart != null);
-        invariant(loader != null);
-        invariant(menu != null);
-		invariant(product != null || loader.state() != Done, "Product cannot be null when the loader is done");
+        Contract.invariant(cart != null);
+        Contract.invariant(loader != null);
+        Contract.invariant(menu != null);
+		Contract.invariant(product != null || loader.state() != Done, "Product cannot be null when the loader is done");
     }
 	
 	///////////////////////////////////////////////////////////////////////////

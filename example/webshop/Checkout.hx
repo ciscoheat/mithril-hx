@@ -1,8 +1,6 @@
 package webshop;
 
 import mithril.M;
-import webshop.models.*;
-using Lambda;
 
 private typedef FormField = {
     var id : String;

@@ -2,15 +2,10 @@ package webshop;
 
 import js.html.DOMElement in Element;
 import haxe.Constraints.Function;
-import haxe.DynamicAccess;
 import js.Browser;
 import js.html.Event;
-import js.html.InputElement;
-import js.html.KeyboardEvent;
 import mithril.M;
 import webshop.models.*;
-using Lambda;
-using StringTools;
 
 class Search implements Mithril
 {

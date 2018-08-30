@@ -2,7 +2,6 @@ package webshop;
 
 import haxecontracts.*;
 import haxe.DynamicAccess;
-import js.html.Element;
 import mithril.M;
 import webshop.models.*;
 
@@ -32,7 +31,7 @@ class ProductList implements Mithril implements HaxeContracts
     // The reason for not passing products directly to the products property is that
     // then another part of the program has to manage the loader, which breaks encapsulation.
     public function onmatch(params : haxe.DynamicAccess<String>, url : String) {
-        requires(params != null);
+        Contract.requires(params != null);
 
         loader.start();
         menu.setActive(null);
@@ -105,11 +104,11 @@ class ProductList implements Mithril implements HaxeContracts
     }
 
     @invariants function invariants() {
-        invariant(products != null);
-        invariant(menu != null);
-        invariant(categories != null);
-        invariant(cart != null);
-        invariant(loader != null);
-        invariant(currentCategory == null || categories.exists.fn(_ == currentCategory));
+        Contract.invariant(products != null);
+        Contract.invariant(menu != null);
+        Contract.invariant(categories != null);
+        Contract.invariant(cart != null);
+        Contract.invariant(loader != null);
+        Contract.invariant(currentCategory == null || categories.exists.fn(_ == currentCategory));
     }    
 }
