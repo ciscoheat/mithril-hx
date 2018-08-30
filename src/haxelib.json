@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Changed xhr request extract function return type from `String` to `Dynamic` to reflect actual Mithril.js",
-  "version": "1.0.1",
+  "releasenote": "Haxe 4 fix for autocompletion.",
+  "version": "1.0.2",
   "contributors": ["ciscoheat"]
 }

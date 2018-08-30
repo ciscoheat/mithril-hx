@@ -91,7 +91,7 @@ class ModuleBuilder
 	private static function replaceMwithFullNamespace(e : Expr) {
 		// Autocompletion for m()
 		if (Context.defined("display")) switch e.expr {
-			case EDisplay(e2, isCall):
+			case EDisplay(e2, _):
 				switch(e2) {
 					case macro m:
 						e2.expr = (macro mithril.M.m).expr;
