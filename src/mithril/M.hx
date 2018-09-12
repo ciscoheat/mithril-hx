@@ -162,8 +162,8 @@ extern class M
 		untyped __js__("} catch(_) {}");
 		// Node patch
 		untyped __js__("try {");
-		untyped __js__('GLOBAL.m = require("mithril")');
-		_patch(untyped __js__('GLOBAL.m'));
+		untyped __js__('global.m = require("mithril")');
+		_patch(untyped __js__('global.m'));
 		untyped __js__("} catch(_) {}");
 	}
 
