@@ -32,11 +32,11 @@ from T1 from T2 to T1 to T2 {}
 
 ///// Typedefs /////
 
-private typedef Component1 = {
+typedef Component1 = {
 	function view() : Vnodes;
 };
 
-private typedef Component2 = {
+typedef Component2 = {
 	function view(vnode : Vnode<Dynamic>) : Vnodes;
 };
 
@@ -206,6 +206,7 @@ class M
 	
 	///// Rendering /////
 	
+	// Latest version at https://github.com/MithrilJS/mithril.js/blob/next/render/hyperscript.js
 	public static function m(selector : String, ?attrs : Dynamic, ?children : Dynamic) : Vnode<Dynamic> {
 		if (selector == null || !Std.is(selector, String) && Reflect.hasField(selector, "view")) {
 			throw "The selector must be either a string or a component.";

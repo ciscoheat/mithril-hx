@@ -20,7 +20,6 @@ class MithrilNodeRender
 	public function new(?indent : String, ?newLine : String) {
 		this.indent = indent == null ? "" : indent;
 		this.newLine = newLine == null ? (this.indent.length > 0 ? "\n" : "") : newLine;
-		this.indentMode = this.indent.length > 0;
 	}
 
 	public function render(view : Vnodes) : String {
@@ -36,8 +35,11 @@ class MithrilNodeRender
 		if(Std.is(view, Int) || Std.is(view, Float) || Std.is(view, Bool))
 			return Std.string(view);
 
-		if(Std.is(view, Array))
-			return [for(v in cast(view, Array<Dynamic>)) _render(v, indentDepth)].join('');
+		if(Std.is(view, Array)) {
+			var output = [for(v in cast(view, Array<Dynamic>)) _render(v, indentDepth)].join(newLine);
+			return if(output.indexOf("<") >= 0) newLine + output + newLine;
+			else output;
+		}
 
 		// view must be a Vnode now.
 		var el : Vnode<Dynamic> = cast view;
@@ -46,26 +48,25 @@ class MithrilNodeRender
 		if (el.tag == "<") {
 			return cast el.state;
 		}
-		
-		var children = createChildrenContent(el, indentDepth + 1);
-		
-		var currentIndent = indentMode ? "".lpad(this.indent, indentDepth * this.indent.length) : "";
+
+		// Test for components
+		if(Std.is(el.tag, Mithril)) {
+			var c : Component1 = cast el.tag;
+			return _render(c.view(), indentDepth);
+		}
+
+		var children = if(el.children == null || !Std.is(el.children, Array)) {
+			el.text;
+		}
+		else {
+			_render(el.children, indentDepth + 1);
+		}
 
 		if(children.length == 0 && voidTags.indexOf(el.tag.toLowerCase()) >= 0) {
-			return '$currentIndent<${el.tag}${createAttrString(el.attrs)}>$newLine$currentIndent';
+			return '<${el.tag}${createAttrString(el.attrs)}>';
 		}
 		
-		var indentChild = indentMode && children.ltrim().startsWith("<");
-		
-		if (indentChild) children = newLine + children + currentIndent;
-		var startIndent = indentChild ? currentIndent : "";
-
-		return '$startIndent<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>$newLine';
-	}
-
-	inline function createChildrenContent(el : Vnode<Dynamic>, newIndentDepth : Int) : String {
-		return if(el.children == null || !Std.is(el.children, Array)) el.text;
-		else _render(el.children, newIndentDepth);
+		return '<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>';
 	}
 
 	function createAttrString(attrs : Dynamic) {

@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Fixing GLOBAL deprecation on Node.js.",
-  "version": "1.0.3",
+  "releasenote": "MithrilNodeRender now handles components.",
+  "version": "1.0.4",
   "contributors": ["ciscoheat"]
 }
