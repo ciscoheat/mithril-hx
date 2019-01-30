@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "MithrilNodeRender now handles components.",
-  "version": "1.0.4",
+  "releasenote": "Signature fix to handle components in m function.",
+  "version": "1.0.5",
   "contributors": ["ciscoheat"]
 }

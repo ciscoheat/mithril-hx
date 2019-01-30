@@ -100,6 +100,7 @@ typedef JSONPOptions<T, T2> = {
 @:final @:native("m")
 extern class M
 {
+	@:overload(function(selector : Mithril) : Vnodes {})
 	@:overload(function(selector : Either<String, Component>) : Vnodes {})
 	@:overload(function(selector : Either<String, Component>, attributes : Dynamic) : Vnodes {})
 	public static function m(selector : Either<String, Component>, attributes : Dynamic, children : Dynamic) : Vnodes;
@@ -207,7 +208,7 @@ class M
 	///// Rendering /////
 	
 	// Latest version at https://github.com/MithrilJS/mithril.js/blob/next/render/hyperscript.js
-	public static function m(selector : String, ?attrs : Dynamic, ?children : Dynamic) : Vnode<Dynamic> {
+	public static function m(selector : Either<String, Mithril>, ?attrs : Dynamic, ?children : Dynamic) : Vnode<Dynamic> {
 		if (selector == null || !Std.is(selector, String) && Reflect.hasField(selector, "view")) {
 			throw "The selector must be either a string or a component.";
 		}
