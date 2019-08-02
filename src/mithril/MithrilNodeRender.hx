@@ -42,10 +42,10 @@ class MithrilNodeRender
 		}
 
 		// view must be a Vnode now.
-		var el : Vnode<Dynamic> = cast view;
+		var el : Vnode = cast view;
 		
 		// Test for trusted html
-		if (el.tag == "<") {
+		if (Std.is(el.tag, String) && cast el.tag == "<") {
 			return cast el.state;
 		}
 
@@ -62,11 +62,13 @@ class MithrilNodeRender
 			_render(el.children, indentDepth + 1);
 		}
 
-		if(children.length == 0 && voidTags.indexOf(el.tag.toLowerCase()) >= 0) {
-			return '<${el.tag}${createAttrString(el.attrs)}>';
+		var tag : String = Std.string(el.tag);
+
+		if(children.length == 0 && voidTags.indexOf(tag.toLowerCase()) >= 0) {
+			return '<${tag}${createAttrString(el.attrs)}>';
 		}
 		
-		return '<${el.tag}${createAttrString(el.attrs)}>$children</${el.tag}>';
+		return '<${tag}${createAttrString(el.attrs)}>$children</${tag}>';
 	}
 
 	function createAttrString(attrs : Dynamic) {

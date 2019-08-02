@@ -49,7 +49,7 @@ class ModuleBuilder
 					f.args[0].type = TPath({
 						name: 'M',
 						pack: ['mithril'],
-						params: [TPType(Context.toComplexType(Context.getLocalType()))],
+						params: [],
 						sub: 'Vnode'
 					});
 				}
@@ -118,7 +118,7 @@ class ModuleBuilder
 			case EObjectDecl(fields): for (field in fields) if (componentMethods.has(field.field)) switch field.expr.expr {
 				case EFunction(_, f):
 					if (f.args.length > 0 && f.args[0].type == null) {
-						f.args[0].type = macro : mithril.M.Vnode<Dynamic>;
+						f.args[0].type = macro : mithril.M.Vnode;
 					}
 				case _:
 			}

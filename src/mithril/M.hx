@@ -13,7 +13,7 @@ import js.Error;
 import js.html.Document;
 import js.html.Event;
 import js.html.XMLHttpRequest;
-import js.html.DOMElement in Element;
+import js.html.Element;
 #else
 // Mock some js classes for server rendering
 typedef XMLHttpRequest = Dynamic;
@@ -37,23 +37,23 @@ typedef Component1 = {
 };
 
 typedef Component2 = {
-	function view(vnode : Vnode<Dynamic>) : Vnodes;
+	function view(vnode : Vnode) : Vnodes;
 };
 
 typedef Component = Either<Component1, Component2>;
 
 typedef RouteResolver<T : Component> = {
 	@:optional function onmatch(args : DynamicAccess<String>, requestedPath : String) : Either<T, Promise<T>>;
-	@:optional function render(vnode : Null<Vnode<T>>) : Vnodes;
+	@:optional function render(vnode : Null<Vnode>) : Vnodes;
 }
 
-typedef Vnode<T> = {
-	var state : Null<T>;
-	var tag : Dynamic;
+typedef Vnode = {
+	var tag : Either<String, Component>;
 	var key : Null<String>;
-	var attrs : Null<DynamicAccess<Dynamic>>;
-	var children : Null<Array<Vnode<Dynamic>>>;	
+	var children : Null<Array<Vnode>>;
 	var text : Null<Dynamic>;
+	var attrs : Null<DynamicAccess<Dynamic>>;
+	var state : Null<Dynamic>;
 	#if js
 	var dom : Null<Element>;
 	#else
@@ -62,7 +62,7 @@ typedef Vnode<T> = {
 	var domSize : Null<Int>;
 };
 
-typedef Vnodes = Either<Vnode<Dynamic>, Array<Vnode<Dynamic>>>;
+typedef Vnodes = Either<Vnode, Array<Vnode>>;
 
 /**
  * Plenty of optional fields for this one.
@@ -96,6 +96,34 @@ typedef JSONPOptions<T, T2> = {
 
 //////////
 
+@:final extern class MithrilRoute
+{
+	@:selfCall 
+	public function route(
+		rootElement : Element, defaultRoute : String, 
+		routes : Dynamic<Either<Component, RouteResolver<Dynamic>>>
+	) : Void;
+
+	public function set(path : String, ?params : { }, ?options : {
+		?replace : Bool,
+		?state : { },
+		?title : String
+	}) : Void;
+
+	public function get() : String;
+
+	public var prefix(default, default) : String;	
+	public var Link(default, null) : Component;
+
+	@:overload(function() : DynamicAccess<String> {})
+	public function param(key : String) : String;
+
+	public var SKIP(default, null) : Component;
+	
+	// Convenience method for route attributes
+	//public static inline function routeAttrs(vnode : Vnode) : DynamicAccess<String> { return untyped __js__("{0}.attrs", vnode); }
+}
+
 #if ((js && !nodejs) || (js && nodejs && mithril_native))
 @:final @:native("m")
 extern class M
@@ -109,23 +137,7 @@ extern class M
 	
 	public static function mount(element : Element, component : Null<Component>) : Void;
 
-	public static function route(rootElement : Element, defaultRoute : String, routes : Dynamic<Either<Component, RouteResolver<Dynamic>>>) : Void;
-	
-	///// Special route accessors /////
-	
-	public static inline function routeSet(route : String, ?data : { }, ?options : {
-		?replace : Bool,
-		?state : { },
-		?title : String
-	}) : Void { 
-		return untyped __js__("m.route.set({0}, {1}, {2})", route, data, options); 		
-	}
-	public static inline function routeGet() : String  { return untyped __js__("m.route.get()"); }
-	public static inline function routePrefix(prefix : String) : Void  { return untyped __js__("m.route.prefix({0})", prefix); }
-	public static inline function routeLink(vnode : Vnode<Dynamic>) : Event -> Void { return untyped __js__("m.route.link({0})", vnode); }
-	
-	// Convenience method for route attributes
-	public static inline function routeAttrs(vnode : Vnode<Dynamic>) : DynamicAccess<String> { return untyped __js__("{0}.attrs", vnode); }
+	public static var route(default, null) : MithrilRoute;
 	
 	///////////////////////////////////
 	
@@ -142,11 +154,9 @@ extern class M
 	public static function parseQueryString(querystring : String) : DynamicAccess<String>;
 	public static function buildQueryString(data : {}) : String;
 	
-	public static function withAttr<T, T2 : Event>(attrName : String, callback : T -> Void) : T2 -> Void;
+	public static function trust(html : String) : Vnode;
 	
-	public static function trust(html : String) : Vnode<Dynamic>;
-	
-	public static function fragment(attrs : {}, children : Array<Vnodes>) : Vnode<Dynamic>;
+	public static function fragment(attrs : {}, children : Array<Vnodes>) : Vnode;
 
 	public static function redraw() : Void;
 	
@@ -199,16 +209,12 @@ class M
 	
 	public static function redraw(?forceSync : Bool) {}
 
-	public static function withAttr<T, T2 : Event>(property : String, ?callback : T -> Void) : T2 -> Void {
-		return function(e) {}
-	}
-	
 	public static var routeLink(default, null) : Function = null;
 	
 	///// Rendering /////
 	
 	// Latest version at https://github.com/MithrilJS/mithril.js/blob/next/render/hyperscript.js
-	public static function m(selector : Either<String, Mithril>, ?attrs : Dynamic, ?children : Dynamic) : Vnode<Dynamic> {
+	public static function m(selector : Either<String, Mithril>, ?attrs : Dynamic, ?children : Dynamic) : Vnode {
 		if (selector == null || !Std.is(selector, String) && Reflect.hasField(selector, "view")) {
 			throw "The selector must be either a string or a component.";
 		}
@@ -244,7 +250,7 @@ class M
 				attributes.set('className', classes.join(" "));
 			
 			selectorCache[selector] = function(attrs : DynamicAccess<Dynamic>, children) {
-				var hasAttrs = false, childList : Array<Vnode<Dynamic>> = null, text : String = null;
+				var hasAttrs = false, childList : Array<Vnode> = null, text : String = null;
 				
 				var className = if (attrs.exists("className") && attrs.get("className") != null && cast(attrs.get("className"), String).length > 0)
 					attrs.get("className")
@@ -278,7 +284,7 @@ class M
 					break;
 				}
 				
-				var childArray : Array<Vnode<Dynamic>> = Std.is(children, Array) ? cast children : null;
+				var childArray : Array<Vnode> = Std.is(children, Array) ? cast children : null;
 				
 				//trace("selectorCache[" + selector + "] childArray:"); trace(childArray);
 				
@@ -337,7 +343,7 @@ class M
 		}
 	}
 	
-	public static function trust(html : String) : Vnode<Dynamic> {
+	public static function trust(html : String) : Vnode {
 		// Implementation differs from native Mithril, html is stored in state instead
 		// because of static platform types.
 		return {
@@ -352,7 +358,7 @@ class M
 		}
 	}
 	
-	static var selectorCache = new Map<String, DynamicAccess<Dynamic> -> Dynamic -> Vnode<Dynamic>>();
+	static var selectorCache = new Map<String, DynamicAccess<Dynamic> -> Dynamic -> Vnode>();
 	
 	static function vnode(tag : Dynamic, key, attrs0, children : Dynamic, text, dom) : Dynamic {
 		return { 

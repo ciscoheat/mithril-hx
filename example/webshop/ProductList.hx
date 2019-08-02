@@ -82,9 +82,8 @@ class ProductList implements Mithril implements HaxeContracts
                     ]),
                     m('tbody[id=products]', products.map(function(p) 
                         m('tr', [
-                            m('td', m('a', {
-                                href: '/product/${p.id}',
-                                oncreate: M.routeLink
+                            m('td', m(M.route.Link, {
+                                href: '/product/${p.id}'
                             }, p.name)),
                             m('td', p.price >= 0 ? '$$${p.price}' : ""),
                             m('td', {style: {color: p.stock < 10 ? "red" : ""}}, Std.string(p.stock)),

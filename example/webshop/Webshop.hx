@@ -39,7 +39,7 @@ class Webshop implements Mithril
         };
 		
         // Routes for the main page content
-        M.route(element("content"), "/", routes);
+        M.route.route(element("content"), "/", routes);
 
         // Define components that should not change if the main content changes
         M.mount(element("navigation"), menu);
@@ -49,7 +49,10 @@ class Webshop implements Mithril
         // An "inline component" just to create the home link.
         M.mount(element("home-link"), {
             view: function() 
-                m("a.navbar-brand[href='/']", {oncreate: M.routeLink}, "Mithril/Haxe Webshop")
+                m(M.route.Link, {
+                    "class": "navbar-brand",
+                    href: '/'
+                }, "Mithril/Haxe Webshop")
         });
     }
 	#else

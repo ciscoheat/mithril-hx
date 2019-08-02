@@ -1,10 +1,10 @@
 {
   "name": "mithril",
-  "description": "Haxe externs for Mithril, a javascript MVC framework.",
+  "description": "Haxe externs for Mithril 2, a javascript MVC framework.",
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Signature fix to handle components in m function.",
-  "version": "1.0.5",
+  "releasenote": "Version 2 compatibility.",
+  "version": "2.0.0",
   "contributors": ["ciscoheat"]
 }

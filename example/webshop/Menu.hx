@@ -25,9 +25,8 @@ class Menu implements Mithril implements HaxeContracts
     public function view(vnode) [
         m('ul.nav.nav-sidebar', categories.map(function(c) {
             m('li', {"class": (active != null && active == c ? "active" : "")}, 
-                m('a', {
-                    href: '/category/${c.slug()}',
-                    oncreate: M.routeLink
+                m(M.route.Link, {
+                    href: '/category/${c.slug()}'
                 }, c.name)
             );
         }))

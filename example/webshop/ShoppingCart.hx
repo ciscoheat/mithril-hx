@@ -107,7 +107,7 @@ class ShoppingCart implements Mithril implements HaxeContracts
 		]),
 		m('li', content.empty() 
 			? m('span', "Proceed to checkout")
-			: m("a[href='/checkout']", {oncreate: M.routeLink}, "Proceed to checkout")
+			: m(M.route.Link, {href: '/checkout'}, "Proceed to checkout")
         )
 	];
 
@@ -124,12 +124,13 @@ class ShoppingCart implements Mithril implements HaxeContracts
                     min: 0, 
                     value: content.get(p), 
                     style: {width: "36px"},
-                    oninput: M.withAttr("value", set.bind(p, _))
+                    oninput: e -> set(p, e.currentTarget.value)
                 }),
-                m('span', m('a', { 
-                    oncreate: M.routeLink, 
-                    href: '/product/${p.id}', 
-                }, ' ${p.name}'), " | $" + subTotal)
+                m('span', 
+                    m(M.route.Link, { 
+                        href: '/product/${p.id}'
+                    }, ' ${p.name}'
+                ), " | $" + subTotal)
             ]));
         }).concat([
             m('li.divider', null),

@@ -37,8 +37,8 @@ class Search implements Mithril
         [
             m('input.form-control', {
                 placeholder: "Search...",
-                oninput: M.withAttr("value", searchEvent),
-                onfocus: M.withAttr("value", searchEvent)
+                oninput: e -> searchEvent(e.currentTarget.value),
+                onfocus: e -> searchEvent(e.currentTarget.value)
             }),
             m('UL.dropdown-menu.dropdown-menu-right', {
                 role: "menu",
@@ -52,11 +52,10 @@ class Search implements Mithril
 				}
             }, results.map(function(p)
                 m('li', {role: "presentation"},
-                    m('a', {
+                    m(M.route.Link, {
                         role: "menuitem",
                         tabindex: -1,
-                        href: '/product/${p.id}',
-                        oncreate: M.routeLink
+                        href: '/product/${p.id}'
                     }, p.name)
                 )
             ))
