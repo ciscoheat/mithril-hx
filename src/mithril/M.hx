@@ -62,34 +62,33 @@ typedef Vnode = {
 
 typedef Vnodes = Either<Vnode, Array<Vnode>>;
 
-/**
- * Plenty of optional fields for this one.
- * @see http://mithril.js.org/request.html
- */
-typedef XHROptions<T, T2, T3> = {
-	@:optional var url : String;
+typedef XHROptions<T, T2> = {
 	@:optional var method : String;
-	@:optional var data : Dynamic;
+	@:optional var url : String;
+	@:optional var params : DynamicAccess<String>;
+	@:optional var body : T2;
 	@:optional var async : Bool;
 	@:optional var user : String;
 	@:optional var password : String;
 	@:optional var withCredentials : Bool;
+	@:optional var timeout : Int;
+	@:optional var responseType : String;
 	@:optional var config : XMLHttpRequest -> XMLHttpRequest;
 	@:optional var headers : DynamicAccess<String>;
 	@:optional var type : T -> Dynamic;
-	@:optional var serialize : T3 -> String;
-	@:optional var deserialize : String -> T3;
-	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2, T3> -> Dynamic;
-	@:optional var useBody : Bool;
+	@:optional var serialize : T2 -> String;
+	@:optional var deserialize : String -> T2;
+	@:optional var extract : XMLHttpRequest -> XHROptions<T, T2> -> Dynamic;
 	@:optional var background : Bool;
 };
 
 typedef JSONPOptions<T, T2> = {
 	@:optional var url : String;
-	@:optional var data : Dynamic;
+	@:optional var params : DynamicAccess<String>;
 	@:optional var type : T -> Dynamic;
 	@:optional var callbackName : String;
 	@:optional var callbackKey : String;
+	@:optional var background : Bool;
 };
 
 //////////
@@ -131,7 +130,8 @@ extern class M
 	@:overload(function(selector : Either<String, Component>, attributes : Dynamic) : Vnodes {})
 	public static function m(selector : Either<String, Component>, attributes : Dynamic, children : Dynamic) : Vnodes;
 
-	public static function render(rootElement : Element, children : Vnodes) : Void;
+	@:overload(function(rootElement : Element, children : Vnodes) : Void {})
+	public static function render(rootElement : Element, children : Vnodes, redraw : Void -> Void) : Void;
 	
 	public static function mount(element : Element, component : Null<Component>) : Void;
 
@@ -140,9 +140,9 @@ extern class M
 	///////////////////////////////////
 	
 	#if !nodejs
-	@:overload(function<T, T2, T3>(url : String) : Promise<T> {})
-	@:overload(function<T, T2, T3>(options : XHROptions<T, T2, T3>) : Promise<T> {})
-	public static function request<T, T2, T3>(url : String, options : XHROptions<T, T2, T3>) : Promise<T>;
+	@:overload(function<T, T2>(url : String) : Promise<T> {})
+	@:overload(function<T, T2>(options : XHROptions<T, T2>) : Promise<T> {})
+	public static function request<T, T2>(url : String, options : XHROptions<T, T2>) : Promise<T>;
 
 	@:overload(function<T>(url : String) : Promise<T> {})
 	@:overload(function<T, T2>(options : JSONPOptions<T, T2>) : Promise<T> {})
@@ -150,15 +150,20 @@ extern class M
 	#end
 
 	public static function parseQueryString(querystring : String) : DynamicAccess<String>;
-	public static function buildQueryString(data : {}) : String;
-	
+	public static function buildQueryString(data : DynamicAccess<String>) : String;
+
+	public static function buildPathname(path : String, data : DynamicAccess<String>) : String;
+	public static function parsePathname(string : String) : {path: String, params: DynamicAccess<String>};
+
 	public static function trust(html : String) : Vnode;
 	
-	public static function fragment(attrs : {}, children : Array<Vnodes>) : Vnode;
+	@:overload(function() : Vnode {})
+	@:overload(function(attrs : {}) : Vnode {})
+	@:overload(function(children : Array<Dynamic>) : Vnode {})
+	public static function fragment(attrs : {}, children : Array<Dynamic>) : Vnode;
 
 	public static function redraw() : Void;
-	
-	public static function version() : String;
+	public static inline function redrawSync() : Void { return untyped __js__("m.redraw.sync()"); }
 	
 	///// Haxe specific stuff /////
 
