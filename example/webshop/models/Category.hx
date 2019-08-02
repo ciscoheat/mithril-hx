@@ -1,6 +1,6 @@
 package webshop.models;
 
-import js.Promise;
+import js.lib.Promise;
 using StringTools;
 
 class Category
