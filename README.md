@@ -85,6 +85,10 @@ Because of the slight mismatch between Haxe classes and the classless Mithril st
 
 This is usually nothing you have to worry about if you're using Haxe classes only for your components and state. In that context, `this` works normally.
 
+## When using Node.js
+
+If you're using Node.js, you can install and use Mithril from npm instead of the Haxe port (see below for server side examples). To do that, define `-D mithril-native`.
+
 # Haxe examples
 
 This repo has some examples that can be interesting to test. Clone it, open a prompt in the directory and run:
@@ -223,8 +227,6 @@ As a bonus, a Neko version of Example 1 will also be compiled. Test it with
 `neko server.n`
 
 The `MithrilNodeRender` is tested with [travix](https://github.com/back2dos/travix/) and should work on all targets. 
-
-Finally, if you're using Node.js, you can install and use Mithril from npm instead of the Haxe port. To do that, define `-D mithril-native`.
 
 # Feedback please!
 
