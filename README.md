@@ -1,6 +1,6 @@
 # Mithril for Haxe
 
-[Mithril](http://mithril.js.org/) is a small, yet great javascript MVC framework that is faster and more flexible than most others. Here's the [Haxe](http://haxe.org/) version for Mithril 1.0+, with some useful extra features thanks to macros and the type inference.
+[Mithril](http://mithril.js.org/) is a small, yet great javascript MVC framework that is faster and more flexible than most others. Here's the [Haxe](http://haxe.org/) version for Mithril 2, with some useful extra features thanks to macros and the type inference.
 
 # Installation
 
