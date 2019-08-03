@@ -65,7 +65,7 @@ class Server
 		
 		app.get('/dashboard/:app?', function(req, res, next) {
 			dashboard.changeApp(req.params.app);
-			renderMithril(dashboard.render(), res, next);
+			renderMithril(dashboard.view(), res, next);
 		});
 		
 		///////////////////////////////////////////////////////////////////////

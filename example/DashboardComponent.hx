@@ -73,7 +73,7 @@ class DashboardComponent implements Mithril
 		#if isomorphic
 		trace('Isomorphic mode active');
 		// Changing route mode to "pathname" to get urls without hash.
-		M.route.prefix("");
+		M.route.prefix = "";
 		#end
 
 		///// Routes must be kept synchronized with NodeRendering.hx /////

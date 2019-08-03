@@ -4,6 +4,6 @@
   "private": true,
   "dependencies": {
     "express": "^4.14.1",
-    "mithril": "^1.0.0"
+    "mithril": "^2.0.3"
   }
 }

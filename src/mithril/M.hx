@@ -8,10 +8,12 @@ import js.lib.Promise;
 import js.html.XMLHttpRequest;
 import js.html.Element;
 #else
+import haxe.Constraints;
 // Mock some js classes for server rendering
 typedef XMLHttpRequest = Dynamic;
 typedef Event = Dynamic;
 typedef Promise<T> = Dynamic;
+typedef Element = Dynamic;
 #end
 
 /////////////////////////////////////////////////////////////
@@ -86,8 +88,7 @@ typedef JSONPOptions<T, T2> = {
 	@:optional var background : Bool;
 };
 
-//////////
-
+#if ((js && !nodejs) || (js && nodejs && mithril_native))
 @:final extern class MithrilRoute
 {
 	@:selfCall 
@@ -111,12 +112,8 @@ typedef JSONPOptions<T, T2> = {
 	public function param(key : String) : String;
 
 	public var SKIP(default, null) : Component;
-	
-	// Convenience method for route attributes
-	//public static inline function routeAttrs(vnode : Vnode) : DynamicAccess<String> { return untyped __js__("{0}.attrs", vnode); }
 }
 
-#if ((js && !nodejs) || (js && nodejs && mithril_native))
 @:final @:native("m")
 extern class M
 {
@@ -132,9 +129,6 @@ extern class M
 
 	public static var route(default, null) : MithrilRoute;
 	
-	///////////////////////////////////
-	
-	#if !nodejs
 	@:overload(function<T, T2>(url : String) : Promise<T> {})
 	@:overload(function<T, T2>(options : XHROptions<T, T2>) : Promise<T> {})
 	public static function request<T, T2>(url : String, options : XHROptions<T, T2>) : Promise<T>;
@@ -142,7 +136,6 @@ extern class M
 	@:overload(function<T>(url : String) : Promise<T> {})
 	@:overload(function<T, T2>(options : JSONPOptions<T, T2>) : Promise<T> {})
 	public static function jsonp<T, T2>(url : String, options : JSONPOptions<T, T2>) : Promise<T>;
-	#end
 
 	public static function parseQueryString(querystring : String) : DynamicAccess<String>;
 	public static function buildQueryString(data : DynamicAccess<String>) : String;
@@ -196,9 +189,34 @@ extern class M
 		})")(__varName);
 	}
 }
+
 #else
 
 ///// Cross-platform implementation of Mithril. /////
+
+@:final class MithrilRoute
+{
+	public function new() {}
+
+	public function route(
+		rootElement : Element, defaultRoute : String, 
+		routes : Dynamic<Either<Component, RouteResolver<Dynamic>>>
+	) : Void {}
+
+	public function set(path : String, ?params : { }, ?options : {
+		?replace : Bool,
+		?state : { },
+		?title : String
+	}) : Void {}
+
+	public function get() : String return "";
+
+	public var prefix(default, default) : String = "";
+	public var Link(default, null) : String = "";	
+	public var SKIP(default, null) : String = "";
+
+	public function param(?key : String) : String return "";
+}
 
 @:final
 class M 
@@ -206,8 +224,7 @@ class M
 	///// Stubs /////
 	
 	public static function redraw(?forceSync : Bool) {}
-
-	public static var routeLink(default, null) : Function = null;
+	public static var route(default, null) = new MithrilRoute();
 	
 	///// Rendering /////
 	

@@ -176,7 +176,7 @@ Compile and run with:
 
 ## Server side - All targets
 
-The rendering part of Mithril has been ported to Haxe, so you can now enjoy writing Mithril templates, and have them rendered to HTML anywhere. Here's a class to get you started:
+The rendering part of Mithril has been ported to Haxe, so you can now enjoy writing Mithril templates and have them rendered to HTML anywhere. Here's a class to get you started:
 
 ```haxe
 import mithril.MithrilNodeRender;
@@ -194,6 +194,8 @@ class Main {
     }
 }
 ```
+
+(Note: The above code may not work in interp mode. Test it with neko instead.)
 
 ## Server side - Node.js & isomorphism
 
