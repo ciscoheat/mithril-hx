@@ -77,7 +77,7 @@ class Main
 ### Upgrading from 1.x to 2.x
 
 - The `M.route` methods can now be called as in the Mithril syntax, `M.route.param` etc. To call `M.route` however, use `M.route.route`.
-- `M.withAttr` has been removed. Use an `e -> e.currentTarget` lambda function instead.
+- `M.withAttr` has been removed. Use an `e -> e.target` lambda function instead.
 
 ## "this" is slightly different
 
@@ -120,7 +120,7 @@ If you prefer a bare-bones example (doesn't require cloning), create the followi
 ```html
 <!doctype html>
 <body>
-<script src="https://unpkg.com/mithril@1.0.0/mithril.js"></script>
+<script src="https://unpkg.com/mithril/mithril.js"></script>
 <script src="example.js"></script>
 </body>
 ```
@@ -151,7 +151,7 @@ class Example implements Mithril
         // Display an input field
         m('input', {
             // Updates the model on input
-            oninput: function(e) user.name = e.target.value,
+            oninput: e -> user.name = e.target.value,
 
             // The redraw triggered by the oninput event will update
             // the input field value from the model automatically

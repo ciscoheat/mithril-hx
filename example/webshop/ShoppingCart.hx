@@ -62,7 +62,7 @@ class ShoppingCart implements Mithril implements HaxeContracts
             html.addEventListener("click", clickOutsideCart);
             dropDownMenu.style.width = Std.string(dropDownMenu.offsetWidth) + "px";
             M.redraw();
-        }, 10);
+        }, 20);
     }
 
     function clickOutsideCart(e : Event) {
@@ -90,7 +90,7 @@ class ShoppingCart implements Mithril implements HaxeContracts
 				href: "",
 				role: "button", 
 				"aria-expanded": false,
-				onclick: function(e) {
+				onclick: e -> {
                     e.preventDefault();
                     open();
                 }
@@ -100,10 +100,8 @@ class ShoppingCart implements Mithril implements HaxeContracts
 			]),
 			m('ul.dropdown-menu', {
 				role: "menu",
-				oncreate: function(vnode) {
-                    dropDownMenu = vnode.dom;
-                }
-			}, items())
+				oncreate: vnode -> dropDownMenu = vnode.dom
+			}, cartItems())
 		]),
 		m('li', content.empty() 
 			? m('span', "Proceed to checkout")
@@ -111,7 +109,7 @@ class ShoppingCart implements Mithril implements HaxeContracts
         )
 	];
 
-    function items() : Array<Vnodes> {
+    function cartItems() : Array<Vnodes> {
         if(content.empty()) return [m('li', m('a', "Empty"))];
 
         var total = 0.0;
@@ -124,7 +122,7 @@ class ShoppingCart implements Mithril implements HaxeContracts
                     min: 0, 
                     value: content.get(p), 
                     style: {width: "36px"},
-                    oninput: e -> set(p, e.currentTarget.value)
+                    oninput: e -> set(p, e.target.value)
                 }),
                 m('span', 
                     m(M.route.Link, { 

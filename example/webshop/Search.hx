@@ -37,8 +37,8 @@ class Search implements Mithril
         [
             m('input.form-control', {
                 placeholder: "Search...",
-                oninput: e -> searchEvent(e.currentTarget.value),
-                onfocus: e -> searchEvent(e.currentTarget.value)
+                oninput: e -> searchEvent(e.target.value),
+                onfocus: e -> searchEvent(e.target.value)
             }),
             m('UL.dropdown-menu.dropdown-menu-right', {
                 role: "menu",
