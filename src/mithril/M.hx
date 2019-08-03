@@ -1,15 +1,10 @@
 package mithril;
 
-using Lambda;
-using StringTools;
-
-import haxe.Constraints.Function;
 import haxe.DynamicAccess;
 
 #if js
 import js.Browser;
 import js.lib.Promise;
-import js.html.Event;
 import js.html.XMLHttpRequest;
 import js.html.Element;
 #else

@@ -44,7 +44,7 @@ class TodoComponent implements Mithril
 			m("table", [for(todo in todos) 
 				m("tr", [
 					m("td", m("input[type=checkbox]", { 
-						onclick: M.withAttr("checked", todos.setStatus.bind(todo)),
+						onclick: e -> todos.setStatus(todo, e.currentTarget.checked),
 						checked: todo.done
 					})),
 					m("td", { style: { textDecoration: todo.done ? "line-through" : "none" }}, todo.description)

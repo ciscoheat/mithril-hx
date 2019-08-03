@@ -15,7 +15,7 @@ class Webshop implements Mithril
 {
 	//
 	// Program entry point
-	// With a preprocessor directive to support testing. Please disregard the else part.
+	// With a preprocessor directive to support testing.
 	//
 	#if !buddy
     static function main() {
@@ -30,7 +30,7 @@ class Webshop implements Mithril
 		
 		var element = Browser.document.getElementById;
         
-		// Note the key parameters in the routes: http://mithril.js.org/route.html#key-parameter
+		// Note the key parameters in the routes: https://mithril.js.org/route.html#key-parameter
         var routes = {
             "/": this,
             "/category/:key": new ProductList(menu, cart, categories),
@@ -81,12 +81,13 @@ class Webshop implements Mithril
     ];
 
     function todo() return [
+        "x Mithril 2.0 library update",
+        "x Make cart not change size when open and items are deleted",
         "Checkout page",
         "Thank you page",
-        "x Make cart not change size when open and items are deleted",
         "Enable use of arrow keys when navigating search results",
         "URL slugs for products",
-        "Fix css for navbar and cart for low-res devices",
+        "Fix css for navbar and cart for mobile devices",
         "Administration section..."
     ];
 }

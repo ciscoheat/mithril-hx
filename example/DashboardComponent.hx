@@ -26,8 +26,8 @@ class DashboardComponent implements Mithril
 		
 		#if !server
 		M.request("https://jsonip.com/").then(
-			function(data : {ip: String}) ip = data.ip,
-			function(_) ip = "Don't know!"
+			data -> ip = data.ip,
+			_ -> ip = "Don't know!"
 		);
 		#end
 	}
@@ -38,18 +38,18 @@ class DashboardComponent implements Mithril
 		M.redraw();
 	}
 
-	public function render(?vnode : Vnode<DashboardComponent>) return [
+	public function view() [
 		m("h1", "Welcome!"),
 		m("p", "Choose your app:"),
 		m("div", {style: {width: "300px"}}, [
-			m("a[href='/dashboard/todos']", {oncreate: M.routeLink}, "Todo list"),
+			m(M.route.Link, {href: "/dashboard/todos"}, "Todo list"),
 			m("span", M.trust("&nbsp;")),
-			m("a[href='/dashboard/chain']", {oncreate: M.routeLink}, "Don't break the chain"),
+			m(M.route.Link, {href: "/dashboard/chain"}, "Don't break the chain"),
 			m("hr"),
-			switch(currentApp) {
-				case Todos: todo.view();
-				case Chain: chainView.view();
-				case None: m("#app");
+			switch(M.route.param('app')) {
+				case Todos: m(todo);
+				case Chain: m(chainView);
+				case _: m("#app");
 			},
 			m("hr"),
 			m("div", ip.length == 0 ? "Retreiving IP..." : "Your IP: " + ip),
@@ -62,11 +62,6 @@ class DashboardComponent implements Mithril
 		chainModel.clear();
 	}
 
-	public function onmatch(params : haxe.DynamicAccess<String>, url : String) {
-		changeApp(params.get('app'));
-		return null;
-	}
-		
 	#if !server
 	//
 	// Client entry point
@@ -78,11 +73,11 @@ class DashboardComponent implements Mithril
 		#if isomorphic
 		trace('Isomorphic mode active');
 		// Changing route mode to "pathname" to get urls without hash.
-		M.routePrefix("");
+		M.route.prefix("");
 		#end
 
 		///// Routes must be kept synchronized with NodeRendering.hx /////
-		M.route(htmlBody, "/dashboard", {
+		M.route.route(htmlBody, "/dashboard", {
 			"/dashboard": dashboard,
 			"/dashboard/:app": dashboard
 		});		

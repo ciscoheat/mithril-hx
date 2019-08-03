@@ -12,7 +12,7 @@ Mithril has a great introduction on its website and an astounding amount of docu
 
 ## Implement the Mithril interface
 
-Because Javascript is so dynamic and Haxe is strongly typed, the balance between flexibility and compiler safety can be difficult. When using Mithril, you will create [components](http://mithril.js.org/components.html) that will be used together with the Mithril API. For these objects you should implement the `Mithril` interface. Here's an example of a Mithril component:
+Because of Javascript's dynamic nature compared to Haxe's strongly typed system, the balance between flexibility and compiler safety can be difficult. When using Mithril, you will create [components](http://mithril.js.org/components.html) that will be used together with the Mithril API. For these objects you should implement the `Mithril` interface. Here's an example of a Mithril component:
 
 ```haxe
 import mithril.M;
@@ -26,7 +26,7 @@ class TodoComponent implements Mithril
     }
 
     // When implementing Mithril, the last m() expression 
-    // or Array of m(), is returned automatically.
+    // or Array of m() is returned automatically.
     public function view() {
         m("div", [
             m("h1", "To do"),
@@ -40,8 +40,22 @@ class TodoComponent implements Mithril
                 ]);
             }))
         ]);
+    }    
+}
+
+class Todo
+{
+    public var done : Bool = false;
+    public var description : String;
+
+    public function new(description, ?done) {
+        this.description = description;
+        if(done != null) this.done = done;
     }
-    
+}
+
+class Main
+{
     // Program entry point
     static function main() {
         var todos = [
@@ -51,30 +65,25 @@ class TodoComponent implements Mithril
         ];
         
         M.mount(js.Browser.document.body, new TodoComponent(todos));
-    }       
-}
-
-class Todo
-{
-    public var done : Bool = false;
-    public var description : String;
-
-    public function new(description) {
-        this.description = description;
     }
 }
 ```
 
-## A few API differences
+## The major API differences
 
-- Use M, not m! `import mithril.M;`, then use `M` instead of `m` for the whole API. As you see above, the only exception is when using `m()`, you can use that without prefixing with `M`.
-- The `route` methods are available by a simple translation: `M.route.link` for example, becomes `M.routeLink`.
+- **Use M, not m!** `import mithril.M;`, then use `M` instead of `m` for the whole API. As you see above, the only exception is when using `m()`, you can use that without prefixing with `M`.
+- `m.redraw.sync()` is available through `M.redrawSync()`.
+
+### Upgrading from 1.x to 2.x
+
+- The `M.route` methods can now be called as in the Mithril syntax, `M.route.param` etc. To call `M.route` however, use `M.route.route`.
+- `M.withAttr` has been removed. Use an `e -> e.currentTarget` lambda function instead.
 
 ## "this" is slightly different
 
-Because of the slight mismatch between Haxe classes and the classless Mithril structure, an important difference is that in [lifecycle methods](http://mithril.js.org/components.html#lifecycle-methods), `this` points to `vnode.tag` instead of `vnode.state`. Otherwise `this` would have pointed to another object when inside instance methods.
+Because of the slight mismatch between Haxe classes and the classless Mithril structure, an important difference is that in [lifecycle methods](http://mithril.js.org/components.html#lifecycle-methods), the native javascript `this` points to `vnode.tag` instead of `vnode.state`. Otherwise it would have pointed to another object when inside instance methods.
 
-This is usually nothing you have to worry about if you're using Haxe classes for your components and state. In that case `this` will work just normally.
+This is usually nothing you have to worry about if you're using Haxe classes only for your components and state. In that context, `this` works normally.
 
 # Haxe examples
 
@@ -94,7 +103,7 @@ A collection of two demo apps, available on the Mithril site.
 
 ## Webshop
 
-A simple, although incomplete, e-commerce site to demonstrate the power of Mithril.
+A simple e-commerce site to demonstrate the power of Mithril.
 
 1. `haxe webshop.hxml`
 1. `nekotools server -d bin/webshop`
