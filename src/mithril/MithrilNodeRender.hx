@@ -42,7 +42,7 @@ class MithrilNodeRender
 		}
 
 		// view must be a Vnode now.
-		var el : Vnode = cast view;
+		var el : Vnode<Dynamic> = cast view;
 		
 		// Test for trusted html
 		if (Std.is(el.tag, String) && cast el.tag == "<") {

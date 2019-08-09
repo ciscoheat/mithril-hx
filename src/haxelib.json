@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Version 2 compatibility.",
-  "version": "2.0.0",
+  "releasenote": "Generic Vnode is back.",
+  "version": "2.1.0",
   "contributors": ["ciscoheat"]
 }

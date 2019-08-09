@@ -31,24 +31,24 @@ typedef Component1 = {
 	function view() : Vnodes;
 };
 
-typedef Component2 = {
-	function view(vnode : Vnode) : Vnodes;
+typedef Component2<T> = {
+	function view(vnode : Vnode<T>) : Vnodes;
 };
 
-typedef Component = Either<Component1, Component2>;
+typedef Component = Either<Component1, Component2<Dynamic>>;
 
 typedef RouteResolver<T : Component> = {
 	@:optional function onmatch(args : DynamicAccess<String>, requestedPath : String) : Either<T, Promise<T>>;
-	@:optional function render(vnode : Null<Vnode>) : Vnodes;
+	@:optional function render(vnode : Null<Vnode<Dynamic>>) : Vnodes;
 }
 
-typedef Vnode = {
+typedef Vnode<T> = {
 	var tag : Either<String, Component>;
 	var key : Null<String>;
-	var children : Null<Array<Vnode>>;
+	var children : Null<Array<Vnode<Dynamic>>>;
 	var text : Null<Dynamic>;
 	var attrs : Null<DynamicAccess<Dynamic>>;
-	var state : Null<Dynamic>;
+	var state : Null<T>;
 	#if js
 	var dom : Null<Element>;
 	#else
@@ -57,7 +57,7 @@ typedef Vnode = {
 	var domSize : Null<Int>;
 };
 
-typedef Vnodes = Either<Vnode, Array<Vnode>>;
+typedef Vnodes = Either<Vnode<Dynamic>, Array<Vnode<Dynamic>>>;
 
 typedef XHROptions<T, T2> = {
 	@:optional var method : String;
@@ -143,12 +143,12 @@ extern class M
 	public static function buildPathname(path : String, data : DynamicAccess<String>) : String;
 	public static function parsePathname(string : String) : {path: String, params: DynamicAccess<String>};
 
-	public static function trust(html : String) : Vnode;
+	public static function trust(html : String) : Vnode<Dynamic>;
 	
-	@:overload(function() : Vnode {})
-	@:overload(function(attrs : {}) : Vnode {})
-	@:overload(function(children : Array<Dynamic>) : Vnode {})
-	public static function fragment(attrs : {}, children : Array<Dynamic>) : Vnode;
+	@:overload(function() : Vnode<Dynamic> {})
+	@:overload(function(attrs : {}) : Vnode<Dynamic> {})
+	@:overload(function(children : Array<Dynamic>) : Vnode<Dynamic> {})
+	public static function fragment(attrs : {}, children : Array<Dynamic>) : Vnode<Dynamic>;
 
 	public static function redraw() : Void;
 	public static inline function redrawSync() : Void { return untyped __js__("m.redraw.sync()"); }
@@ -229,7 +229,7 @@ class M
 	///// Rendering /////
 	
 	// Latest version at https://github.com/MithrilJS/mithril.js/blob/next/render/hyperscript.js
-	public static function m(selector : Either<String, Mithril>, ?attrs : Dynamic, ?children : Dynamic) : Vnode {
+	public static function m(selector : Either<String, Mithril>, ?attrs : Dynamic, ?children : Dynamic) : Vnode<Dynamic> {
 		if (selector == null || !Std.is(selector, String) && Reflect.hasField(selector, "view")) {
 			throw "The selector must be either a string or a component.";
 		}
@@ -265,7 +265,7 @@ class M
 				attributes.set('className', classes.join(" "));
 			
 			selectorCache[selector] = function(attrs : DynamicAccess<Dynamic>, children) {
-				var hasAttrs = false, childList : Array<Vnode> = null, text : String = null;
+				var hasAttrs = false, childList : Array<Vnode<Dynamic>> = null, text : String = null;
 				
 				var className = if (attrs.exists("className") && attrs.get("className") != null && cast(attrs.get("className"), String).length > 0)
 					attrs.get("className")
@@ -299,7 +299,7 @@ class M
 					break;
 				}
 				
-				var childArray : Array<Vnode> = Std.is(children, Array) ? cast children : null;
+				var childArray : Array<Vnode<Dynamic>> = Std.is(children, Array) ? cast children : null;
 				
 				//trace("selectorCache[" + selector + "] childArray:"); trace(childArray);
 				
@@ -358,7 +358,7 @@ class M
 		}
 	}
 	
-	public static function trust(html : String) : Vnode {
+	public static function trust(html : String) : Vnode<String> {
 		// Implementation differs from native Mithril, html is stored in state instead
 		// because of static platform types.
 		return {
@@ -373,7 +373,7 @@ class M
 		}
 	}
 	
-	static var selectorCache = new Map<String, DynamicAccess<Dynamic> -> Dynamic -> Vnode>();
+	static var selectorCache = new Map<String, DynamicAccess<Dynamic> -> Dynamic -> Vnode<Dynamic>>();
 	
 	static function vnode(tag : Dynamic, key, attrs0, children : Dynamic, text, dom) : Dynamic {
 		return { 
