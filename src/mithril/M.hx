@@ -38,7 +38,7 @@ typedef Component2<T> = {
 typedef Component = Either<Component1, Component2<Dynamic>>;
 
 typedef RouteResolver<T : Component> = {
-	@:optional function onmatch(args : DynamicAccess<String>, requestedPath : String) : Either<T, Promise<T>>;
+	@:optional function onmatch(args : DynamicAccess<String>, requestedPath : String, route : String) : Null<Either<T, Promise<T>>>;
 	@:optional function render(vnode : Null<Vnode<Dynamic>>) : Vnodes;
 }
 
