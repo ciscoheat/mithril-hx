@@ -7,6 +7,7 @@ using StringTools;
 /**
  * Haxe port of https://github.com/StephanHoyer/mithril-node-render
  */
+@:nullSafety(Strict)
 class MithrilNodeRender
 {
 	static var voidTags = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 
@@ -15,7 +16,6 @@ class MithrilNodeRender
 
 	var indent : String;
 	var newLine : String;
-	var indentMode : Bool;
 
 	public function new(?indent : String, ?newLine : String) {
 		this.indent = indent == null ? "" : indent;
@@ -63,12 +63,13 @@ class MithrilNodeRender
 		}
 
 		var tag : String = Std.string(el.tag);
+		var attrs = el.attrs == null ? "" : createAttrString(el.attrs);
 
-		if(children.length == 0 && voidTags.indexOf(tag.toLowerCase()) >= 0) {
-			return '<${tag}${createAttrString(el.attrs)}>';
+		if(children != null && children.length == 0 && voidTags.indexOf(tag.toLowerCase()) >= 0) {
+			return '<${tag}$attrs>';
 		}
 		
-		return '<${tag}${createAttrString(el.attrs)}>$children</${tag}>';
+		return '<${tag}$attrs>$children</${tag}>';
 	}
 
 	function createAttrString(attrs : Dynamic) {
@@ -76,7 +77,7 @@ class MithrilNodeRender
 		
 		return Reflect.fields(attrs).map(function(name) {
 			// Needed a typehint to Dynamic for java to treat most values as not strings.
-			var value : Dynamic = Reflect.field(attrs, name);
+			var value : Null<Dynamic> = Reflect.field(attrs, name);
 			if (value == null) return ' ' + (name == 'className' ? 'class' : name);
 			
 			//trace("------"); trace(name); trace(value); 
@@ -91,11 +92,11 @@ class MithrilNodeRender
 				
 				return ' style="' + Reflect.fields(styles).map(function(property) {
 					// Same here for java as above
-					var value : Dynamic = Reflect.field(styles, property);
-					return camelToDash(property).toLowerCase() + ':' + escape(value);
+					var value : Null<Dynamic> = Reflect.field(styles, property);
+					return camelToDash(property).toLowerCase() + ':' + escape(value == null ? "" : value);
 				}).join(';') + '"';
 			}
-			return ' ' + (name == 'className' ? 'class' : name) + '="' + escape(value) + '"';
+			return ' ' + (name == 'className' ? 'class' : name) + '="' + escape(value == null ? "" : value) + '"';
 		}).join('');
 	}
 
