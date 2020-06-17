@@ -159,6 +159,7 @@ extern class M
 		// Hacking time! For patching window.m and the Node module.
 		// Pass a property of window with the same value as the @:native metadata
 		// to the inline function. It will be replaced with the var name.
+		#if (haxe_ver < 4.0)
 		untyped __js__("try {");
 		_patch(untyped Browser.window.m);
 		untyped __js__("} catch(_) {}");
@@ -167,6 +168,16 @@ extern class M
 		untyped __js__('global.m = require("mithril")');
 		_patch(untyped __js__('global.m'));
 		untyped __js__("} catch(_) {}");
+		#else
+		js.Syntax.code("try {");
+		_patch(untyped Browser.window.m);
+		js.Syntax.code("} catch(_) {}");
+		// Node patch
+		js.Syntax.code("try {");
+		js.Syntax.code('global.m = require("mithril")');
+		_patch(js.Syntax.code('global.m'));
+		js.Syntax.code("} catch(_) {}");
+		#end
 	}
 
 	@:noCompletion public static inline function _patch(__varName : Dynamic) : Void {
@@ -175,6 +186,7 @@ extern class M
 		// and converts List to Array so Lambda.map can be used conveniently.
 		//
 		// if (typeof module !== 'undefined' && module.exports) m.request = function(args, extra) { return new Promise(function(res, rej) {}); };
+		#if (haxe_ver < 4.0)
 		untyped __js__("(function(m) {
 			if (m.m) return;
 			m.m = function() {
@@ -187,6 +199,20 @@ extern class M
 				return m.apply(this, arguments);
 			}
 		})")(__varName);
+		#else
+		js.Syntax.code("(function(m) {
+			if (m.m) return;
+			m.m = function() {
+				try { 
+					for(var i=0; i < arguments.length; ++i) if(arguments[i] instanceof List) {
+						var list = arguments[i].h; arguments[i] = [];
+						while(list != null) { arguments[i].push(l[0]); list = l[1]; }
+					}
+				} catch(e) {}
+				return m.apply(this, arguments);
+			}
+		})")(__varName);
+		#end
 	}
 }
 
