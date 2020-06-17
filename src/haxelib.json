@@ -4,7 +4,7 @@
   "url" : "https://github.com/ciscoheat/mithril-hx",
   "license": "MIT",
   "tags": ["js", "mvc", "web"],
-  "releasenote": "Signature change in RouteResolver.onmatch",
-  "version": "2.2.0",
+  "releasenote": "Fixed javascript code injection deprecation notice.",
+  "version": "2.2.1",
   "contributors": ["ciscoheat"]
 }

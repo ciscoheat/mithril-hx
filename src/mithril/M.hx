@@ -151,7 +151,11 @@ extern class M
 	public static function fragment(attrs : {}, children : Array<Dynamic>) : Vnode<Dynamic>;
 
 	public static function redraw() : Void;
+	#if (haxe_ver < 4.0)
 	public static inline function redrawSync() : Void { return untyped __js__("m.redraw.sync()"); }
+	#else
+	public static inline function redrawSync() : Void { js.Syntax.code("m.redraw.sync()"); }
+	#end
 	
 	///// Haxe specific stuff /////
 

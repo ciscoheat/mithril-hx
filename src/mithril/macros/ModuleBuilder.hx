@@ -78,12 +78,15 @@ class ModuleBuilder
 	private static function injectCorrectThisReference(methodName : String, f : Function) {
 		switch(f.expr.expr) {
 			case EBlock(exprs):
+				#if (haxe_ver >= 4.0)
+				var jsExpr = {expr: EConst(CString('if(arguments.length > 0 && arguments[0].tag != this) return arguments[0].tag.${methodName}.apply(arguments[0].tag, arguments)', SingleQuotes)), pos: Context.currentPos() };
+				#end
 				exprs.unshift(macro
 					#if (haxe_ver < 4.0)
 					// Needs to be untyped to avoid clashing with macros that modify return (particularly HaxeContracts)
 					untyped __js__('if(arguments.length > 0 && arguments[0].tag != this) return arguments[0].tag.$methodName.apply(arguments[0].tag, arguments)')
 					#else
-					js.Syntax.code('if(arguments.length > 0 && arguments[0].tag != this) return arguments[0].tag.$methodName.apply(arguments[0].tag, arguments)')
+					js.Syntax.code($jsExpr)
 					#end
 				);
 			case _:
