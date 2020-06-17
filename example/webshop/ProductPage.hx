@@ -1,5 +1,6 @@
 package webshop;
 
+import js.Syntax;
 import haxecontracts.*;
 import mithril.M;
 import webshop.models.*;
@@ -65,7 +66,7 @@ class ProductPage implements Mithril implements HaxeContracts
             m('div.row', [
                 m('div.col-xs-12.col-sm-12.col-md-7.col-lg-6', [
                     m("img[data-src='holder.js/100px450?auto=yes&random=yes']", {
-                        oncreate: function() untyped __js__("Holder.run()")
+                        oncreate: function() Syntax.code("Holder.run()")
                     }),
                     m('div.clearfix', {style: {"margin": "10px"}}),
                     m('div.row', [

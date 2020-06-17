@@ -2,6 +2,7 @@ package webshop.models;
 
 import js.lib.Promise;
 using StringTools;
+using Lambda;
 
 class Category
 {
@@ -26,10 +27,11 @@ class Category
         var delay = Std.random(100);
         if(Math.random() > 0.87) delay = Std.random(1000) + 1000;
 
-        var mapData = function(data : Array<Dynamic>) {
-            return data.map(function(d : Dynamic) {
-                var category = new Category(d);
-                category.products = d.products.map(function(p) return new Product(p, category));
+        function mapData(data : Array<Dynamic>) {
+            return data.map(function(d : haxe.DynamicAccess<Dynamic>) {
+                var category = new Category(cast d);
+                var products : Array<Dynamic> = d.get("products");
+                category.products = [for(p in products) new Product(p, category)];
                 return category;
             });
         };

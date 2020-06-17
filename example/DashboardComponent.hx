@@ -2,7 +2,7 @@
 import mithril.M;
 import ChainComponent;
 
-@:enum abstract CurrentApp(String) from String {
+enum abstract CurrentApp(String) from String to String {
 	var None = "";
 	var Todos = "todos";
 	var Chain = "chain";
@@ -59,7 +59,7 @@ class DashboardComponent implements Mithril
 
 	function clearData() {
 		todo.clear();
-		chainModel.clear();
+		chainModel.clearAll();
 	}
 
 	#if !server

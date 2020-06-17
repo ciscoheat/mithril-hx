@@ -38,7 +38,7 @@ class ChainModel extends IntMap<Bool>
 		save();
 	}	
 	
-	public function clear() {
+	public function clearAll() {
 		for(key in keys()) this.remove(key);
 		resetDate();
 		save();
