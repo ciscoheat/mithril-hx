@@ -8,11 +8,11 @@ Standard procedure: `haxelib install mithril` and then `-lib mithril` in your .h
 
 # How to use
 
-Mithril has a great introduction on its website and an astounding amount of documentation, so I'll only highlight what you need to get started with the Haxe version here.
+Mithril has a great introduction on its website and plenty of documentation, so I'll only highlight what you need to get started with the Haxe version here.
 
 ## Implement the Mithril interface
 
-Because of Javascript's dynamic nature compared to Haxe's strongly typed system, the balance between flexibility and compiler safety can be difficult. When using Mithril, you will create [components](http://mithril.js.org/components.html) that will be used together with the Mithril API. For these objects you should implement the `Mithril` interface. Here's an example of a Mithril component:
+When using Mithril, you will create [components](http://mithril.js.org/components.html) that will be used with the Mithril API. The recommended way to create a component is using a class that implements the `Mithril` interface. Here's an example of a Mithril component:
 
 ```haxe
 import mithril.M;
@@ -27,30 +27,32 @@ class TodoComponent implements Mithril
 
     // When implementing Mithril, the last m() expression 
     // or Array of m() is returned automatically.
-    public function view() {
+    public function view()
         m("div", [
             m("h1", "To do"),
-            m("table", todos.map(function(todo) {
+            m("table", [for(todo in todos)
                 m("tr", [
                     m("td", m("input[type=checkbox]", { 
-                        onclick: function(e) todo.done = e.target.checked,
+                        onclick: e -> todo.done = e.target.checked,
                         checked: todo.done
                     })),
                     m("td", todo.description)
-                ]);
-            }))
+                ])
+            ])
         ]);
-    }    
 }
 
+/**
+ * The model
+ */
 class Todo
 {
-    public var done : Bool = false;
+    public var done : Bool;
     public var description : String;
 
-    public function new(description, ?done) {
+    public function new(description, done = false) {
         this.description = description;
-        if(done != null) this.done = done;
+        this.done = done;
     }
 }
 
@@ -79,15 +81,15 @@ class Main
 - The `M.route` methods can now be called as in the Mithril syntax, `M.route.param` etc. To call `M.route` however, use `M.route.route`.
 - `M.withAttr` has been removed. Use an `e -> e.target` lambda function instead.
 
-## "this" is slightly different
-
-Because of the slight mismatch between Haxe classes and the classless Mithril structure, an important difference is that in [lifecycle methods](http://mithril.js.org/components.html#lifecycle-methods), the native javascript `this` points to `vnode.tag` instead of `vnode.state`. Otherwise it would have pointed to another object when inside instance methods.
-
-This is usually nothing you have to worry about if you're using Haxe classes only for your components and state. In that context, `this` works normally.
-
 ## When using Node.js
 
 If you're using Node.js, you can install and use Mithril from npm instead of the Haxe port (see below for server side examples). To do that, define `-D mithril-native`.
+
+## Side note: "this" is slightly different in native javascript
+
+Because of the slight mismatch between Haxe classes and the classless Mithril structure, in [lifecycle methods](http://mithril.js.org/components.html#lifecycle-methods), the native javascript `this` points to `vnode.tag` instead of `vnode.state`. Otherwise it would have pointed to another object when inside instance methods.
+
+This is usually nothing you have to worry about if you're using Haxe classes for your components and state. In that context, `this` works as expected.
 
 # Haxe examples
 
