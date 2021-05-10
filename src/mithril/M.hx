@@ -118,6 +118,8 @@ typedef JSONPOptions<T, T2> = {
 extern class M
 {
 	@:overload(function(selector : Mithril) : Vnodes {})
+	@:overload(function(selector : Mithril, attributes : Dynamic) : Vnodes {})
+	@:overload(function(selector : Mithril, attributes : Dynamic, children : Dynamic) : Vnodes {})
 	@:overload(function(selector : Either<String, Component>) : Vnodes {})
 	@:overload(function(selector : Either<String, Component>, attributes : Dynamic) : Vnodes {})
 	public static function m(selector : Either<String, Component>, attributes : Dynamic, children : Dynamic) : Vnodes;
