@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "express": "^4.14.1",
+    "express": "^4.17.3",
     "mithril": "^2.0.3"
   }
 }
